@@ -1,0 +1,33 @@
+# Configuration Supabase pour le développement local
+# Ce fichier est utilisé par Supabase CLI
+
+[project]
+# Votre project reference (trouvez-le dans Settings → API)
+# project_id = "your-project-ref"
+
+[api]
+# Port pour l'API locale
+port = 54321
+# Schéma par défaut
+schemas = ["public", "storage"]
+# Schémas supplémentaires
+extra_search_path = ["public", "extensions"]
+
+[db]
+# Port pour PostgreSQL local
+port = 54322
+
+[studio]
+# Port pour Supabase Studio local
+port = 54323
+# API URL
+api_url = "http://localhost:54321"
+
+[inbucket]
+# Port pour Inbucket (email testing)
+port = 54324
+
+[storage]
+# Configuration du storage
+file_size_limit = "50MiB"
+

@@ -1,8 +1,13 @@
-export interface Note {
+export interface Document {
   id: string
   user_id: string
   topic_slug: string
-  content: string
+  name: string
+  file_path: string
+  file_size: number | null
+  file_type: string | null
+  description: string | null
+  expires_at: string | null
   created_at: string
   updated_at: string
 }

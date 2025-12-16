@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { 
   Zap,
   CheckCircle2,
-  PenSquare,
+  FileText,
   Clock,
   Heart,
   BookOpen,
@@ -30,10 +30,10 @@ const features = [
     color: 'from-purple-500 to-pink-600'
   },
   {
-    icon: PenSquare,
-    title: 'Notes personnelles',
-    description: 'Gardez vos informations importantes à portée de main pour chaque topic',
-    color: 'from-green-500 to-emerald-600'
+    icon: FileText,
+    title: 'Documents & Pièces justificatives',
+    description: 'Stockez et organisez tous vos documents administratifs par topic',
+    color: 'from-indigo-500 to-purple-600'
   },
   {
     icon: Clock,
@@ -89,8 +89,8 @@ export default async function TopicsPage() {
                 </p>
                 <p className="text-zinc-600 leading-relaxed">
                   Chaque sujet est expliqué de manière claire et accessible, avec des checklists pratiques, 
-                  des FAQ détaillées et des ressources officielles. Personnalisez votre expérience avec des notes 
-                  et des rappels pour ne rien oublier.
+                  des FAQ détaillées et des ressources officielles. Stockez vos documents, créez des rappels 
+                  et sauvegardez vos ressources favorites pour une gestion complète de votre vie administrative.
                 </p>
               </div>
             </div>
@@ -152,9 +152,9 @@ export default async function TopicsPage() {
                 <div className="w-16 h-16 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
                   <span className="text-2xl font-bold text-blue-600">3</span>
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Personnalisez</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Organisez</h3>
                 <p className="text-sm text-zinc-600">
-                  Ajoutez vos notes, créez des rappels et sauvegardez vos ressources favorites
+                  Stockez vos documents, créez des rappels et sauvegardez vos ressources favorites
                 </p>
               </div>
             </div>

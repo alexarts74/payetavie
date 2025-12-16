@@ -7,17 +7,22 @@
 -- Supprimer les tables existantes si elles existent (optionnel, pour repartir de zéro)
 DROP TABLE IF EXISTS bookmarks CASCADE;
 DROP TABLE IF EXISTS reminders CASCADE;
-DROP TABLE IF EXISTS notes CASCADE;
+DROP TABLE IF EXISTS documents CASCADE;
 DROP TABLE IF EXISTS topics CASCADE;
 
 -- ============================================
--- Table des notes personnelles
+-- Table des documents et pièces justificatives
 -- ============================================
-CREATE TABLE notes (
+CREATE TABLE documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   topic_slug TEXT NOT NULL,
-  content TEXT NOT NULL,
+  name TEXT NOT NULL,
+  file_path TEXT NOT NULL,
+  file_size BIGINT,
+  file_type TEXT,
+  description TEXT,
+  expires_at DATE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -52,7 +57,8 @@ CREATE TABLE bookmarks (
 -- ============================================
 -- Index pour améliorer les performances
 -- ============================================
-CREATE INDEX notes_user_topic_idx ON notes(user_id, topic_slug);
+CREATE INDEX documents_user_topic_idx ON documents(user_id, topic_slug);
+CREATE INDEX documents_expires_at_idx ON documents(expires_at) WHERE expires_at IS NOT NULL;
 CREATE INDEX reminders_user_topic_idx ON reminders(user_id, topic_slug);
 CREATE INDEX bookmarks_user_topic_idx ON bookmarks(user_id, topic_slug);
 CREATE INDEX reminders_due_date_idx ON reminders(due_date) WHERE due_date IS NOT NULL;
@@ -60,27 +66,27 @@ CREATE INDEX reminders_due_date_idx ON reminders(due_date) WHERE due_date IS NOT
 -- ============================================
 -- Row Level Security (RLS)
 -- ============================================
-ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reminders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
--- Politiques RLS pour les notes
+-- Politiques RLS pour les documents
 -- ============================================
-CREATE POLICY "Users can view their own notes"
-  ON notes FOR SELECT
+CREATE POLICY "Users can view their own documents"
+  ON documents FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can insert their own notes"
-  ON notes FOR INSERT
+CREATE POLICY "Users can insert their own documents"
+  ON documents FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update their own notes"
-  ON notes FOR UPDATE
+CREATE POLICY "Users can update their own documents"
+  ON documents FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can delete their own notes"
-  ON notes FOR DELETE
+CREATE POLICY "Users can delete their own documents"
+  ON documents FOR DELETE
   USING (auth.uid() = user_id);
 
 -- ============================================
@@ -131,8 +137,8 @@ $$ language 'plpgsql';
 -- ============================================
 -- Triggers pour mettre à jour updated_at
 -- ============================================
-CREATE TRIGGER update_notes_updated_at 
-  BEFORE UPDATE ON notes
+CREATE TRIGGER update_documents_updated_at 
+  BEFORE UPDATE ON documents
   FOR EACH ROW 
   EXECUTE FUNCTION update_updated_at_column();
 
@@ -147,4 +153,4 @@ CREATE TRIGGER update_reminders_updated_at
 -- Vous pouvez exécuter cette requête pour vérifier que tout est bien créé :
 -- SELECT table_name FROM information_schema.tables 
 -- WHERE table_schema = 'public' 
--- AND table_name IN ('notes', 'reminders', 'bookmarks');
+-- AND table_name IN ('documents', 'reminders', 'bookmarks');

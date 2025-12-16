@@ -1,12 +1,14 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getNotes } from '@/app/actions/notes'
 import { getReminders } from '@/app/actions/reminders'
 import { getBookmarks } from '@/app/actions/bookmarks'
-import NotesSection from '@/components/NotesSection'
+import { getDocuments } from '@/app/actions/documents'
 import RemindersSection from '@/components/RemindersSection'
 import BookmarksSection from '@/components/BookmarksSection'
-import { Zap, CheckCircle2, HelpCircle } from 'lucide-react'
+import DocumentsSection from '@/components/DocumentsSection'
+import FAQModal from '@/components/FAQModal'
+import { getPredefinedReminders } from '@/lib/predefined-reminders'
+import { Zap, CheckCircle2 } from 'lucide-react'
 
 export default async function ImpotsPage() {
   const supabase = await createClient()
@@ -19,9 +21,10 @@ export default async function ImpotsPage() {
   }
 
   const topicSlug = 'impots'
-  const { data: notes } = await getNotes(topicSlug)
   const { data: reminders } = await getReminders(topicSlug)
   const { data: bookmarks } = await getBookmarks(topicSlug)
+  const { data: documents } = await getDocuments(topicSlug)
+  const predefinedReminders = getPredefinedReminders(topicSlug)
 
   const topic = {
     title: 'Impôts',
@@ -93,71 +96,40 @@ export default async function ImpotsPage() {
           </div>
         </div>
 
-        {/* Notes Section */}
-        <div className="flex justify-around">
-          <div className="mb-8">
-            <NotesSection topicSlug={topicSlug} initialNotes={notes} />
-          </div>
-
-          {/* Reminders Section */}
-          <div className="mb-8">
-            <RemindersSection topicSlug={topicSlug} initialReminders={reminders} />
-          </div>
+        {/* Section Rappels - En premier car plus important */}
+        <div className="mb-8">
+          <RemindersSection 
+            topicSlug={topicSlug} 
+            initialReminders={reminders}
+            predefinedReminders={predefinedReminders}
+          />
         </div>
 
-        {/* Layout en 2 colonnes pour Checklist et FAQ */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* Checklist - Colonne gauche */}
-          <div className="relative">
-            <div className="sticky top-8">
-              <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md">
-                    <CheckCircle2 className="w-5 h-5 text-white" />
-                  </div>
-                  <h2 className="text-2xl font-semibold text-zinc-900">Checklist</h2>
-                </div>
-                <div className="space-y-2">
-                  {topic.checklist.map((item, index) => (
-                    <div key={index} className="group flex items-start gap-3 p-3 rounded-[1.25rem] hover:bg-blue-50 transition-all duration-300">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                        <span className="text-white font-semibold text-xs">{index + 1}</span>
-                      </div>
-                      <p className="text-zinc-600 text-sm leading-relaxed flex-1 pt-1.5 group-hover:text-zinc-900 transition-colors">
-                        {item}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Section Documents */}
+        <div className="mb-8">
+          <DocumentsSection topicSlug={topicSlug} initialDocuments={documents} />
+        </div>
 
-          {/* FAQ - Colonne droite */}
-          <div>
-            <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-md">
-                  <HelpCircle className="w-5 h-5 text-white" />
-                </div>
-                <h2 className="text-2xl font-semibold text-zinc-900">FAQ</h2>
+        {/* Checklist */}
+        <div className="mb-8">
+          <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md">
+                <CheckCircle2 className="w-5 h-5 text-white" />
               </div>
-              <div className="space-y-3">
-                {topic.faq.map((item, index) => (
-                  <div
-                    key={index}
-                    className="group relative p-4 rounded-[1.25rem] border border-blue-100 hover:border-blue-300 bg-white hover:bg-blue-50 transition-all duration-300"
-                  >
-                    <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-l-[1.25rem] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <h3 className="text-base font-semibold text-zinc-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {item.question}
-                    </h3>
-                    <p className="text-zinc-600 leading-relaxed text-sm">
-                      {item.answer}
-                    </p>
+              <h2 className="text-2xl font-semibold text-zinc-900">Checklist</h2>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {topic.checklist.map((item, index) => (
+                <div key={index} className="group flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-all duration-300 border border-blue-50">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                    <span className="text-white font-semibold text-xs">{index + 1}</span>
                   </div>
-                ))}
-              </div>
+                  <p className="text-zinc-600 text-sm leading-relaxed flex-1 pt-0.5 group-hover:text-zinc-900 transition-colors">
+                    {item}
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -169,6 +141,9 @@ export default async function ImpotsPage() {
           resources={topic.resources}
         />
       </div>
+
+      {/* Modal FAQ */}
+      <FAQModal faq={topic.faq} />
     </div>
   )
 }
