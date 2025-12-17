@@ -8,7 +8,8 @@ export async function uploadDocument(
   file: File,
   name: string,
   description?: string,
-  expiresAt?: string
+  expiresAt?: string,
+  employerName?: string
 ) {
   console.log('📤 [UPLOAD] Début de l\'upload')
   console.log('📤 [UPLOAD] Paramètres:', { topicSlug, fileName: file.name, fileSize: file.size, fileType: file.type, name })
@@ -82,6 +83,7 @@ export async function uploadDocument(
     file_type: file.type,
     description: description || null,
     expires_at: expiresAt || null,
+    employer_name: employerName || null,
   }
   console.log('📤 [UPLOAD] Données à insérer en DB:', insertData)
 
@@ -207,6 +209,7 @@ export async function updateDocument(
     name?: string
     description?: string
     expiresAt?: string | null
+    employerName?: string | null
   }
 ) {
   const supabase = await createClient()
@@ -222,6 +225,7 @@ export async function updateDocument(
   if (updates.name !== undefined) updateData.name = updates.name
   if (updates.description !== undefined) updateData.description = updates.description
   if (updates.expiresAt !== undefined) updateData.expires_at = updates.expiresAt
+  if (updates.employerName !== undefined) updateData.employer_name = updates.employerName
 
   const { data, error } = await supabase
     .from('documents')

@@ -109,27 +109,27 @@ export default async function LogementPage() {
 
         {/* Checklist */}
         <div className="mb-8">
-          <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md">
+              <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-md">
                 <CheckCircle2 className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-2xl font-semibold text-zinc-900">Checklist</h2>
-            </div>
+                  </div>
+                  <h2 className="text-2xl font-semibold text-zinc-900">Checklist</h2>
+                </div>
             <div className="grid sm:grid-cols-2 gap-3">
-              {topic.checklist.map((item, index) => (
+                  {topic.checklist.map((item, index) => (
                 <div key={index} className="group flex items-start gap-3 p-3 rounded-xl hover:bg-blue-50 transition-all duration-300 border border-blue-50">
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                    <span className="text-white font-semibold text-xs">{index + 1}</span>
-                  </div>
+                        <span className="text-white font-semibold text-xs">{index + 1}</span>
+                      </div>
                   <p className="text-zinc-600 text-sm leading-relaxed flex-1 pt-0.5 group-hover:text-zinc-900 transition-colors">
-                    {item}
-                  </p>
-                </div>
-              ))}
+                        {item}
+                      </p>
+                    </div>
+                  ))}
+              </div>
             </div>
           </div>
-        </div>
 
         {/* Resources Section */}
         <BookmarksSection

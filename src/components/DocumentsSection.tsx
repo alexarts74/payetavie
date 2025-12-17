@@ -5,50 +5,210 @@ import { uploadDocument, deleteDocument, updateDocument } from '@/app/actions/do
 import type { Document } from '@/types'
 import { FileText, Upload, X, Download, Calendar, Edit2, Trash2, Check, X as XIcon } from 'lucide-react'
 
+interface UploadModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onUpload: (file: File, categoryName: string) => Promise<void>
+  isUploading: boolean
+  title: string
+  categoryLabel: string
+  categoryPlaceholder: string
+}
+
 interface DocumentsSectionProps {
   topicSlug: string
   initialDocuments: (Document & { public_url: string })[]
+}
+
+function UploadModal({ isOpen, onClose, onUpload, isUploading, title, categoryLabel, categoryPlaceholder }: UploadModalProps) {
+  const [categoryName, setCategoryName] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  if (!isOpen) return null
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedFile(file)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!categoryName.trim()) {
+      alert(`Merci de renseigner ${categoryLabel.toLowerCase()}.`)
+      return
+    }
+    if (!selectedFile) {
+      alert('Merci de sélectionner un fichier.')
+      return
+    }
+    await onUpload(selectedFile, categoryName.trim())
+    setCategoryName('')
+    setSelectedFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
+  const handleClose = () => {
+    setCategoryName('')
+    setSelectedFile(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-[2rem] p-6 w-full max-w-md mx-4 shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-semibold text-zinc-900">{title}</h3>
+          <button
+            onClick={handleClose}
+            className="p-2 rounded-lg hover:bg-zinc-100 text-zinc-600 transition-all"
+            disabled={isUploading}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">
+              {categoryLabel} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={categoryName}
+              onChange={(e) => setCategoryName(e.target.value)}
+              placeholder={categoryPlaceholder}
+              className="w-full p-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+              disabled={isUploading}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">
+              Fichier <span className="text-red-500">*</span>
+            </label>
+            <label className="block w-full p-4 rounded-xl border-2 border-dashed border-zinc-300 hover:border-indigo-400 transition-colors cursor-pointer">
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileSelect}
+                className="hidden"
+                disabled={isUploading}
+                accept=".pdf,.png,.jpg,.jpeg"
+              />
+              <div className="text-center">
+                {selectedFile ? (
+                  <div className="flex items-center justify-center gap-2 text-indigo-600">
+                    <FileText className="w-5 h-5" />
+                    <span className="text-sm font-medium truncate max-w-[200px]">{selectedFile.name}</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-zinc-500">
+                    <Upload className="w-8 h-8" />
+                    <span className="text-sm">Cliquez pour sélectionner un fichier</span>
+                    <span className="text-xs">PDF, PNG, JPG</span>
+                  </div>
+                )}
+              </div>
+            </label>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="flex-1 px-4 py-3 rounded-xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 transition-all"
+              disabled={isUploading}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-medium hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isUploading || !categoryName.trim() || !selectedFile}
+            >
+              {isUploading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Upload...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Ajouter
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 export default function DocumentsSection({ topicSlug, initialDocuments }: DocumentsSectionProps) {
   const [documents, setDocuments] = useState<(Document & { public_url: string })[]>(initialDocuments)
   const [isUploading, setIsUploading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ name: '', description: '', expiresAt: '' })
+  const [editForm, setEditForm] = useState({ name: '', description: '', expiresAt: '', employerName: '' })
+  const isPayslipTopic = topicSlug === 'fiches-de-paie'
+  const needsCategory = isPayslipTopic
+  const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all')
+  const [showUploadModal, setShowUploadModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('📁 [CLIENT] Fichier sélectionné')
     const file = e.target.files?.[0]
-    console.log('📁 [CLIENT] Fichier:', file ? { name: file.name, size: file.size, type: file.type } : 'null')
-    
-    if (!file) {
-      console.log('📁 [CLIENT] ❌ Aucun fichier sélectionné')
+    if (!file) return
+
+    if (needsCategory) {
+      setShowUploadModal(true)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
       return
     }
 
-    console.log('📁 [CLIENT] Début upload, topicSlug:', topicSlug)
     setIsUploading(true)
-    
     try {
       const result = await uploadDocument(topicSlug, file, file.name)
-      console.log('📁 [CLIENT] Résultat upload:', result)
-      
       if (result.data) {
-        console.log('📁 [CLIENT] ✅ Document ajouté avec succès')
         setDocuments([result.data, ...documents])
       } else if (result.error) {
-        console.error('📁 [CLIENT] ❌ Erreur upload:', result.error)
         alert(`Erreur lors de l'upload: ${result.error}`)
       }
     } catch (error) {
-      console.error('📁 [CLIENT] ❌ Exception lors de l\'upload:', error)
       alert(`Erreur: ${error}`)
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
+    }
+  }
+
+  const handleUploadFromModal = async (file: File, categoryName: string) => {
+    setIsUploading(true)
+    try {
+      const result = await uploadDocument(topicSlug, file, file.name, undefined, undefined, categoryName)
+      if (result.data) {
+        setDocuments([result.data, ...documents])
+        setShowUploadModal(false)
+      } else if (result.error) {
+        alert(`Erreur lors de l'upload: ${result.error}`)
+      }
+    } catch (error) {
+      alert(`Erreur: ${error}`)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -66,7 +226,8 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
     setEditForm({
       name: doc.name,
       description: doc.description || '',
-      expiresAt: doc.expires_at ? doc.expires_at.split('T')[0] : ''
+      expiresAt: doc.expires_at ? doc.expires_at.split('T')[0] : '',
+      employerName: (doc as any).employer_name || ''
     })
   }
 
@@ -74,19 +235,48 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
     const result = await updateDocument(documentId, {
       name: editForm.name,
       description: editForm.description || undefined,
-      expiresAt: editForm.expiresAt || null
+      expiresAt: editForm.expiresAt || null,
+      employerName: needsCategory ? (editForm.employerName || null) : undefined
     })
 
     if (result.data) {
       setDocuments(documents.map(d => d.id === documentId ? { ...d, ...result.data } : d))
       setEditingId(null)
-      setEditForm({ name: '', description: '', expiresAt: '' })
+      setEditForm({ name: '', description: '', expiresAt: '', employerName: '' })
     }
   }
 
   const isExpired = (expiresAt: string | null) => {
     if (!expiresAt) return false
     return new Date(expiresAt) < new Date()
+  }
+
+  const categories = needsCategory
+    ? Array.from(new Set(documents.map(d => (d as any).employer_name).filter(Boolean))) as string[]
+    : []
+
+  const filteredDocuments = needsCategory && selectedCategory !== 'all'
+    ? documents.filter(d => (d as any).employer_name === selectedCategory)
+    : documents
+
+  const getModalConfig = () => {
+    if (isPayslipTopic) {
+      return {
+        title: 'Ajouter une fiche de paie',
+        categoryLabel: 'Nom de l\'entreprise',
+        categoryPlaceholder: 'Ex: Acme Corp'
+      }
+    }
+    return {
+      title: 'Ajouter un document',
+      categoryLabel: 'Catégorie',
+      categoryPlaceholder: 'Catégorie'
+    }
+  }
+
+  const getFilterLabel = () => {
+    if (isPayslipTopic) return 'Filtrer par entreprise'
+    return 'Filtrer'
   }
 
   const formatFileSize = (bytes: number | null) => {
@@ -112,9 +302,15 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
           </div>
           <h2 className="text-2xl font-semibold text-zinc-900">Documents & Pièces justificatives</h2>
         </div>
-        <label className="px-4 py-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium hover:shadow-lg hover:scale-105 transition-all cursor-pointer flex items-center gap-2">
+        <button
+          onClick={() => needsCategory ? setShowUploadModal(true) : fileInputRef.current?.click()}
+          className="px-4 py-2 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-sm font-medium hover:shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+          disabled={isUploading}
+        >
           <Upload className="w-4 h-4" />
           {isUploading ? 'Upload...' : 'Ajouter'}
+        </button>
+        {!needsCategory && (
           <input
             ref={fileInputRef}
             type="file"
@@ -122,16 +318,48 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
             className="hidden"
             disabled={isUploading}
           />
-        </label>
+        )}
       </div>
 
+      {needsCategory && categories.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="flex items-center gap-2 text-xs text-zinc-600">
+            <span className="font-medium">{getFilterLabel()} :</span>
+            <button
+              onClick={() => setSelectedCategory('all')}
+              className={`px-2.5 py-1 rounded-full border text-xs transition-all ${
+                selectedCategory === 'all'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50'
+              }`}
+            >
+              Toutes
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-2.5 py-1 rounded-full border text-xs transition-all max-w-[120px] truncate ${
+                  selectedCategory === cat
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50'
+                }`}
+                title={cat}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3">
-        {documents.length === 0 ? (
+        {filteredDocuments.length === 0 ? (
           <p className="text-zinc-500 text-sm text-center py-8">
             Aucun document pour le moment. Ajoutez votre premier document !
           </p>
         ) : (
-          documents.map((doc) => {
+          filteredDocuments.map((doc) => {
             const expired = isExpired(doc.expires_at)
             return (
               <div
@@ -152,6 +380,15 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                       className="w-full p-2 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       autoFocus
                     />
+                    {needsCategory && (
+                      <input
+                        type="text"
+                        value={editForm.employerName}
+                        onChange={(e) => setEditForm({ ...editForm, employerName: e.target.value })}
+                        placeholder={isPayslipTopic ? "Nom de l'entreprise" : "Type d'aide / Organisme"}
+                        className="w-full p-2 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    )}
                     <textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
@@ -177,7 +414,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                       <button
                         onClick={() => {
                           setEditingId(null)
-                          setEditForm({ name: '', description: '', expiresAt: '' })
+                          setEditForm({ name: '', description: '', expiresAt: '', employerName: '' })
                         }}
                         className="px-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-700 text-xs font-medium hover:bg-zinc-200 transition-all flex items-center gap-1"
                       >
@@ -196,6 +433,11 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                         <h3 className="text-sm font-semibold text-zinc-900 mb-1 truncate">
                           {doc.name}
                         </h3>
+                        {needsCategory && (doc as any).employer_name && (
+                          <p className="text-[11px] text-indigo-700 font-medium mb-1">
+                            {(doc as any).employer_name}
+                          </p>
+                        )}
                         {doc.description && (
                           <p className="text-xs text-zinc-600 mb-2">{doc.description}</p>
                         )}
@@ -246,6 +488,16 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
           })
         )}
       </div>
+
+      {needsCategory && (
+        <UploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUpload={handleUploadFromModal}
+          isUploading={isUploading}
+          {...getModalConfig()}
+        />
+      )}
     </div>
   )
 }

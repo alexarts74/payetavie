@@ -8,6 +8,7 @@ export interface Document {
   file_type: string | null
   description: string | null
   expires_at: string | null
+  employer_name: string | null
   created_at: string
   updated_at: string
 }

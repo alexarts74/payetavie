@@ -13,6 +13,10 @@ import {
   Shield,
 } from 'lucide-react'
 
+type NavLinksProps = {
+  onNavigate?: () => void
+}
+
 const topics = [
   { slug: 'impots', title: 'Impôts', icon: FileText },
   { slug: 'urssaf', title: 'URSSAF / Cotisations sociales', icon: Briefcase },
@@ -31,7 +35,7 @@ const topicGroups = [
   { name: 'Vie pratique', topics: ['logement', 'banque', 'assurances'] },
 ]
 
-export default function NavLinks() {
+export default function NavLinks({ onNavigate }: NavLinksProps) {
   const pathname = usePathname()
 
   return (
@@ -45,6 +49,7 @@ export default function NavLinks() {
           <div key={topic.slug}>
             <Link
               href={`/topics/${topic.slug}`}
+              onClick={onNavigate}
               className={`flex items-center gap-3 px-4 py-4 rounded-xl transition-all group relative ${
                 isActive
                   ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-sm'

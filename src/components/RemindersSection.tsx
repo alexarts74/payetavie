@@ -129,14 +129,14 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                           })}
                         </span>
                       </div>
-                    </div>
-                    <button
+      </div>
+            <button
                       onClick={() => handleActivatePredefined(predefined)}
                       className="px-2.5 py-1 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-medium hover:shadow-md transition-all flex items-center gap-1 flex-shrink-0"
-                    >
+            >
                       <Plus className="w-3 h-3" />
                       Activer
-                    </button>
+            </button>
                   </div>
                 </div>
               )

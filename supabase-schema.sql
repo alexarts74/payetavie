@@ -23,6 +23,7 @@ CREATE TABLE documents (
   file_type TEXT,
   description TEXT,
   expires_at DATE,
+  employer_name TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
