@@ -10,7 +10,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "PayeTaVie - Assistant administratif personnel",
-  description: "Votre assistant pour comprendre et gérer tous les aspects de la vie adulte : impôts, URSSAF, mutuelle, fiches de paie, aides, logement, banque, assurances",
+  description: "Votre assistant pour comprendre et gérer tous les aspects de la vie adulte : impôts, URSSAF, mutuelle, fiches de paie, aides, logement, assurances",
 };
 
 export default function RootLayout({

@@ -298,6 +298,67 @@ export function getPredefinedReminders(topicSlug: string): PredefinedReminder[] 
       month: monthlyDate.getMonth() + 1,
       day: monthlyDate.getDate()
     })
+  } else if (topicSlug === 'logement') {
+    // Rappels Logement (2 rappels essentiels)
+
+    // 1) Renouvellement assurance habitation (annuel)
+    const assuranceDate = new Date(currentYear, 0, 15) // 15 janvier
+    if (assuranceDate < currentDate) {
+      assuranceDate.setFullYear(currentYear + 1)
+    }
+    reminders.push({
+      id: 'logement-renouvellement-assurance',
+      title: 'Renouveler votre assurance habitation',
+      description: 'Vérifiez la date d\'expiration de votre assurance habitation et renouvelez-la si nécessaire. L\'assurance habitation est obligatoire pour tous les locataires.',
+      dueDate: formatDate(assuranceDate),
+      month: 1,
+      day: 15
+    })
+
+    // 2) Vérification et régularisation des charges (annuel)
+    const chargesDate = new Date(currentYear, 11, 1) // 1er décembre
+    if (chargesDate < currentDate) {
+      chargesDate.setFullYear(currentYear + 1)
+    }
+    reminders.push({
+      id: 'logement-verification-charges',
+      title: 'Vérifier et régulariser les charges',
+      description: 'Vérifiez la régularisation annuelle des charges (eau, électricité, charges de copropriété) avec votre propriétaire ou votre syndic.',
+      dueDate: formatDate(chargesDate),
+      month: 12,
+      day: 1
+    })
+  } else if (topicSlug === 'assurances') {
+    // Rappels Assurances (2 rappels essentiels)
+
+    // 1) Comparer les offres avant renouvellement (1 mois avant échéance typique)
+    // La plupart des assurances se renouvellent en janvier, donc on met en décembre
+    const compareDate = new Date(currentYear, 11, 1) // 1er décembre
+    if (compareDate < currentDate) {
+      compareDate.setFullYear(currentYear + 1)
+    }
+    reminders.push({
+      id: 'assurances-comparer-offres',
+      title: 'Comparer les offres d\'assurance avant renouvellement',
+      description: 'Avant le renouvellement de vos assurances, comparez les offres du marché, négociez avec votre assureur actuel ou changez si vous trouvez mieux. La plupart des contrats se renouvellent en janvier.',
+      dueDate: formatDate(compareDate),
+      month: 12,
+      day: 1
+    })
+
+    // 2) Vérifier les garanties et faire le point (annuel)
+    const reviewDate = new Date(currentYear, 5, 1) // 1er juillet (mi-année)
+    if (reviewDate < currentDate) {
+      reviewDate.setFullYear(currentYear + 1)
+    }
+    reminders.push({
+      id: 'assurances-verifier-garanties',
+      title: 'Faire le point sur vos assurances et garanties',
+      description: 'Vérifiez que vos garanties (auto, habitation, santé, etc.) correspondent toujours à vos besoins. Vérifiez les franchises, les plafonds et les exclusions.',
+      dueDate: formatDate(reviewDate),
+      month: 7,
+      day: 1
+    })
   }
 
   return reminders

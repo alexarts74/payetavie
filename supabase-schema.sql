@@ -24,6 +24,7 @@ CREATE TABLE documents (
   description TEXT,
   expires_at DATE,
   employer_name TEXT,
+  document_type TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -60,6 +61,7 @@ CREATE TABLE bookmarks (
 -- ============================================
 CREATE INDEX documents_user_topic_idx ON documents(user_id, topic_slug);
 CREATE INDEX documents_expires_at_idx ON documents(expires_at) WHERE expires_at IS NOT NULL;
+CREATE INDEX documents_type_idx ON documents(document_type) WHERE document_type IS NOT NULL;
 CREATE INDEX reminders_user_topic_idx ON reminders(user_id, topic_slug);
 CREATE INDEX bookmarks_user_topic_idx ON bookmarks(user_id, topic_slug);
 CREATE INDEX reminders_due_date_idx ON reminders(due_date) WHERE due_date IS NOT NULL;

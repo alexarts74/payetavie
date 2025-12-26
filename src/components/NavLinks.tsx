@@ -9,7 +9,6 @@ import {
   DollarSign, 
   HandHeart, 
   Home, 
-  Building2, 
   Shield,
 } from 'lucide-react'
 
@@ -24,7 +23,6 @@ const topics = [
   { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
   { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
   { slug: 'logement', title: 'Logement', icon: Home },
-  { slug: 'banque', title: 'Banque / Finances', icon: Building2 },
   { slug: 'assurances', title: 'Assurances', icon: Shield },
 ]
 
@@ -32,7 +30,7 @@ const topics = [
 const topicGroups = [
   { name: 'Administratif', topics: ['impots', 'urssaf'] },
   { name: 'Santé & Social', topics: ['mutuelle', 'fiches-de-paie', 'caf'] },
-  { name: 'Vie pratique', topics: ['logement', 'banque', 'assurances'] },
+  { name: 'Vie pratique', topics: ['logement', 'assurances'] },
 ]
 
 export default function NavLinks({ onNavigate }: NavLinksProps) {

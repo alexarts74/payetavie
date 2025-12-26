@@ -19,7 +19,6 @@ export default async function Home() {
     { name: 'Fiches de paie', icon: '💰' },
     { name: 'CAF', icon: '🤝' },
     { name: 'Logement', icon: '🏠' },
-    { name: 'Banque', icon: '🏦' },
     { name: 'Assurances', icon: '🛡️' },
   ]
 

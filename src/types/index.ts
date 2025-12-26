@@ -9,6 +9,7 @@ export interface Document {
   description: string | null
   expires_at: string | null
   employer_name: string | null
+  document_type: string | null
   created_at: string
   updated_at: string
 }

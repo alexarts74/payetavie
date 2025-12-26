@@ -9,7 +9,8 @@ export async function uploadDocument(
   name: string,
   description?: string,
   expiresAt?: string,
-  employerName?: string
+  employerName?: string,
+  documentType?: string
 ) {
   console.log('📤 [UPLOAD] Début de l\'upload')
   console.log('📤 [UPLOAD] Paramètres:', { topicSlug, fileName: file.name, fileSize: file.size, fileType: file.type, name })
@@ -84,6 +85,7 @@ export async function uploadDocument(
     description: description || null,
     expires_at: expiresAt || null,
     employer_name: employerName || null,
+    document_type: documentType || null,
   }
   console.log('📤 [UPLOAD] Données à insérer en DB:', insertData)
 
@@ -183,7 +185,7 @@ export async function getDocuments(topicSlug: string) {
 
   const { data, error } = await supabase
     .from('documents')
-    .select('*')
+    .select('*, document_type')
     .eq('user_id', user.id)
     .eq('topic_slug', topicSlug)
     .order('created_at', { ascending: false })
@@ -210,6 +212,7 @@ export async function updateDocument(
     description?: string
     expiresAt?: string | null
     employerName?: string | null
+    documentType?: string | null
   }
 ) {
   const supabase = await createClient()
@@ -226,6 +229,7 @@ export async function updateDocument(
   if (updates.description !== undefined) updateData.description = updates.description
   if (updates.expiresAt !== undefined) updateData.expires_at = updates.expiresAt
   if (updates.employerName !== undefined) updateData.employer_name = updates.employerName
+  if (updates.documentType !== undefined) updateData.document_type = updates.documentType
 
   const { data, error } = await supabase
     .from('documents')

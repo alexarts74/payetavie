@@ -8,11 +8,14 @@ import { FileText, Upload, X, Download, Calendar, Edit2, Trash2, Check, X as XIc
 interface UploadModalProps {
   isOpen: boolean
   onClose: () => void
-  onUpload: (file: File, categoryName: string) => Promise<void>
+  onUpload: (file: File, categoryName: string, expiresAt?: string) => Promise<void>
   isUploading: boolean
   title: string
   categoryLabel: string
   categoryPlaceholder: string
+  showExpiresAt?: boolean
+  categoryOptions?: { value: string; label: string }[]
+  useSelect?: boolean
 }
 
 interface DocumentsSectionProps {
@@ -20,8 +23,20 @@ interface DocumentsSectionProps {
   initialDocuments: (Document & { public_url: string })[]
 }
 
-function UploadModal({ isOpen, onClose, onUpload, isUploading, title, categoryLabel, categoryPlaceholder }: UploadModalProps) {
+function UploadModal({ 
+  isOpen, 
+  onClose, 
+  onUpload, 
+  isUploading, 
+  title, 
+  categoryLabel, 
+  categoryPlaceholder,
+  showExpiresAt = false,
+  categoryOptions,
+  useSelect = false
+}: UploadModalProps) {
   const [categoryName, setCategoryName] = useState('')
+  const [expiresAt, setExpiresAt] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -44,8 +59,9 @@ function UploadModal({ isOpen, onClose, onUpload, isUploading, title, categoryLa
       alert('Merci de sélectionner un fichier.')
       return
     }
-    await onUpload(selectedFile, categoryName.trim())
+    await onUpload(selectedFile, categoryName.trim(), showExpiresAt ? expiresAt : undefined)
     setCategoryName('')
+    setExpiresAt('')
     setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -54,6 +70,7 @@ function UploadModal({ isOpen, onClose, onUpload, isUploading, title, categoryLa
 
   const handleClose = () => {
     setCategoryName('')
+    setExpiresAt('')
     setSelectedFile(null)
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
@@ -80,16 +97,48 @@ function UploadModal({ isOpen, onClose, onUpload, isUploading, title, categoryLa
             <label className="block text-sm font-medium text-zinc-700 mb-2">
               {categoryLabel} <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-              placeholder={categoryPlaceholder}
-              className="w-full p-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-              disabled={isUploading}
-            />
+            {useSelect && categoryOptions ? (
+              <select
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                className="w-full p-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+                disabled={isUploading}
+              >
+                <option value="">Sélectionner un type</option>
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder={categoryPlaceholder}
+                className="w-full p-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                required
+                disabled={isUploading}
+              />
+            )}
           </div>
+
+          {showExpiresAt && (
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Date d'expiration (optionnel)
+              </label>
+              <input
+                type="date"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className="w-full p-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                disabled={isUploading}
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-2">
@@ -158,9 +207,11 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
   const [documents, setDocuments] = useState<(Document & { public_url: string })[]>(initialDocuments)
   const [isUploading, setIsUploading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ name: '', description: '', expiresAt: '', employerName: '' })
+  const [editForm, setEditForm] = useState({ name: '', description: '', expiresAt: '', employerName: '', documentType: '' })
   const isPayslipTopic = topicSlug === 'fiches-de-paie'
-  const needsCategory = isPayslipTopic
+  const isLogementTopic = topicSlug === 'logement'
+  const isAssurancesTopic = topicSlug === 'assurances'
+  const needsCategory = isPayslipTopic || isLogementTopic || isAssurancesTopic
   const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -195,15 +246,33 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
     }
   }
 
-  const handleUploadFromModal = async (file: File, categoryName: string) => {
+  const handleUploadFromModal = async (file: File, categoryName: string, expiresAt?: string) => {
     setIsUploading(true)
     try {
-      const result = await uploadDocument(topicSlug, file, file.name, undefined, undefined, categoryName)
-      if (result.data) {
-        setDocuments([result.data, ...documents])
-        setShowUploadModal(false)
-      } else if (result.error) {
-        alert(`Erreur lors de l'upload: ${result.error}`)
+      if (isPayslipTopic) {
+        const result = await uploadDocument(topicSlug, file, file.name, undefined, undefined, categoryName)
+        if (result.data) {
+          setDocuments([result.data, ...documents])
+          setShowUploadModal(false)
+        } else if (result.error) {
+          alert(`Erreur lors de l'upload: ${result.error}`)
+        }
+      } else if (isLogementTopic) {
+        const result = await uploadDocument(topicSlug, file, file.name, undefined, expiresAt, undefined, categoryName)
+        if (result.data) {
+          setDocuments([result.data, ...documents])
+          setShowUploadModal(false)
+        } else if (result.error) {
+          alert(`Erreur lors de l'upload: ${result.error}`)
+        }
+      } else if (isAssurancesTopic) {
+        const result = await uploadDocument(topicSlug, file, file.name, undefined, expiresAt, undefined, categoryName)
+        if (result.data) {
+          setDocuments([result.data, ...documents])
+          setShowUploadModal(false)
+        } else if (result.error) {
+          alert(`Erreur lors de l'upload: ${result.error}`)
+        }
       }
     } catch (error) {
       alert(`Erreur: ${error}`)
@@ -227,7 +296,8 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
       name: doc.name,
       description: doc.description || '',
       expiresAt: doc.expires_at ? doc.expires_at.split('T')[0] : '',
-      employerName: (doc as any).employer_name || ''
+      employerName: (doc as any).employer_name || '',
+      documentType: (doc as any).document_type || ''
     })
   }
 
@@ -236,13 +306,14 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
       name: editForm.name,
       description: editForm.description || undefined,
       expiresAt: editForm.expiresAt || null,
-      employerName: needsCategory ? (editForm.employerName || null) : undefined
+      employerName: isPayslipTopic ? (editForm.employerName || null) : undefined,
+      documentType: (isLogementTopic || isAssurancesTopic) ? (editForm.documentType || null) : undefined
     })
 
     if (result.data) {
       setDocuments(documents.map(d => d.id === documentId ? { ...d, ...result.data } : d))
       setEditingId(null)
-      setEditForm({ name: '', description: '', expiresAt: '', employerName: '' })
+      setEditForm({ name: '', description: '', expiresAt: '', employerName: '', documentType: '' })
     }
   }
 
@@ -251,32 +322,96 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
     return new Date(expiresAt) < new Date()
   }
 
-  const categories = needsCategory
+  const categories = isPayslipTopic
     ? Array.from(new Set(documents.map(d => (d as any).employer_name).filter(Boolean))) as string[]
+    : (isLogementTopic || isAssurancesTopic)
+    ? Array.from(new Set(documents.map(d => (d as any).document_type).filter(Boolean))) as string[]
     : []
 
   const filteredDocuments = needsCategory && selectedCategory !== 'all'
-    ? documents.filter(d => (d as any).employer_name === selectedCategory)
+    ? documents.filter(d => 
+        isPayslipTopic 
+          ? (d as any).employer_name === selectedCategory
+          : (isLogementTopic || isAssurancesTopic)
+          ? (d as any).document_type === selectedCategory
+          : true
+      )
     : documents
+
+  const documentTypesLogement = [
+    { value: 'bail', label: 'Bail / Contrat de location' },
+    { value: 'assurance', label: 'Assurance habitation' },
+    { value: 'charges', label: 'Charges / Quittances' },
+    { value: 'etat-des-lieux', label: 'État des lieux' },
+    { value: 'depot-garantie', label: 'Dépôt de garantie' },
+    { value: 'autre', label: 'Autre' }
+  ]
+
+  const documentTypesAssurances = [
+    { value: 'contrat-auto', label: 'Contrat assurance auto' },
+    { value: 'contrat-habitation', label: 'Contrat assurance habitation' },
+    { value: 'contrat-sante', label: 'Contrat assurance santé' },
+    { value: 'attestation', label: 'Attestation d\'assurance' },
+    { value: 'avis-echeance', label: 'Avis d\'échéance' },
+    { value: 'sinistre', label: 'Sinistre / Déclaration' },
+    { value: 'autre', label: 'Autre' }
+  ]
+
+  const documentTypes = isLogementTopic ? documentTypesLogement : documentTypesAssurances
 
   const getModalConfig = () => {
     if (isPayslipTopic) {
       return {
         title: 'Ajouter une fiche de paie',
         categoryLabel: 'Nom de l\'entreprise',
-        categoryPlaceholder: 'Ex: Acme Corp'
+        categoryPlaceholder: 'Ex: Acme Corp',
+        showExpiresAt: false,
+        categoryOptions: undefined,
+        useSelect: false
+      }
+    }
+    if (isLogementTopic) {
+      return {
+        title: 'Ajouter un document logement',
+        categoryLabel: 'Type de document',
+        categoryPlaceholder: 'Sélectionner un type',
+        showExpiresAt: true,
+        categoryOptions: documentTypesLogement,
+        useSelect: true
+      }
+    }
+    if (isAssurancesTopic) {
+      return {
+        title: 'Ajouter un document assurance',
+        categoryLabel: 'Type de document',
+        categoryPlaceholder: 'Sélectionner un type',
+        showExpiresAt: true,
+        categoryOptions: documentTypesAssurances,
+        useSelect: true
       }
     }
     return {
       title: 'Ajouter un document',
       categoryLabel: 'Catégorie',
-      categoryPlaceholder: 'Catégorie'
+      categoryPlaceholder: 'Catégorie',
+      showExpiresAt: false,
+      categoryOptions: undefined,
+      useSelect: false
     }
   }
 
   const getFilterLabel = () => {
     if (isPayslipTopic) return 'Filtrer par entreprise'
+    if (isLogementTopic) return 'Filtrer par type'
+    if (isAssurancesTopic) return 'Filtrer par type'
     return 'Filtrer'
+  }
+
+  const getTypeLabel = (type: string | null) => {
+    if (!type) return null
+    const allTypes = [...documentTypesLogement, ...documentTypesAssurances]
+    const found = allTypes.find(t => t.value === type)
+    return found ? found.label : type
   }
 
   const formatFileSize = (bytes: number | null) => {
@@ -344,9 +479,9 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                     ? 'bg-indigo-600 text-white border-indigo-600'
                     : 'bg-white text-zinc-600 border-zinc-200 hover:bg-zinc-50'
                 }`}
-                title={cat}
+                title={(isLogementTopic || isAssurancesTopic) ? getTypeLabel(cat) || cat : cat}
               >
-                {cat}
+                {(isLogementTopic || isAssurancesTopic) ? (getTypeLabel(cat) || cat) : cat}
               </button>
             ))}
           </div>
@@ -380,14 +515,28 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                       className="w-full p-2 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       autoFocus
                     />
-                    {needsCategory && (
+                    {isPayslipTopic && (
                       <input
                         type="text"
                         value={editForm.employerName}
                         onChange={(e) => setEditForm({ ...editForm, employerName: e.target.value })}
-                        placeholder={isPayslipTopic ? "Nom de l'entreprise" : "Type d'aide / Organisme"}
+                        placeholder="Nom de l'entreprise"
                         className="w-full p-2 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
+                    )}
+                    {(isLogementTopic || isAssurancesTopic) && (
+                      <select
+                        value={editForm.documentType}
+                        onChange={(e) => setEditForm({ ...editForm, documentType: e.target.value })}
+                        className="w-full p-2 rounded-xl border border-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      >
+                        <option value="">Sélectionner un type</option>
+                        {(isLogementTopic ? documentTypesLogement : documentTypesAssurances).map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
                     )}
                     <textarea
                       value={editForm.description}
@@ -433,9 +582,14 @@ export default function DocumentsSection({ topicSlug, initialDocuments }: Docume
                         <h3 className="text-sm font-semibold text-zinc-900 mb-1 truncate">
                           {doc.name}
                         </h3>
-                        {needsCategory && (doc as any).employer_name && (
+                        {isPayslipTopic && (doc as any).employer_name && (
                           <p className="text-[11px] text-indigo-700 font-medium mb-1">
                             {(doc as any).employer_name}
+                          </p>
+                        )}
+                        {(isLogementTopic || isAssurancesTopic) && (doc as any).document_type && (
+                          <p className="text-[11px] text-indigo-700 font-medium mb-1">
+                            {getTypeLabel((doc as any).document_type)}
                           </p>
                         )}
                         {doc.description && (
