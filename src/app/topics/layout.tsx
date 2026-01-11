@@ -18,7 +18,7 @@ export default async function TopicsLayout({
 
   return (
     <TopicsShell userEmail={user.email}>
-      {children}
+        {children}
     </TopicsShell>
   )
 }

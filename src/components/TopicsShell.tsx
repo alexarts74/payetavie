@@ -83,18 +83,23 @@ export default function TopicsShell({ userEmail, children }: TopicsShellProps) {
       </aside>
 
       {/* Menu mobile en slide-in */}
-      {isMobileNavOpen && (
-        <>
-          {/* Overlay */}
-          <button
-            type="button"
-            aria-label="Fermer le menu"
-            className="fixed inset-0 bg-black/40 z-40 md:hidden"
-            onClick={() => setIsMobileNavOpen(false)}
-          />
+      <>
+        {/* Overlay */}
+        <button
+          type="button"
+          aria-label="Fermer le menu"
+          className={`fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity duration-300 ease-in-out ${
+            isMobileNavOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setIsMobileNavOpen(false)}
+        />
 
-          {/* Panneau latéral */}
-          <aside className="fixed left-0 top-0 h-screen w-72 max-w-[80%] bg-white shadow-2xl shadow-blue-500/30 z-50 flex flex-col md:hidden">
+        {/* Panneau latéral */}
+        <aside
+          className={`fixed left-0 top-0 h-screen w-72 max-w-[80%] bg-white shadow-2xl shadow-blue-500/30 z-50 flex flex-col md:hidden transition-transform duration-300 ease-in-out ${
+            isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
             <div className="p-4 border-b border-blue-100/60 flex items-center justify-between">
               <Link
                 href="/topics"
@@ -141,8 +146,7 @@ export default function TopicsShell({ userEmail, children }: TopicsShellProps) {
               </form>
             </div>
           </aside>
-        </>
-      )}
+      </>
 
       {/* Contenu principal */}
       <main className="pt-14 md:pt-0 md:ml-64">

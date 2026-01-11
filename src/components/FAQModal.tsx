@@ -27,15 +27,20 @@ export default function FAQModal({ faq }: FAQModalProps) {
       </button>
 
       {/* Modal */}
-      {isOpen && (
+      <div 
+        className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
+          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsOpen(false)}
+      >
         <div 
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={() => setIsOpen(false)}
+          className={`bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl transition-all duration-300 ease-in-out ${
+            isOpen 
+              ? 'opacity-100 translate-y-0 scale-100' 
+              : 'opacity-0 translate-y-8 sm:translate-y-4 scale-95 pointer-events-none'
+          }`}
+          onClick={(e) => e.stopPropagation()}
         >
-          <div 
-            className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom sm:slide-in-from-bottom-4 duration-300"
-            onClick={(e) => e.stopPropagation()}
-          >
             {/* Header */}
             <div className="sticky top-0 bg-gradient-to-br from-purple-500 to-pink-600 p-6 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
@@ -74,7 +79,6 @@ export default function FAQModal({ faq }: FAQModalProps) {
             </div>
           </div>
         </div>
-      )}
     </>
   )
 }
