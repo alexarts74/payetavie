@@ -1,26 +1,206 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ========================================
+   CSS Variables (light/dark)
+   Les variables sont necessaires pour le theming dynamique.
+   Tout le reste est en Tailwind via @theme et @utility.
+   ======================================== */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --glass-bg: #ffffff;
+  --glass-bg-heavy: #ffffff;
+  --glass-border: rgba(0, 0, 0, 0.12);
+  --glass-border-accent: rgba(99, 102, 241, 0.4);
+  --shadow-glass: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-glass-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  --gradient-page: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  --glass-overlay-bg: rgba(0, 0, 0, 0.4);
+  --glass-input-focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  --scrollbar-thumb: rgba(161, 161, 170, 0.3);
+  --scrollbar-thumb-hover: rgba(161, 161, 170, 0.5);
 }
 
+.dark {
+  --background: #0a0a0f;
+  --foreground: #ededed;
+  --glass-bg: #1e1e28;
+  --glass-bg-heavy: #1a1a24;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border-accent: rgba(129, 140, 248, 0.3);
+  --shadow-glass: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-glass-lg: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --gradient-page: linear-gradient(135deg, #0f0f1a 0%, #0a0a0f 50%, #0f0a1a 100%);
+  --glass-overlay-bg: rgba(0, 0, 0, 0.6);
+  --glass-input-focus-ring: 0 0 0 3px rgba(129, 140, 248, 0.2);
+  --scrollbar-thumb: rgba(113, 113, 122, 0.3);
+  --scrollbar-thumb-hover: rgba(113, 113, 122, 0.5);
+}
+
+/* ========================================
+   Tailwind Theme — couleurs, fonts, animations
+   ======================================== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+
+  --animate-fade-in: fade-in 0.4s ease-out forwards;
+  --animate-slide-up: slide-up 0.5s ease-out forwards;
+  --animate-slide-down: slide-down 0.5s ease-out forwards;
+  --animate-scale-in: scale-in 0.3s ease-out forwards;
+  --animate-slide-left: slide-left 0.4s ease-out forwards;
+  --animate-slide-right: slide-right 0.4s ease-out forwards;
 }
 
-/* Dark mode désactivé par défaut - peut être réactivé plus tard si besoin */
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
+/* ========================================
+   Keyframes (necessaires, pas d'equivalent Tailwind)
+   ======================================== */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translateX(15px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-15px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ========================================
+   @utility — classes custom en pur Tailwind 4
+   ======================================== */
+@utility glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+@utility glass-card-heavy {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+@utility glass-sidebar {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+}
+
+@utility glass-input {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+
+  &:focus {
+    border-color: var(--glass-border-accent);
+    box-shadow: var(--glass-input-focus-ring);
+  }
+}
+
+@utility glass-modal {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass-lg);
+}
+
+@utility glass-overlay {
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+@utility gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility stagger-1 { animation-delay: 0.1s; }
+@utility stagger-2 { animation-delay: 0.2s; }
+@utility stagger-3 { animation-delay: 0.3s; }
+@utility stagger-4 { animation-delay: 0.4s; }
+@utility stagger-5 { animation-delay: 0.5s; }
+
+/* ========================================
+   Base — html, body, scrollbar, reduced motion
+   ======================================== */
+@layer base {
+  html {
+    height: 100%;
+    overflow: hidden;
+    background: var(--background);
+  }
+
+  body {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    background: var(--gradient-page);
+    color: var(--foreground);
+    font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

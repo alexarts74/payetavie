@@ -3,12 +3,15 @@ import { redirect } from 'next/navigation'
 import { getReminders } from '@/app/actions/reminders'
 import { getBookmarks } from '@/app/actions/bookmarks'
 import { getDocuments } from '@/app/actions/documents'
+import { getChecklistProgress } from '@/app/actions/checklists'
 import RemindersSection from '@/components/RemindersSection'
 import BookmarksSection from '@/components/BookmarksSection'
 import DocumentsSection from '@/components/DocumentsSection'
 import FAQModal from '@/components/FAQModal'
 import { getPredefinedReminders } from '@/lib/predefined-reminders'
-import { Zap, CheckCircle2 } from 'lucide-react'
+import ChecklistSection from '@/components/ChecklistSection'
+import { Zap } from 'lucide-react'
+import { getUserSubscription, getPlanLimits } from '@/lib/subscription'
 
 export default async function MedecinGeneralistePage() {
   const supabase = await createClient()
@@ -24,7 +27,10 @@ export default async function MedecinGeneralistePage() {
   const { data: reminders } = await getReminders(topicSlug)
   const { data: bookmarks } = await getBookmarks(topicSlug)
   const { data: documents } = await getDocuments(topicSlug)
+  const { data: checklistProgress } = await getChecklistProgress(topicSlug)
   const predefinedReminders = getPredefinedReminders(topicSlug)
+  const { plan } = await getUserSubscription()
+  const limits = getPlanLimits(plan)
 
   const topic = {
     title: 'Médecin généraliste',
@@ -77,15 +83,13 @@ export default async function MedecinGeneralistePage() {
       <div className="max-w-7xl mx-auto">
         {/* Hero TL;DR */}
         <div className="relative mb-8">
-          <div className="relative bg-gradient-to-br from-red-600 to-pink-600 rounded-[2rem] p-6 text-white overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-pink-400/20 rounded-full blur-2xl -ml-24 -mb-24" />
+          <div className="relative bg-indigo-600 rounded-[2rem] p-6 text-white overflow-hidden">
             <div className="relative z-10">
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-10 h-10 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center shadow-md">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shadow-md">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-2xl font-semibold">TL;DR</h2>
+                <h2 className="text-xl font-semibold">TL;DR</h2>
               </div>
               <p className="text-base leading-relaxed opacity-95">
                 {topic.tldr}
@@ -96,45 +100,35 @@ export default async function MedecinGeneralistePage() {
 
         {/* Checklist */}
         <div className="mb-8">
-          <div className="bg-white rounded-[2rem] border border-blue-100 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center shadow-md">
-                <CheckCircle2 className="w-5 h-5 text-white" />
-              </div>
-              <h2 className="text-2xl font-semibold text-zinc-900">Checklist</h2>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {topic.checklist.map((item, index) => (
-                <div key={index} className="group flex items-start gap-3 p-3 rounded-xl hover:bg-red-50 transition-all duration-300 border border-red-50">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-red-600 to-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                    <span className="text-white font-semibold text-xs">{index + 1}</span>
-                  </div>
-                  <p className="text-zinc-600 text-sm leading-relaxed flex-1 pt-0.5 group-hover:text-zinc-900 transition-colors">
-                    {item}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ChecklistSection items={topic.checklist} topicSlug={topicSlug} initialProgress={checklistProgress} />
         </div>
 
         {/* Reminders */}
-        <RemindersSection
-          topicSlug={topicSlug}
-          initialReminders={reminders || []}
-          predefinedReminders={predefinedReminders}
-        />
+        <div className="mb-8">
+          <RemindersSection
+            topicSlug={topicSlug}
+            initialReminders={reminders || []}
+            predefinedReminders={predefinedReminders}
+            plan={plan}
+            remindersCount={(reminders ?? []).filter(r => !r.completed).length}
+            remindersLimit={limits.reminders}
+          />
+        </div>
 
         {/* Documents */}
         <div className="mb-8">
-          <DocumentsSection topicSlug={topicSlug} initialDocuments={documents || []} />
+          <DocumentsSection topicSlug={topicSlug} initialDocuments={documents || []} plan={plan} documentsCount={(documents ?? []).length} documentsLimit={limits.documents} />
         </div>
+
 
         {/* Resources */}
         <BookmarksSection
           topicSlug={topicSlug}
           initialBookmarks={bookmarks || []}
           resources={topic.resources}
+          plan={plan}
+          bookmarksCount={(bookmarks ?? []).length}
+          bookmarksLimit={limits.bookmarksPerTopic}
         />
       </div>
 

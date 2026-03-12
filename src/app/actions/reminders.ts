@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkResourceLimit } from '@/lib/subscription'
 
 export async function createReminder(
   topicSlug: string,
@@ -16,6 +17,12 @@ export async function createReminder(
 
   if (!user) {
     return { error: 'Non authentifié' }
+  }
+
+  // Vérifier la limite de rappels actifs
+  const limitCheck = await checkResourceLimit('reminders', user.id)
+  if (!limitCheck.allowed) {
+    return { error: limitCheck.error, upgradeRequired: limitCheck.upgradeRequired }
   }
 
   const { data, error } = await supabase

@@ -1,35 +1,32 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-  FileText, 
-  Briefcase, 
-  Heart, 
-  DollarSign, 
-  HandHeart, 
-  Home, 
+import {
+  FileText,
+  Briefcase,
+  Heart,
+  DollarSign,
+  HandHeart,
+  Home,
   Shield,
   Stethoscope,
   Pill,
   TestTube,
-  Building2,
-  Calendar,
-  GraduationCap,
-  BookOpen,
-  Car,
-  CarFront,
-  Bus,
-  Plane,
-  Wallet,
   Users,
+  Receipt,
   ChevronDown,
+  Settings,
   type LucideIcon,
 } from 'lucide-react'
+import ManageTopicsModal from '@/components/ManageTopicsModal'
+import type { PlanName } from '@/types'
 
 type NavLinksProps = {
   onNavigate?: () => void
+  selectedTopics?: string[]
+  plan?: PlanName
 }
 
 type Topic = {
@@ -46,188 +43,282 @@ type Category = {
 
 const categories: Category[] = [
   {
-    name: 'Administration & Finances',
-    icon: Wallet,
+    name: 'Travail',
+    icon: Briefcase,
     topics: [
-      { slug: 'impots', title: 'Impôts', icon: FileText },
-      { slug: 'urssaf', title: 'URSSAF / Cotisations sociales', icon: Briefcase },
       { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
       { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
-      { slug: 'assurances', title: 'Assurances', icon: Shield },
     ],
   },
   {
-    name: 'Santé & Médical',
+    name: 'Sante',
     icon: Stethoscope,
     topics: [
       { slug: 'mutuelle', title: 'Mutuelle', icon: Heart },
-      { slug: 'medecin-generaliste', title: 'Médecin généraliste', icon: Stethoscope },
+      { slug: 'medecin-generaliste', title: 'Medecin generaliste', icon: Stethoscope },
       { slug: 'pharmacie', title: 'Pharmacie', icon: Pill },
-      { slug: 'analyses-medicales', title: 'Analyses médicales', icon: TestTube },
+      { slug: 'analyses-medicales', title: 'Analyses medicales', icon: TestTube },
     ],
   },
   {
-    name: 'Travail & Carrière',
-    icon: Briefcase,
-    topics: [
-      { slug: 'contrat-de-travail', title: 'Contrat de travail', icon: FileText },
-      { slug: 'conges-rtt', title: 'Congés & RTT', icon: Calendar },
-      { slug: 'formation-professionnelle', title: 'Formation professionnelle', icon: GraduationCap },
-      { slug: 'chomage', title: 'Chômage', icon: Building2 },
-    ],
-  },
-  {
-    name: 'Études & Formation',
-    icon: GraduationCap,
-    topics: [
-      { slug: 'cours-examens', title: 'Cours & Examens', icon: BookOpen },
-      { slug: 'inscriptions-etudiantes', title: 'Inscriptions', icon: FileText },
-      { slug: 'bourses-etudiantes', title: 'Bourses étudiantes', icon: HandHeart },
-      { slug: 'stage-alternance', title: 'Stage & Alternance', icon: Briefcase },
-    ],
-  },
-  {
-    name: 'Logement & Vie quotidienne',
+    name: 'Logement',
     icon: Home,
     topics: [
       { slug: 'logement', title: 'Logement', icon: Home },
     ],
   },
   {
-    name: 'Transport & Mobilité',
-    icon: Car,
+    name: 'Freelance',
+    icon: Briefcase,
     topics: [
-      { slug: 'permis-conduire', title: 'Permis de conduire', icon: CarFront },
-      { slug: 'vehicule', title: 'Véhicule', icon: Car },
-      { slug: 'transports-communs', title: 'Transports en commun', icon: Bus },
-    ],
-  },
-  {
-    name: 'Autre',
-    icon: Users,
-    topics: [
-      { slug: 'voyages', title: 'Voyages', icon: Plane },
+      { slug: 'freelance-clients', title: 'Clients', icon: Users },
+      { slug: 'freelance-facturation', title: 'Facturation', icon: Receipt },
+      { slug: 'impots', title: 'Impots', icon: FileText },
+      { slug: 'urssaf', title: 'URSSAF / Cotisations sociales', icon: Briefcase },
+      { slug: 'assurances', title: 'Assurances', icon: Shield },
     ],
   },
 ]
 
-export default function NavLinks({ onNavigate }: NavLinksProps) {
+export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksProps) {
   const pathname = usePathname()
-  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
+  const prevPathnameRef = useRef(pathname)
+  const [isManageOpen, setIsManageOpen] = useState(false)
 
-  // Ouvrir automatiquement la catégorie qui contient le topic actif
-  useEffect(() => {
-    const activeCategory = categories.find(cat =>
-      cat.topics.some(topic => pathname === `/topics/${topic.slug}`)
-    )
-    if (activeCategory) {
-      setOpenCategories(new Set([activeCategory.name]))
+  // Filter categories based on selectedTopics and plan
+  const filteredCategories = useMemo(() => {
+    const canAccessPro = plan === 'pro'
+    // Hide Freelance category for non-pro users
+    const planFiltered = canAccessPro ? categories : categories.filter(cat => cat.name !== 'Freelance')
+    if (!selectedTopics) return planFiltered
+    return planFiltered
+      .map(cat => ({ ...cat, topics: cat.topics.filter(t => selectedTopics.includes(t.slug)) }))
+      .filter(cat => cat.topics.length > 0)
+  }, [selectedTopics, plan])
+
+  // Helper to get the href for a topic slug
+  const getTopicHref = (slug: string) => {
+    if (slug.startsWith('freelance-')) {
+      return `/freelance/${slug.replace('freelance-', '')}`
     }
-  }, [pathname])
+    return `/topics/${slug}`
+  }
+
+  // Helper to check if a topic is active
+  const isTopicActive = (slug: string) => {
+    if (slug.startsWith('freelance-')) {
+      return pathname.startsWith(`/freelance/${slug.replace('freelance-', '')}`)
+    }
+    return pathname === `/topics/${slug}`
+  }
+
+  // Determine which category should be open based on pathname
+  const activeCategoryName = useMemo(() => {
+    const activeCategory = filteredCategories.find(cat =>
+      cat.topics.some(topic => isTopicActive(topic.slug))
+    )
+    return activeCategory?.name || null
+  }, [pathname, filteredCategories])
+
+  const [openCategories, setOpenCategories] = useState<Set<string>>(() => {
+    return activeCategoryName ? new Set([activeCategoryName]) : new Set()
+  })
+
+  // Ouvrir automatiquement la categorie qui contient le topic actif quand le pathname change
+  useEffect(() => {
+    if (prevPathnameRef.current !== pathname && activeCategoryName) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Necessary to sync state with URL changes
+      setOpenCategories(new Set([activeCategoryName]))
+    }
+    prevPathnameRef.current = pathname
+  }, [pathname, activeCategoryName])
 
   const toggleCategory = (categoryName: string) => {
     setOpenCategories(prev => {
-      const next = new Set(prev)
-      if (next.has(categoryName)) {
-        next.delete(categoryName)
-      } else {
-        next.add(categoryName)
+      // Si la categorie est deja ouverte, on la ferme
+      if (prev.has(categoryName)) {
+        return new Set()
       }
-      return next
+      // Sinon, on ferme toutes les autres et on ouvre seulement celle-ci
+      return new Set([categoryName])
     })
   }
 
   return (
-    <div className="space-y-1">
-      {categories.map((category, categoryIndex) => {
+    <div className="space-y-0.5">
+      {filteredCategories.length === 0 && (
+        <div className="px-3 py-4 text-center">
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">Aucun sujet selectionne</p>
+          <button
+            onClick={() => setIsManageOpen(true)}
+            className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+          >
+            Gerer mes sujets
+          </button>
+        </div>
+      )}
+      {filteredCategories.map((category, categoryIndex) => {
         const CategoryIcon = category.icon
-        const isLastCategory = categoryIndex === categories.length - 1
+        const isLastCategory = categoryIndex === filteredCategories.length - 1
+        const isSingleTopic = category.topics.length === 1 && category.topics[0].title === category.name
+        const hasActiveTopic = category.topics.some(
+          topic => isTopicActive(topic.slug)
+        )
+
+        // Categorie avec un seul topic identique au nom → lien direct
+        if (isSingleTopic) {
+          const topic = category.topics[0]
+          const isActive = isTopicActive(topic.slug)
+          return (
+            <div key={category.name}>
+              <Link
+                href={getTopicHref(topic.slug)}
+                onClick={onNavigate}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
+                  isActive
+                    ? 'bg-indigo-50/50 dark:bg-indigo-500/10'
+                    : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                }`}
+              >
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-indigo-50 dark:bg-indigo-900/50'
+                    : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
+                }`}>
+                  <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
+                    isActive
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                  }`} />
+                </div>
+                <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 text-left truncate ${
+                  isActive
+                    ? 'text-zinc-800 dark:text-zinc-200'
+                    : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                }`}>
+                  {category.name}
+                </span>
+              </Link>
+              {!isLastCategory && <div className="h-1" />}
+            </div>
+          )
+        }
+
         const isOpen = openCategories.has(category.name)
-        const hasActiveTopic = category.topics.some(topic => pathname === `/topics/${topic.slug}`)
 
         return (
           <div key={category.name}>
-            {/* En-tête de catégorie (cliquable) */}
+            {/* En-tete de categorie (cliquable) */}
             <button
               onClick={() => toggleCategory(category.name)}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all hover:bg-zinc-50 group"
+              className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 group relative ${
+                hasActiveTopic && !isOpen
+                  ? 'bg-indigo-50/50 dark:bg-indigo-500/10'
+                  : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+              }`}
             >
-              <div className="flex items-center gap-2">
-                <CategoryIcon className="w-4 h-4 text-zinc-500 group-hover:text-zinc-700 transition-colors" />
-                <span className="text-xs font-semibold text-zinc-500 group-hover:text-zinc-700 uppercase tracking-wider transition-colors">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                  isOpen || hasActiveTopic
+                    ? 'bg-indigo-50 dark:bg-indigo-900/50'
+                    : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
+                }`}>
+                  <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
+                    isOpen || hasActiveTopic
+                      ? 'text-indigo-600 dark:text-indigo-400'
+                      : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                  }`} />
+                </div>
+                <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 text-left truncate ${
+                  isOpen || hasActiveTopic
+                    ? 'text-zinc-800 dark:text-zinc-200'
+                    : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                }`}>
                   {category.name}
                 </span>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${
+                className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition-all duration-200 ${
                   isOpen ? 'rotate-180' : ''
                 }`}
               />
             </button>
 
-            {/* Topics de la catégorie (avec transition) */}
+            {/* Topics de la categorie (avec transition) */}
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="space-y-0 py-1">
-                {category.topics.map((topic, topicIndex) => {
+              <div className="py-1 ml-[22px] border-l border-zinc-200/80 dark:border-zinc-700/40">
+                {category.topics.map((topic) => {
                   const TopicIcon = topic.icon
-                  const isActive = pathname === `/topics/${topic.slug}`
-                  const isLastTopic = topicIndex === category.topics.length - 1
+                  const isActive = isTopicActive(topic.slug)
 
                   return (
-                    <div key={topic.slug}>
+                    <div key={topic.slug} className="relative">
                       <Link
-                        href={`/topics/${topic.slug}`}
+                        href={getTopicHref(topic.slug)}
                         onClick={onNavigate}
-                        className={`flex items-center gap-3 px-4 py-2.5 ml-4 mr-2 rounded-lg transition-all group relative ${
+                        className={`flex items-center gap-2.5 px-3 py-2 ml-3 mr-1 rounded-lg transition-all duration-200 group relative ${
                           isActive
-                            ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 shadow-sm'
-                            : 'hover:bg-zinc-50'
+                            ? 'bg-indigo-50 dark:bg-indigo-950/50'
+                            : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                         }`}
                       >
-                        <TopicIcon 
-                          className={`w-4 h-4 transition-colors ${
+                        {isActive && (
+                          <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-indigo-600" />
+                        )}
+                        <TopicIcon
+                          className={`w-4 h-4 flex-shrink-0 transition-colors duration-200 ${
                             isActive
-                              ? 'text-blue-600'
-                              : 'text-zinc-600'
-                          }`} 
+                              ? 'text-indigo-600 dark:text-indigo-400'
+                              : 'text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400'
+                          }`}
                         />
-                        <span 
-                          className={`text-sm font-medium transition-colors ${
+                        <span
+                          className={`text-[12px] tracking-wide leading-tight transition-colors duration-200 ${
                             isActive
-                              ? 'text-blue-700 font-semibold'
-                              : 'text-zinc-700'
+                              ? 'text-indigo-700 dark:text-indigo-300 font-semibold'
+                              : 'text-zinc-600 dark:text-zinc-400 font-semibold group-hover:text-zinc-800 dark:group-hover:text-zinc-200'
                           }`}
                         >
                           {topic.title}
                         </span>
                       </Link>
-                      
-                      {/* Séparateur après chaque topic (sauf le dernier de la catégorie) */}
-                      {!isLastTopic && (
-                        <div className="px-4 py-0.5 ml-4 mr-2">
-                          <div className="h-px bg-zinc-100" />
-                        </div>
-                      )}
                     </div>
                   )
                 })}
               </div>
             </div>
 
-            {/* Séparateur entre catégories (sauf la dernière) */}
+            {/* Espacement entre categories (sauf la derniere) */}
             {!isLastCategory && (
-              <div className="px-4 py-2">
-                <div className="h-px bg-zinc-200" />
-              </div>
+              <div className="h-1" />
             )}
           </div>
         )
       })}
+
+      {/* Bouton Gerer mes sujets */}
+      {selectedTopics && (
+        <div className="pt-2">
+          <button
+            onClick={() => setIsManageOpen(true)}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            Gerer mes sujets
+          </button>
+        </div>
+      )}
+
+      <ManageTopicsModal
+        isOpen={isManageOpen}
+        onClose={() => setIsManageOpen(false)}
+        currentTopics={selectedTopics ?? []}
+        plan={plan}
+      />
     </div>
   )
 }
-

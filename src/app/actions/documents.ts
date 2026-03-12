@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkResourceLimit } from '@/lib/subscription'
 
 export async function uploadDocument(
   topicSlug: string,
@@ -31,6 +32,12 @@ export async function uploadDocument(
   if (!user) {
     console.error('📤 [UPLOAD] ❌ Utilisateur non authentifié')
     return { error: 'Non authentifié' }
+  }
+
+  // Vérifier la limite de documents
+  const limitCheck = await checkResourceLimit('documents', user.id)
+  if (!limitCheck.allowed) {
+    return { error: limitCheck.error, upgradeRequired: limitCheck.upgradeRequired }
   }
 
   // Générer un nom de fichier unique

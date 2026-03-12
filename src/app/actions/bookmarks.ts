@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { checkResourceLimit } from '@/lib/subscription'
 
 export async function addBookmark(
   topicSlug: string,
@@ -15,6 +16,12 @@ export async function addBookmark(
 
   if (!user) {
     return { error: 'Non authentifié' }
+  }
+
+  // Vérifier la limite de favoris par thématique
+  const limitCheck = await checkResourceLimit('bookmarks', user.id, topicSlug)
+  if (!limitCheck.allowed) {
+    return { error: limitCheck.error, upgradeRequired: limitCheck.upgradeRequired }
   }
 
   // Vérifier si le bookmark existe déjà

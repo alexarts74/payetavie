@@ -1,51 +1,47 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { 
-  Zap,
-  CheckCircle2,
+import { getUserPreferences } from '@/app/actions/preferences'
+import Link from 'next/link'
+import {
   FileText,
-  Clock,
+  Briefcase,
   Heart,
-  BookOpen,
-  Shield
+  DollarSign,
+  HandHeart,
+  Home,
+  Shield,
+  Stethoscope,
+  Pill,
+  TestTube,
+  ArrowRight,
 } from 'lucide-react'
+import TopicToggleButton from '@/components/TopicToggleButton'
 
-const features = [
+const categories = [
   {
-    icon: Zap,
-    title: 'TL;DR clair',
-    description: 'Résumés rapides pour comprendre l\'essentiel en quelques secondes',
-    color: 'from-blue-500 to-indigo-600'
+    name: 'Travail',
+    icon: Briefcase,
+    topics: [
+      { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
+      { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
+    ],
   },
   {
-    icon: CheckCircle2,
-    title: 'Checklists pratiques',
-    description: 'Des listes d\'actions concrètes pour ne rien oublier dans vos démarches',
-    color: 'from-green-500 to-emerald-600'
+    name: 'Sante & Medical',
+    icon: Stethoscope,
+    topics: [
+      { slug: 'mutuelle', title: 'Mutuelle', icon: Heart },
+      { slug: 'medecin-generaliste', title: 'Medecin generaliste', icon: Stethoscope },
+      { slug: 'pharmacie', title: 'Pharmacie', icon: Pill },
+      { slug: 'analyses-medicales', title: 'Analyses medicales', icon: TestTube },
+    ],
   },
   {
-    icon: BookOpen,
-    title: 'FAQ complètes',
-    description: 'Réponses aux questions les plus fréquentes sur chaque sujet',
-    color: 'from-purple-500 to-pink-600'
-  },
-  {
-    icon: FileText,
-    title: 'Documents & Pièces justificatives',
-    description: 'Stockez et organisez tous vos documents administratifs par topic',
-    color: 'from-indigo-500 to-purple-600'
-  },
-  {
-    icon: Clock,
-    title: 'Rappels personnalisés',
-    description: 'Créez des rappels avec dates d\'échéance pour ne manquer aucun délai',
-    color: 'from-orange-500 to-red-600'
-  },
-  {
-    icon: Heart,
-    title: 'Favoris',
-    description: 'Sauvegardez vos ressources officielles préférées pour un accès rapide',
-    color: 'from-indigo-500 to-blue-600'
+    name: 'Logement',
+    icon: Home,
+    topics: [
+      { slug: 'logement', title: 'Logement', icon: Home },
+    ],
   },
 ]
 
@@ -59,109 +55,138 @@ export default async function TopicsPage() {
     redirect('/auth/login')
   }
 
+  const { data: preferences } = await getUserPreferences()
+  const selectedTopics = preferences?.selected_topics
+  const hasPreferences = !!selectedTopics && selectedTopics.length > 0
+
+  // Split categories into selected and other topics
+  const selectedCategories = hasPreferences
+    ? categories
+        .map(cat => ({ ...cat, topics: cat.topics.filter(t => selectedTopics.includes(t.slug)) }))
+        .filter(cat => cat.topics.length > 0)
+    : categories
+
+  const otherCategories = hasPreferences
+    ? categories
+        .map(cat => ({ ...cat, topics: cat.topics.filter(t => !selectedTopics.includes(t.slug)) }))
+        .filter(cat => cat.topics.length > 0)
+    : []
+
   return (
     <div className="p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header minimaliste */}
-        <div className="mb-16 text-center pt-12">
-          <h1 className="text-3xl sm:text-5xl font-bold text-zinc-900 mb-6">
-            Bienvenue sur <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">PayeTaVie</span>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 animate-fade-in">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+            {hasPreferences ? 'Mes sujets' : 'Tous les topics'}
           </h1>
-          <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
-            Votre assistant personnel pour comprendre et gérer tous les aspects administratifs de la vie adulte
+          <p className="text-zinc-700 dark:text-zinc-400">
+            {hasPreferences
+              ? 'Les sujets que vous suivez pour gerer votre vie administrative'
+              : 'Explorez tous les sujets disponibles pour gerer votre vie administrative'}
           </p>
         </div>
 
-        {/* Section principale */}
-        <div className="space-y-16">
-          {/* Qu'est-ce que PayeTaVie */}
-          <section>
-            <div className="flex items-start gap-6">
-              <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg">
-                <Shield className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-zinc-900 mb-3">Qu'est-ce que PayeTaVie ?</h2>
-                <p className="text-zinc-600 leading-relaxed mb-4">
-                  PayeTaVie est votre guide complet pour naviguer dans les méandres de l'administration française. 
-                  Que vous soyez jeune actif, indépendant ou simplement en quête de clarté, nous vous accompagnons 
-                  dans la compréhension des impôts, cotisations, mutuelles, aides sociales et bien plus encore.
-                </p>
-                <p className="text-zinc-600 leading-relaxed">
-                  Chaque sujet est expliqué de manière claire et accessible, avec des checklists pratiques, 
-                  des FAQ détaillées et des ressources officielles. Stockez vos documents, créez des rappels 
-                  et sauvegardez vos ressources favorites pour une gestion complète de votre vie administrative.
-                </p>
-              </div>
-            </div>
-          </section>
+        {/* Selected topics */}
+        <div className="space-y-8">
+          {selectedCategories.map((category, categoryIndex) => {
+            const CategoryIcon = category.icon
+            return (
+              <div
+                key={category.name}
+                className="glass-card rounded-2xl p-6 animate-slide-up"
+                style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
+                    <CategoryIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{category.name}</h2>
+                </div>
 
-          {/* Features */}
-          <section>
-            <h2 className="text-2xl font-bold text-zinc-900 mb-8 text-center">
-              Tout ce dont vous avez besoin
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, index) => {
-                const Icon = feature.icon
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {category.topics.map((topic) => {
+                    const TopicIcon = topic.icon
+                    return (
+                      <Link
+                        key={topic.slug}
+                        href={`/topics/${topic.slug}`}
+                        className="group flex items-center gap-4 p-4 rounded-xl glass-card transition-all duration-150 hover:border-indigo-200 dark:hover:border-indigo-800"
+                      >
+                        <div className="w-12 h-12 rounded-lg bg-indigo-50 dark:bg-indigo-900/50 flex items-center justify-center">
+                          <TopicIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors">
+                            {topic.title}
+                          </h3>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-zinc-500 dark:text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-all" />
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Other available topics */}
+        {otherCategories.length > 0 && (
+          <>
+            <div className="mt-12 mb-8 animate-fade-in">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+                Autres sujets disponibles
+              </h2>
+              <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                Ajoutez des sujets pour les retrouver dans votre sidebar
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              {otherCategories.map((category, categoryIndex) => {
+                const CategoryIcon = category.icon
                 return (
                   <div
-                    key={index}
-                    className="group p-6 rounded-2xl border border-blue-100 bg-white hover:border-blue-200 hover:shadow-lg transition-all duration-300"
+                    key={`other-${category.name}`}
+                    className="glass-card rounded-2xl p-6 opacity-70 animate-slide-up"
+                    style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}
                   >
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md`}>
-                      <Icon className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-12 h-12 rounded-xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center">
+                        <CategoryIcon className="w-6 h-6 text-zinc-500 dark:text-zinc-400" />
+                      </div>
+                      <h2 className="text-2xl font-semibold text-zinc-500 dark:text-zinc-400">{category.name}</h2>
                     </div>
-                    <h3 className="text-lg font-semibold text-zinc-900 mb-2">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-zinc-600 leading-relaxed">
-                      {feature.description}
-                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {category.topics.map((topic) => {
+                        const TopicIcon = topic.icon
+                        return (
+                          <div
+                            key={topic.slug}
+                            className="flex items-center gap-4 p-4 rounded-xl glass-card transition-all duration-300"
+                          >
+                            <div className="w-12 h-12 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                              <TopicIcon className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-zinc-500 dark:text-zinc-400">
+                                {topic.title}
+                              </h3>
+                            </div>
+                            <TopicToggleButton slug={topic.slug} />
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 )
               })}
             </div>
-          </section>
-
-          {/* Comment ça marche */}
-          <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 sm:p-12">
-            <h2 className="text-2xl font-bold text-zinc-900 mb-8 text-center">
-              Comment ça marche ?
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <span className="text-2xl font-bold text-blue-600">1</span>
-                </div>
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Explorez les sujets</h3>
-                <p className="text-sm text-zinc-600">
-                  Parcourez les différents topics dans la barre latérale pour trouver ce qui vous intéresse
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <span className="text-2xl font-bold text-blue-600">2</span>
-                </div>
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Consultez les guides</h3>
-                <p className="text-sm text-zinc-600">
-                  Lisez les TL;DR, suivez les checklists et consultez les FAQ pour chaque sujet
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-white border-2 border-blue-200 flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <span className="text-2xl font-bold text-blue-600">3</span>
-                </div>
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">Organisez</h3>
-                <p className="text-sm text-zinc-600">
-                  Stockez vos documents, créez des rappels et sauvegardez vos ressources favorites
-                </p>
-              </div>
-            </div>
-          </section>
-        </div>
+          </>
+        )}
       </div>
     </div>
   )
 }
-

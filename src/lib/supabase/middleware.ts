@@ -39,6 +39,9 @@ export async function updateSession(request: NextRequest) {
     !user &&
     !request.nextUrl.pathname.startsWith('/auth/login') &&
     !request.nextUrl.pathname.startsWith('/auth/register') &&
+    !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/pricing') &&
+    !request.nextUrl.pathname.startsWith('/api/webhooks/stripe') &&
     request.nextUrl.pathname !== '/'
   ) {
     // no user, potentially respond by redirecting the user to the login page
@@ -59,6 +62,14 @@ export async function updateSession(request: NextRequest) {
   //    return myNewResponse
   // If this is not done, you may be causing the browser and server to go out
   // of sync and terminate the user's session prematurely.
+
+  // Désactiver le cache navigateur pour les pages HTML (pas les assets statiques)
+  const pathname = request.nextUrl.pathname
+  const isStaticAsset = pathname.startsWith('/_next/') || pathname.match(/\.\w+$/)
+  if (!isStaticAsset) {
+    supabaseResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+    supabaseResponse.headers.set('Pragma', 'no-cache')
+  }
 
   return supabaseResponse
 }
