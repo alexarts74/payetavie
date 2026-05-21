@@ -137,7 +137,7 @@ function StepProgress({ currentStep }: { currentStep: number }) {
           <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-zinc-200 dark:bg-zinc-700" />
           {/* Progress line fill */}
           <div
-            className="absolute top-5 left-[10%] h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-500"
+            className="absolute top-5 left-[10%] h-0.5 bg-gradient-to-r from-indigo-500 to-violet-600 transition-all duration-500"
             style={{ width: `${(currentStep / (stepLabels.length - 1)) * 80}%` }}
           />
 
@@ -149,9 +149,9 @@ function StepProgress({ currentStep }: { currentStep: number }) {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                     isActive
-                      ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/40 scale-110'
+                      ? 'bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/35 scale-110'
                       : isPast
-                        ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white'
+                        ? 'bg-gradient-to-br from-indigo-500 to-violet-600 text-white'
                         : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700'
                   }`}
                 >
@@ -182,7 +182,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
     <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center animate-slide-left">
       {/* Left: content */}
       <div className="flex-1 max-w-xl">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/40 mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/35 mb-6">
           <span className="text-2xl font-bold text-white">PTV</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-semibold mb-3">
@@ -203,8 +203,8 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
                 className={`glass-card rounded-2xl p-5 flex items-start gap-4 animate-slide-up stagger-${i + 1}`}
                 style={{ opacity: 0 }}
               >
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 dark:from-blue-500/30 dark:to-indigo-500/30 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-sm shadow-indigo-500/20">
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1">{card.title}</h3>
@@ -217,7 +217,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
 
         <button
           onClick={onNext}
-          className="group flex items-center gap-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm shadow-sm transition-colors duration-150"
+          className="group flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold text-sm shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-150"
         >
           Commencer
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -392,7 +392,7 @@ function AccountStep({
             <button
               type="submit"
               disabled={loading || !passwordsMatch || password.length < 6}
-              className="w-full group relative flex items-center justify-center gap-2 py-3 px-6 rounded-xl shadow-sm text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-150"
+              className="w-full group relative flex items-center justify-center gap-2 py-3 px-6 rounded-xl shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 hover:shadow-md hover:shadow-indigo-500/25"
             >
               {loading ? (
                 <>
@@ -741,7 +741,7 @@ function ProfileStep({
                         {matchingTopics.map(t => (
                           <span
                             key={t.slug}
-                            className="text-[11px] px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-500/20"
+                            className="text-[11px] px-2 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200/50"
                           >
                             {t.title}
                           </span>
@@ -992,7 +992,7 @@ function SummaryStep({
               cat.topics.filter(t => selectedTopics.has(t.slug)).map(t => (
                 <span
                   key={t.slug}
-                  className="text-[11px] px-2 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-500/20"
+                  className="text-[11px] px-2 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200/50"
                 >
                   {t.title}
                 </span>
@@ -1013,7 +1013,7 @@ function SummaryStep({
           <button
             onClick={onFinish}
             disabled={loading}
-            className="group flex items-center gap-2 px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm shadow-sm transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl font-semibold text-sm shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -1042,8 +1042,8 @@ function SummaryStep({
               const Icon = card.icon
               return (
                 <div key={card.title} className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-sm shadow-indigo-500/20">
+                    <Icon className="w-4 h-4 text-white" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{card.title}</p>
@@ -1093,21 +1093,6 @@ export default function RegisterPage() {
       setCheckingAuth(false)
     }
     checkAuth()
-  }, [])
-
-  // Force light mode on onboarding page
-  useEffect(() => {
-    const html = document.documentElement
-    const wasDark = html.classList.contains('dark')
-    html.classList.remove('dark')
-    html.classList.add('light')
-
-    return () => {
-      if (wasDark) {
-        html.classList.remove('light')
-        html.classList.add('dark')
-      }
-    }
   }, [])
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -1221,7 +1206,7 @@ export default function RegisterPage() {
   if (checkingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
       </div>
     )
   }
@@ -1229,9 +1214,10 @@ export default function RegisterPage() {
   return (
     <div className="h-screen flex flex-col relative overflow-hidden">
       {/* Background decorations */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5 dark:from-blue-600/10 dark:via-indigo-600/10 dark:to-purple-600/10" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/10 dark:bg-blue-400/5 rounded-full blur-3xl -mr-48 -mt-48" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/10 dark:bg-indigo-400/5 rounded-full blur-3xl -ml-48 -mb-48" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30" />
+      <div className="absolute inset-0 app-bg opacity-40 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-indigo-300/15 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-300/12 rounded-full blur-3xl -ml-48 -mb-48 pointer-events-none" />
 
       {/* Email confirmation overlay */}
       {emailConfirmationRequired && (
@@ -1239,7 +1225,7 @@ export default function RegisterPage() {
           <div className="w-full max-w-md animate-fade-in">
             <div className="text-center mb-6">
               <Link href="/" className="inline-block mb-3">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/50 mb-2 hover:scale-105 transition-transform">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/40 mb-2 hover:scale-105 transition-transform">
                   <span className="text-2xl font-bold text-white">PTV</span>
                 </div>
               </Link>
@@ -1255,8 +1241,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="glass-card-heavy rounded-3xl p-6 sm:p-8 animate-scale-in text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
-                <Mail className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center">
+                <Mail className="w-8 h-8 text-indigo-600" />
               </div>
               <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-2">
                 Nous avons envoyé un email de confirmation à
@@ -1269,7 +1255,7 @@ export default function RegisterPage() {
               </p>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-medium text-sm hover:from-blue-700 hover:to-indigo-700 transition-all shadow-md shadow-blue-500/30"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-xl font-medium text-sm hover:from-indigo-500 hover:to-violet-500 transition-all shadow-md shadow-indigo-500/30"
               >
                 Aller à la connexion
                 <ArrowRight className="w-4 h-4" />

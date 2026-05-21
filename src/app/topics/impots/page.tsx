@@ -81,6 +81,15 @@ export default async function ImpotsPage() {
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
+        {/* Page header */}
+        <div className="mb-6 animate-fade-in">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-500/20 mb-3">
+            <span className="text-sm">{topic.icon}</span>
+            <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Sujet</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">{topic.title}</h1>
+        </div>
+
         {/* Hero TL;DR avec éléments flottants */}
         <div className="relative mb-8">
           <div className="relative bg-indigo-600 rounded-[2rem] p-6 text-white overflow-hidden">

@@ -180,14 +180,14 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                     : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
                   isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-900/50'
+                    ? 'bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/20'
                     : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
                 }`}>
                   <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                     isActive
-                      ? 'text-indigo-600 dark:text-indigo-400'
+                      ? 'text-white'
                       : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
                   }`} />
                 </div>
@@ -218,14 +218,14 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
               }`}
             >
               <div className="flex items-center gap-2.5">
-                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
                   isOpen || hasActiveTopic
-                    ? 'bg-indigo-50 dark:bg-indigo-900/50'
+                    ? 'bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/20'
                     : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
                 }`}>
                   <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                     isOpen || hasActiveTopic
-                      ? 'text-indigo-600 dark:text-indigo-400'
+                      ? 'text-white'
                       : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
                   }`} />
                 </div>
@@ -238,7 +238,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                 </span>
               </div>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-500 dark:group-hover:text-zinc-400 transition-all duration-200 ${
+                className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-all duration-200 ${
                   isOpen ? 'rotate-180' : ''
                 }`}
               />

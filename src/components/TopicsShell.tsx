@@ -25,8 +25,8 @@ function UserInitials({ email }: { email: string }) {
     .join('')
 
   return (
-    <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/50 flex items-center justify-center">
-      <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">{initials || <User className="w-3.5 h-3.5" />}</span>
+    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-sm shadow-indigo-500/20">
+      <span className="text-xs font-semibold text-white">{initials || <User className="w-3.5 h-3.5" />}</span>
     </div>
   )
 }
@@ -93,7 +93,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
       {/* Barre supérieure mobile */}
       <header className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 glass-card-heavy md:hidden">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600 shadow-sm flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/30 flex items-center justify-center">
             <span className="text-sm font-bold text-white">P</span>
           </div>
           <span className="text-lg font-semibold gradient-text">
@@ -146,7 +146,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
         {/* Logo/Header */}
         <div className="px-5 py-5 border-b border-[var(--glass-border)] flex-shrink-0">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 shadow-sm flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/30 flex items-center justify-center">
               <span className="text-lg font-bold text-white">P</span>
             </div>
             <div>
@@ -168,7 +168,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               href="/dashboard"
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                 pathname === '/dashboard'
-                  ? 'bg-indigo-50 dark:bg-indigo-950/50 shadow-sm'
+                  ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40 shadow-sm'
                   : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
               }`}
             >
@@ -199,7 +199,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                 href="/depenses"
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                   pathname.startsWith('/depenses')
-                    ? 'bg-indigo-50 dark:bg-indigo-950/50 shadow-sm'
+                    ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40 shadow-sm'
                     : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                 }`}
               >
@@ -247,7 +247,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
             href="/profile"
             className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
               pathname === '/profile'
-                ? 'bg-indigo-50 dark:bg-indigo-950/50'
+                ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
                 : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
             }${plan !== 'pro' ? ' mb-3' : ''}`}
           >
@@ -317,7 +317,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                 className="flex items-center gap-3"
                 onClick={() => setIsMobileNavOpen(false)}
               >
-                <div className="w-9 h-9 rounded-xl bg-indigo-600 shadow-sm flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/30 flex items-center justify-center">
                   <span className="text-sm font-bold text-white">P</span>
                 </div>
                 <div>
@@ -346,7 +346,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                     pathname === '/dashboard'
-                      ? 'bg-indigo-50 dark:bg-indigo-950/50 shadow-sm'
+                      ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40 shadow-sm'
                       : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                   }`}
                 >
@@ -376,7 +376,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                     onClick={() => setIsMobileNavOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                       pathname.startsWith('/depenses')
-                        ? 'bg-indigo-50 dark:bg-indigo-950/50 shadow-sm'
+                        ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40 shadow-sm'
                         : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                     }`}
                   >
@@ -419,7 +419,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                 onClick={() => setIsMobileNavOpen(false)}
                 className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
                   pathname === '/profile'
-                    ? 'bg-indigo-50 dark:bg-indigo-950/50'
+                    ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
                     : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
                 }${plan !== 'pro' ? ' mb-3' : ''}`}
               >
@@ -468,7 +468,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
       </>
 
       {/* Contenu principal */}
-      <main className="pt-14 md:pt-14 md:ml-[272px]">
+      <main className="pt-14 md:pt-14 md:ml-[272px] app-bg">
         {children}
       </main>
     </div>

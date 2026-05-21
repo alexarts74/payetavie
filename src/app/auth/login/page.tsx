@@ -57,92 +57,77 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Panel — Branding & Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800" />
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-400/40 blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-purple-400/30 blur-3xl animate-pulse" style={{ animationDuration: '6s', animationDelay: '2s' }} />
-          <div className="absolute top-[40%] left-[50%] w-[300px] h-[300px] rounded-full bg-blue-400/20 blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '4s' }} />
-        </div>
-
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
-          }}
-        />
+    <div className="h-screen flex overflow-hidden bg-white">
+      {/* Left Panel — Branding (1/4) */}
+      <div className="hidden lg:flex lg:w-1/4 relative overflow-hidden flex-col justify-between p-8 xl:p-10">
+        {/* Gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800" />
+        {/* Orbs */}
+        <div className="absolute top-[-10%] left-[-20%] w-[300px] h-[300px] rounded-full bg-indigo-400/40 blur-3xl" />
+        <div className="absolute bottom-[-10%] right-[-20%] w-[280px] h-[280px] rounded-full bg-violet-400/30 blur-3xl" />
+        {/* Dot grid */}
+        <div className="absolute inset-0 dot-grid-white opacity-[0.08]" />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
-          {/* Top — Logo */}
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:bg-white/30 transition-colors">
+              <span className="text-base font-bold text-white">P</span>
+            </div>
+            <span className="text-xl font-bold text-white">PayeTaVie</span>
+          </Link>
+        </div>
+
+        <div className="relative z-10 space-y-6">
           <div>
-            <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:bg-white/30 transition-colors">
-                <span className="text-xl font-bold text-white">P</span>
-              </div>
-              <span className="text-2xl font-bold text-white">PayeTaVie</span>
-            </Link>
-          </div>
-
-          {/* Center — Features */}
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-3xl xl:text-4xl font-bold text-white leading-tight mb-4">
-                Gerez votre admin<br />en toute simplicite
-              </h2>
-              <p className="text-indigo-100 text-lg max-w-md">
-                Tout ce qu&apos;il faut pour maitriser votre vie administrative, au meme endroit.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {[
-                { icon: FileText, text: 'Documents organises par categorie' },
-                { icon: Bell, text: 'Rappels pour ne rien oublier' },
-                { icon: CheckCircle2, text: 'Checklists pas a pas' },
-                { icon: Shield, text: 'Donnees securisees et privees' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10 shrink-0 group-hover:bg-white/20 transition-colors">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-white/90 font-medium">{text}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom — Social proof */}
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {['bg-emerald-400', 'bg-sky-400', 'bg-amber-400', 'bg-rose-400'].map((color, i) => (
-                <div key={i} className={`w-8 h-8 rounded-full ${color} border-2 border-indigo-700 flex items-center justify-center`}>
-                  <span className="text-[10px] font-bold text-white">{['A', 'M', 'S', 'L'][i]}</span>
-                </div>
-              ))}
-            </div>
-            <p className="text-indigo-200 text-sm">
-              Rejoignez des utilisateurs qui simplifient leur quotidien
+            <h2 className="text-2xl font-bold text-white leading-tight mb-3">
+              Gerez votre admin<br />simplement
+            </h2>
+            <p className="text-indigo-200 text-sm leading-relaxed">
+              Tout ce qu&apos;il faut pour maitriser votre vie administrative.
             </p>
           </div>
+          <div className="space-y-3">
+            {[
+              { icon: FileText, text: 'Documents organises' },
+              { icon: Bell, text: 'Rappels intelligents' },
+              { icon: CheckCircle2, text: 'Checklists guidees' },
+              { icon: Shield, text: 'Donnees securisees' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center border border-white/10 shrink-0">
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-white/85 text-sm font-medium">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 flex items-center gap-2">
+          <div className="flex -space-x-1.5">
+            {['bg-emerald-400', 'bg-sky-400', 'bg-amber-400', 'bg-rose-400'].map((color, i) => (
+              <div key={i} className={`w-7 h-7 rounded-full ${color} border-2 border-indigo-700 flex items-center justify-center`}>
+                <span className="text-[9px] font-bold text-white">{['A', 'M', 'S', 'L'][i]}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-indigo-200 text-xs">Des milliers d&apos;utilisateurs</p>
         </div>
       </div>
 
-      {/* Right Panel — Login Form */}
-      <div className="flex-1 flex items-center justify-center px-6 sm:px-8 py-12 relative">
-        {/* Subtle background pattern for light mode */}
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-50 via-white to-indigo-50/30 dark:from-zinc-950 dark:via-zinc-900 dark:to-indigo-950/20" />
+      {/* Right Panel — Form (3/4) */}
+      <div className="flex-1 lg:w-3/4 flex items-center justify-center px-6 py-12 relative overflow-y-auto overflow-x-hidden bg-gradient-to-br from-white via-indigo-50/40 to-violet-50/30">
+        <div className="absolute inset-0 app-bg opacity-40 pointer-events-none" />
+        {/* Orbs */}
+        <div className="absolute top-[-60px] right-[-60px] w-[350px] h-[350px] rounded-full bg-indigo-200/20 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-[5%] left-[10%] w-[280px] h-[280px] rounded-full bg-violet-200/15 blur-3xl pointer-events-none" />
 
-        <div className="w-full max-w-[420px] relative z-10">
-          {/* Mobile Logo (shown only on small screens) */}
+        <div className="w-full max-w-[480px] relative z-10 mx-auto">
+          {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8 animate-fade-in">
             <Link href="/" className="inline-flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/30 flex items-center justify-center">
                 <span className="text-xl font-bold text-white">P</span>
               </div>
               <span className="text-2xl font-bold gradient-text">PayeTaVie</span>
@@ -151,21 +136,25 @@ export default function LoginPage() {
 
           {/* Header */}
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider">Connexion</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold gradient-text mb-2">
               Bon retour parmi nous
             </h1>
-            <p className="text-zinc-500 dark:text-zinc-400">
+            <p className="text-zinc-500 text-base">
               Connectez-vous pour acceder a votre espace
             </p>
           </div>
 
-          {/* Form */}
-          <div className="animate-slide-up">
+          {/* Form card */}
+          <div className="bg-white/85 backdrop-blur-sm border border-white/70 shadow-xl shadow-indigo-500/8 rounded-3xl p-8 animate-slide-up">
             <form className="space-y-5" onSubmit={handleLogin}>
               {error && (
-                <div className="rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/40 p-4 animate-scale-in">
-                  <p className="text-sm text-red-700 dark:text-red-300 font-medium flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                <div className="rounded-xl bg-red-50 border border-red-200 p-4 animate-scale-in">
+                  <p className="text-sm text-red-700 font-medium flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
                     {error}
                   </p>
                 </div>
@@ -173,10 +162,7 @@ export default function LoginPage() {
 
               {/* Email */}
               <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-                >
+                <label htmlFor="email" className="block text-sm font-semibold text-zinc-700">
                   Adresse email
                 </label>
                 <div className="relative group">
@@ -191,7 +177,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3 rounded-xl bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 transition-all duration-200"
+                    className="block w-full pl-11 pr-4 py-3 rounded-xl bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all duration-200 text-[15px]"
                     placeholder="votre@email.com"
                   />
                 </div>
@@ -199,10 +185,7 @@ export default function LoginPage() {
 
               {/* Password */}
               <div className="space-y-1.5">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-                >
+                <label htmlFor="password" className="block text-sm font-semibold text-zinc-700">
                   Mot de passe
                 </label>
                 <div className="relative group">
@@ -217,20 +200,16 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-11 pr-12 py-3 rounded-xl bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-indigo-400 dark:focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 dark:focus:ring-indigo-400/10 transition-all duration-200"
+                    className="block w-full pl-11 pr-12 py-3 rounded-xl bg-white border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 transition-all duration-200 text-[15px]"
                     placeholder="••••••••"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-zinc-400 hover:text-zinc-600 transition-colors"
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-[18px] w-[18px]" />
-                    ) : (
-                      <Eye className="h-[18px] w-[18px]" />
-                    )}
+                    {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
                   </button>
                 </div>
               </div>
@@ -239,11 +218,11 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full group relative flex items-center justify-center gap-2.5 py-3 px-6 rounded-xl text-[15px] font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-sm shadow-indigo-600/20 hover:shadow-md hover:shadow-indigo-600/25"
+                className="w-full group relative flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-[15px] font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:from-indigo-700 active:to-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/30 mt-1"
               >
                 {loading ? (
                   <>
-                    <div className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Connexion en cours...</span>
                   </>
                 ) : (
@@ -256,21 +235,19 @@ export default function LoginPage() {
             </form>
 
             {/* Divider */}
-            <div className="relative my-8">
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-zinc-200 dark:border-zinc-700/60"></div>
+                <div className="w-full border-t border-zinc-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white dark:bg-zinc-900 px-4 text-zinc-400 dark:text-zinc-500">
-                  Pas encore inscrit ?
-                </span>
+                <span className="bg-white px-4 text-zinc-400">Pas encore inscrit ?</span>
               </div>
             </div>
 
-            {/* Register Link */}
+            {/* Register link */}
             <Link
               href="/auth/register"
-              className="w-full group flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-[15px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-950/50 border border-indigo-200/60 dark:border-indigo-800/30 transition-all duration-150"
+              className="w-full group flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-[15px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/60 transition-all duration-150"
             >
               <span>Creer un compte</span>
               <ArrowRight className="w-[18px] h-[18px] group-hover:translate-x-0.5 transition-transform" />
@@ -278,10 +255,10 @@ export default function LoginPage() {
           </div>
 
           {/* Back to home */}
-          <div className="text-center mt-8 animate-fade-in">
+          <div className="text-center mt-6 animate-fade-in">
             <Link
               href="/"
-              className="text-sm text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors inline-flex items-center gap-1.5"
+              className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors inline-flex items-center gap-1.5"
             >
               <ArrowRight className="w-3.5 h-3.5 rotate-180" />
               Retour a l&apos;accueil

@@ -270,10 +270,3 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 
 ---
 
-## Derniers changements notables (git récent)
-
-- **Landing page** refaite avec `LandingNavbar` + `ForceLightMode` (forçage light mode sur `/`)
-- **Fix `revalidatePath`** dans `toggleClientActive` : chemin corrigé `/clients/${id}` → `/freelance/clients/${id}`
-- **Fix `requirePlan('pro')`** ajouté sur `getClient`, `getClientInvoices`, `getClientQuotations`
-- **globals.css** retouché (variables CSS dark/light mode)
-- Fichiers `supabase/.temp/*` mis à jour (versions gotrue/storage)
