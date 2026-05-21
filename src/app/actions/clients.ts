@@ -44,6 +44,11 @@ export async function getClients(search?: string, activeOnly?: boolean) {
 }
 
 export async function getClient(id: string) {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { data: null, error: planCheck.error, upgradeRequired: planCheck.upgradeRequired }
+  }
+
   const supabase = await createClient()
   const {
     data: { user },
@@ -147,7 +152,7 @@ export async function updateClient(id: string, updates: {
   }
 
   revalidatePath('/freelance/clients')
-  revalidatePath(`/clients/${id}`)
+  revalidatePath(`/freelance/clients/${id}`)
   return { data: data as Client }
 }
 
@@ -184,11 +189,16 @@ export async function toggleClientActive(id: string) {
   }
 
   revalidatePath('/freelance/clients')
-  revalidatePath(`/clients/${id}`)
+  revalidatePath(`/freelance/clients/${id}`)
   return { success: true }
 }
 
 export async function getClientInvoices(clientId: string) {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { data: [], error: planCheck.error, upgradeRequired: planCheck.upgradeRequired }
+  }
+
   const supabase = await createClient()
   const {
     data: { user },
@@ -214,6 +224,11 @@ export async function getClientInvoices(clientId: string) {
 }
 
 export async function getClientQuotations(clientId: string) {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { data: [], error: planCheck.error, upgradeRequired: planCheck.upgradeRequired }
+  }
+
   const supabase = await createClient()
   const {
     data: { user },

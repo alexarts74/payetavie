@@ -269,7 +269,7 @@ export async function updateQuotation(id: string, input: {
   }
 
   revalidatePath('/freelance/facturation')
-  revalidatePath(`/facturation/devis/${id}`)
+  revalidatePath(`/freelance/facturation/devis/${id}`)
   return { success: true }
 }
 
@@ -360,7 +360,7 @@ export async function updateQuotationStatus(id: string, newStatus: QuotationStat
   }
 
   revalidatePath('/freelance/facturation')
-  revalidatePath(`/facturation/devis/${id}`)
+  revalidatePath(`/freelance/facturation/devis/${id}`)
   return { success: true }
 }
 
@@ -436,6 +436,6 @@ export async function convertQuotationToInvoice(quotationId: string) {
     .eq('user_id', user.id)
 
   revalidatePath('/freelance/facturation')
-  revalidatePath(`/facturation/devis/${quotationId}`)
+  revalidatePath(`/freelance/facturation/devis/${quotationId}`)
   return { data: result.data }
 }

@@ -281,7 +281,7 @@ export async function updateInvoice(id: string, input: {
   }
 
   revalidatePath('/freelance/facturation')
-  revalidatePath(`/facturation/factures/${id}`)
+  revalidatePath(`/freelance/facturation/factures/${id}`)
   return { success: true }
 }
 
@@ -373,7 +373,7 @@ export async function updateInvoiceStatus(id: string, newStatus: InvoiceStatus) 
   }
 
   revalidatePath('/freelance/facturation')
-  revalidatePath(`/facturation/factures/${id}`)
+  revalidatePath(`/freelance/facturation/factures/${id}`)
   return { success: true }
 }
 

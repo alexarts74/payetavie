@@ -156,6 +156,37 @@
 @utility stagger-4 { animation-delay: 0.4s; }
 @utility stagger-5 { animation-delay: 0.5s; }
 
+/* Hero background orbs */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+.dark .hero-orb {
+  opacity: 0.2;
+}
+
+.hero-orb-1 {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-70%);
+  background: radial-gradient(circle, #6366f1, #4f46e5, transparent);
+}
+
+.hero-orb-2 {
+  width: 500px;
+  height: 500px;
+  top: -100px;
+  left: 50%;
+  transform: translateX(0%);
+  background: radial-gradient(circle, #a855f7, #7c3aed, transparent);
+}
+
 /* ========================================
    Base — html, body, scrollbar, reduced motion
    ======================================== */
