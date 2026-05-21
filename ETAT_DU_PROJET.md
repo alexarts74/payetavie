@@ -1,6 +1,6 @@
 # État du projet — PayeTaVie
 
-> Dernière mise à jour : 2026-05-21
+> Dernière mise à jour : 2026-05-21 (rappels récurrents, pages erreur, confirmation email UX)
 
 ---
 
@@ -108,6 +108,7 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 | Limite plan free (10 rappels) | DONE | `checkResourceLimit()` |
 | Notifications email via cron | DONE | Edge Function + Resend API |
 | Vérification `CRON_SECRET` sur l'edge function | DONE | |
+| **Rappels récurrents** (annuel / mensuel) | **DONE** | Création auto du suivant à la complétion, badge ↻, formulaire inline |
 
 ---
 
@@ -246,7 +247,7 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 | RLS Supabase sur toutes les tables | DONE | Isolation par `user_id` |
 | Triggers `updated_at` auto | DONE | |
 | Edge Function cron rappels emails | DONE | Supabase Functions + Resend |
-| Migrations versionnées | DONE | `migrations/` (`000_` → `009_`) |
+| Migrations versionnées | DONE | `migrations/` (`000_` → `010_`) |
 | `revalidatePath` après chaque mutation | DONE | |
 | TypeScript strict mode | DONE | |
 | ESLint configuré | DONE | |
@@ -258,8 +259,10 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 | Idée | Priorité | Notes |
 |------|----------|-------|
 | Tests unitaires / integration | - | Aucun test configuré pour l'instant |
-| Mentions légales / CGU / politique de confidentialité | MEDIUM | Pages légales absentes |
-| Mot de passe oublié / reset password | MEDIUM | Flow non visible dans le code |
+| Mentions légales / CGU / politique de confidentialité | DONE | Pages `/mentions-legales`, `/cgu`, `/politique-confidentialite` |
+| Mot de passe oublié / reset password | DONE | `/auth/forgot-password` + `/auth/reset-password` |
+| Pages 404 / error boundary | DONE | `not-found.tsx`, `error.tsx`, `global-error.tsx` |
+| Confirmation email UX (bannière verte) | DONE | Paramètre `email_confirmed` sur callback |
 | OAuth (Google, etc.) | LOW | Non implémenté |
 | Notifications push (web) | LOW | Seulement email pour l'instant |
 | Topics supplémentaires (retraite, véhicule...) | LOW | 10 topics actuellement |

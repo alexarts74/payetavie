@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { translateAuthError } from '@/lib/auth-errors'
 import { completeOnboarding, skipOnboarding } from '@/app/actions/preferences'
@@ -1065,6 +1065,8 @@ function SummaryStep({
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const emailConfirmed = searchParams.get('email_confirmed') === 'true'
   const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(0)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -1277,7 +1279,15 @@ export default function RegisterPage() {
           <div className="flex-1 flex items-center justify-center px-4 sm:px-8 pb-4 relative z-10 overflow-hidden">
             <div className="w-full max-w-5xl">
               {step === 0 && (
-                <WelcomeStep onNext={() => { setError(null); setStep(1) }} />
+                <>
+                  {emailConfirmed && (
+                    <div className="mb-4 flex items-center gap-2 px-4 py-3 rounded-xl bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800/50 text-green-800 dark:text-green-300 text-sm font-medium animate-scale-in">
+                      <Check className="w-4 h-4 flex-shrink-0" />
+                      Email confirmé ! Bienvenue sur PayeTaVie.
+                    </div>
+                  )}
+                  <WelcomeStep onNext={() => { setError(null); setStep(1) }} />
+                </>
               )}
 
               {step === 1 && (

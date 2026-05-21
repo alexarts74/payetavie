@@ -40,8 +40,13 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/auth/login') &&
     !request.nextUrl.pathname.startsWith('/auth/register') &&
     !request.nextUrl.pathname.startsWith('/auth/callback') &&
+    !request.nextUrl.pathname.startsWith('/auth/forgot-password') &&
+    !request.nextUrl.pathname.startsWith('/auth/reset-password') &&
     !request.nextUrl.pathname.startsWith('/pricing') &&
     !request.nextUrl.pathname.startsWith('/api/webhooks/stripe') &&
+    !request.nextUrl.pathname.startsWith('/mentions-legales') &&
+    !request.nextUrl.pathname.startsWith('/cgu') &&
+    !request.nextUrl.pathname.startsWith('/politique-confidentialite') &&
     request.nextUrl.pathname !== '/'
   ) {
     // no user, potentially respond by redirecting the user to the login page

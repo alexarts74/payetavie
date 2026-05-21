@@ -506,10 +506,21 @@ export default async function Home() {
             </nav>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-[var(--glass-border)] text-center">
+          <div className="mt-6 pt-6 border-t border-[var(--glass-border)] flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-xs text-zinc-400 dark:text-zinc-500">
               © {new Date().getFullYear()} PayeTaVie. Tous droits réservés.
             </p>
+            <nav className="flex items-center gap-4">
+              <Link href="/mentions-legales" className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
+                Mentions légales
+              </Link>
+              <Link href="/cgu" className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
+                CGU
+              </Link>
+              <Link href="/politique-confidentialite" className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
+                Confidentialité
+              </Link>
+            </nav>
           </div>
         </div>
       </footer>

@@ -51,6 +51,15 @@ const categories: Category[] = [
     ],
   },
   {
+    name: 'Finances',
+    icon: FileText,
+    topics: [
+      { slug: 'impots', title: 'Impots', icon: FileText },
+      { slug: 'urssaf', title: 'URSSAF / Cotisations', icon: Briefcase },
+      { slug: 'assurances', title: 'Assurances', icon: Shield },
+    ],
+  },
+  {
     name: 'Sante',
     icon: Stethoscope,
     topics: [
@@ -67,17 +76,11 @@ const categories: Category[] = [
       { slug: 'logement', title: 'Logement', icon: Home },
     ],
   },
-  {
-    name: 'Freelance',
-    icon: Briefcase,
-    topics: [
-      { slug: 'freelance-clients', title: 'Clients', icon: Users },
-      { slug: 'freelance-facturation', title: 'Facturation', icon: Receipt },
-      { slug: 'impots', title: 'Impots', icon: FileText },
-      { slug: 'urssaf', title: 'URSSAF / Cotisations sociales', icon: Briefcase },
-      { slug: 'assurances', title: 'Assurances', icon: Shield },
-    ],
-  },
+]
+
+const freelanceLinks = [
+  { slug: 'freelance-clients', title: 'Clients', icon: Users, href: '/freelance/clients' },
+  { slug: 'freelance-facturation', title: 'Facturation', icon: Receipt, href: '/freelance/facturation' },
 ]
 
 export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksProps) {
@@ -85,24 +88,15 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
   const prevPathnameRef = useRef(pathname)
   const [isManageOpen, setIsManageOpen] = useState(false)
 
-  // Filter categories based on selectedTopics and plan
+  const canAccessPro = plan === 'pro'
+
+  // Filter categories based on selectedTopics
   const filteredCategories = useMemo(() => {
-    const canAccessPro = plan === 'pro'
-    // Hide Freelance category for non-pro users
-    const planFiltered = canAccessPro ? categories : categories.filter(cat => cat.name !== 'Freelance')
-    if (!selectedTopics) return planFiltered
-    return planFiltered
+    if (!selectedTopics) return categories
+    return categories
       .map(cat => ({ ...cat, topics: cat.topics.filter(t => selectedTopics.includes(t.slug)) }))
       .filter(cat => cat.topics.length > 0)
-  }, [selectedTopics, plan])
-
-  // Helper to get the href for a topic slug
-  const getTopicHref = (slug: string) => {
-    if (slug.startsWith('freelance-')) {
-      return `/freelance/${slug.replace('freelance-', '')}`
-    }
-    return `/topics/${slug}`
-  }
+  }, [selectedTopics])
 
   // Helper to check if a topic is active
   const isTopicActive = (slug: string) => {
@@ -135,18 +129,16 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
 
   const toggleCategory = (categoryName: string) => {
     setOpenCategories(prev => {
-      // Si la categorie est deja ouverte, on la ferme
       if (prev.has(categoryName)) {
         return new Set()
       }
-      // Sinon, on ferme toutes les autres et on ouvre seulement celle-ci
       return new Set([categoryName])
     })
   }
 
   return (
     <div className="space-y-0.5">
-      {filteredCategories.length === 0 && (
+      {filteredCategories.length === 0 && !canAccessPro && (
         <div className="px-3 py-4 text-center">
           <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">Aucun sujet selectionne</p>
           <button
@@ -172,7 +164,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
           return (
             <div key={category.name}>
               <Link
-                href={getTopicHref(topic.slug)}
+                href={`/topics/${topic.slug}`}
                 onClick={onNavigate}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
                   isActive
@@ -258,7 +250,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                   return (
                     <div key={topic.slug} className="relative">
                       <Link
-                        href={getTopicHref(topic.slug)}
+                        href={`/topics/${topic.slug}`}
                         onClick={onNavigate}
                         className={`flex items-center gap-2.5 px-3 py-2 ml-3 mr-1 rounded-lg transition-all duration-200 group relative ${
                           isActive
@@ -299,6 +291,56 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
           </div>
         )
       })}
+
+      {/* Section Freelance (Pro uniquement) */}
+      {canAccessPro && (
+        <>
+          <div className="my-3 border-t border-zinc-200/80 dark:border-zinc-700/40" />
+          <div className="px-3 pb-1">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Briefcase className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">Freelance</span>
+              <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/30 text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Pro</span>
+            </div>
+            <div className="space-y-0.5">
+              {freelanceLinks.map(({ slug, title, icon: Icon, href }) => {
+                const isActive = pathname.startsWith(href)
+                return (
+                  <Link
+                    key={slug}
+                    href={href}
+                    onClick={onNavigate}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group ${
+                      isActive
+                        ? 'bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-700/30'
+                        : 'hover:bg-purple-50/60 dark:hover:bg-purple-900/20 border border-transparent'
+                    }`}
+                  >
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm shadow-purple-500/20'
+                        : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-purple-100/80 dark:group-hover:bg-purple-900/30'
+                    }`}>
+                      <Icon className={`w-3.5 h-3.5 transition-colors duration-200 ${
+                        isActive
+                          ? 'text-white'
+                          : 'text-zinc-500 dark:text-zinc-500 group-hover:text-purple-600 dark:group-hover:text-purple-400'
+                      }`} />
+                    </div>
+                    <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
+                      isActive
+                        ? 'text-purple-700 dark:text-purple-300'
+                        : 'text-zinc-500 dark:text-zinc-500 group-hover:text-purple-700 dark:group-hover:text-purple-300'
+                    }`}>
+                      {title}
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Bouton Gerer mes sujets */}
       {selectedTopics && (

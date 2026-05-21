@@ -5,7 +5,7 @@ import { createReminder, updateReminder, deleteReminder } from '@/app/actions/re
 import { exportTopicRemindersToIcs } from '@/app/actions/calendar-export'
 import type { Reminder } from '@/types'
 import type { PredefinedReminder } from '@/lib/predefined-reminders'
-import { Clock, Check, Calendar, Trash2, Plus, Sparkles, Download } from 'lucide-react'
+import { Clock, Check, Calendar, Trash2, Plus, Sparkles, Download, RefreshCw } from 'lucide-react'
 import type { PlanName } from '@/types'
 import UpgradePrompt from '@/components/UpgradePrompt'
 
@@ -20,6 +20,11 @@ interface RemindersSectionProps {
 
 export default function RemindersSection({ topicSlug, initialReminders, predefinedReminders, plan, remindersCount, remindersLimit }: RemindersSectionProps) {
   const [reminders, setReminders] = useState<Reminder[]>(initialReminders)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newTitle, setNewTitle] = useState('')
+  const [newDueDate, setNewDueDate] = useState('')
+  const [newRecurrence, setNewRecurrence] = useState<'annuel' | 'mensuel' | ''>('')
+  const [addingReminder, setAddingReminder] = useState(false)
 
   // Identifier quels rappels predefinis sont deja actives
   // On compare par titre et date pour matcher
@@ -49,6 +54,30 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
     return predefinedReminders.filter(pr => !activatedPredefinedIds.has(pr.id))
   }, [predefinedReminders, activatedPredefinedIds])
 
+  const handleAddCustomReminder = async () => {
+    if (!newTitle.trim()) return
+    setAddingReminder(true)
+    const result = await createReminder(
+      topicSlug,
+      newTitle.trim(),
+      undefined,
+      newDueDate || undefined,
+      newRecurrence || null
+    )
+    if (result.data) {
+      setReminders([...reminders, result.data].sort((a, b) => {
+        if (!a.due_date) return 1
+        if (!b.due_date) return -1
+        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      }))
+      setNewTitle('')
+      setNewDueDate('')
+      setNewRecurrence('')
+      setShowAddForm(false)
+    }
+    setAddingReminder(false)
+  }
+
   const handleActivatePredefined = async (predefined: PredefinedReminder) => {
     const result = await createReminder(
       topicSlug,
@@ -75,7 +104,9 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
   const handleToggleComplete = async (reminderId: string, completed: boolean) => {
     const result = await updateReminder(reminderId, { completed })
     if (result.data) {
-      setReminders(reminders.map(r => r.id === reminderId ? result.data : r))
+      const updated = reminders.map(r => r.id === reminderId ? result.data : r)
+      // Si rappel récurrent complété, la Server Action crée le suivant → revalidatePath rafraîchira
+      setReminders(updated)
     }
   }
 
@@ -118,16 +149,72 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
           </div>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Rappels</h2>
         </div>
-        {reminders.length > 0 && plan !== 'free' && (
-          <button
-            onClick={handleExportIcs}
-            className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-            title="Exporter les rappels (.ics)"
-          >
-            <Download className="w-4 h-4 text-zinc-700 dark:text-zinc-400" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {reminders.length > 0 && plan !== 'free' && (
+            <button
+              onClick={handleExportIcs}
+              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              title="Exporter les rappels (.ics)"
+            >
+              <Download className="w-4 h-4 text-zinc-700 dark:text-zinc-400" />
+            </button>
+          )}
+          {!reminderLimitReached && (
+            <button
+              onClick={() => setShowAddForm(v => !v)}
+              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              title="Ajouter un rappel"
+            >
+              <Plus className="w-4 h-4 text-zinc-700 dark:text-zinc-400" />
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Formulaire d'ajout rapide */}
+      {showAddForm && !reminderLimitReached && (
+        <div className="mb-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-zinc-800/30 space-y-3">
+          <input
+            type="text"
+            placeholder="Titre du rappel"
+            value={newTitle}
+            onChange={e => setNewTitle(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          <div className="flex gap-2">
+            <input
+              type="date"
+              value={newDueDate}
+              onChange={e => setNewDueDate(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+            <select
+              value={newRecurrence}
+              onChange={e => setNewRecurrence(e.target.value as 'annuel' | 'mensuel' | '')}
+              className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            >
+              <option value="">Aucune récurrence</option>
+              <option value="mensuel">Mensuelle</option>
+              <option value="annuel">Annuelle</option>
+            </select>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => { setShowAddForm(false); setNewTitle(''); setNewDueDate(''); setNewRecurrence('') }}
+              className="px-3 py-1.5 rounded-lg text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleAddCustomReminder}
+              disabled={!newTitle.trim() || addingReminder}
+              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors disabled:opacity-50"
+            >
+              {addingReminder ? 'Ajout...' : 'Ajouter'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {reminderLimitReached && (
         <div className="mb-4">
@@ -229,7 +316,7 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                       )}
                     </button>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className={`text-sm font-semibold ${
                           reminder.completed ? 'text-zinc-600 dark:text-zinc-500 line-through' : 'text-zinc-900 dark:text-zinc-100'
                         }`}>
@@ -238,6 +325,12 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                         {isPredefined && (
                           <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
                             Automatique
+                          </span>
+                        )}
+                        {reminder.recurrence && (
+                          <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
+                            <RefreshCw className="w-2.5 h-2.5" />
+                            {reminder.recurrence === 'annuel' ? 'Annuel' : 'Mensuel'}
                           </span>
                         )}
                       </div>

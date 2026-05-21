@@ -22,6 +22,7 @@ export interface Reminder {
   description: string | null
   due_date: string | null
   completed: boolean
+  recurrence: 'annuel' | 'mensuel' | null
   created_at: string
   updated_at: string
 }

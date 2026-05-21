@@ -44,6 +44,17 @@ export function translateAuthError(errorMessage: string): string {
     return 'Session expirée. Veuillez vous reconnecter'
   }
 
+  // Erreurs de réinitialisation de mot de passe
+  if (errorLower.includes('same password') || errorLower.includes('new password should be different')) {
+    return 'Le nouveau mot de passe doit être différent de l\'ancien'
+  }
+  if (errorLower.includes('recovery token not found') || errorLower.includes('token has expired') || errorLower.includes('otp expired')) {
+    return 'Ce lien de réinitialisation est expiré ou invalide. Veuillez en demander un nouveau'
+  }
+  if (errorLower.includes('user not found')) {
+    return 'Aucun compte associé à cette adresse email'
+  }
+
   // Erreur générique si aucune correspondance
   return errorMessage
 }

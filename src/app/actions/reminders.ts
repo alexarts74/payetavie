@@ -8,7 +8,8 @@ export async function createReminder(
   topicSlug: string,
   title: string,
   description?: string,
-  dueDate?: string
+  dueDate?: string,
+  recurrence?: 'annuel' | 'mensuel' | null
 ) {
   const supabase = await createClient()
   const {
@@ -33,6 +34,7 @@ export async function createReminder(
       title,
       description,
       due_date: dueDate || null,
+      recurrence: recurrence || null,
     })
     .select()
     .single()
@@ -52,6 +54,7 @@ export async function updateReminder(
     description?: string
     dueDate?: string | null
     completed?: boolean
+    recurrence?: 'annuel' | 'mensuel' | null
   }
 ) {
   const supabase = await createClient()
@@ -68,6 +71,7 @@ export async function updateReminder(
   if (updates.description !== undefined) updateData.description = updates.description
   if (updates.dueDate !== undefined) updateData.due_date = updates.dueDate
   if (updates.completed !== undefined) updateData.completed = updates.completed
+  if (updates.recurrence !== undefined) updateData.recurrence = updates.recurrence
 
   const { data, error } = await supabase
     .from('reminders')
@@ -79,6 +83,26 @@ export async function updateReminder(
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Si le rappel vient d'être complété et qu'il a une récurrence + une date, créer le suivant
+  if (updates.completed === true && data.recurrence && data.due_date) {
+    const currentDate = new Date(data.due_date)
+    let nextDate: Date
+    if (data.recurrence === 'annuel') {
+      nextDate = new Date(currentDate)
+      nextDate.setFullYear(nextDate.getFullYear() + 1)
+    } else {
+      nextDate = new Date(currentDate)
+      nextDate.setMonth(nextDate.getMonth() + 1)
+    }
+    await createReminder(
+      data.topic_slug,
+      data.title,
+      data.description || undefined,
+      nextDate.toISOString().split('T')[0],
+      data.recurrence
+    )
   }
 
   revalidatePath(`/topics/${data.topic_slug}`)
