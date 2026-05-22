@@ -17,6 +17,40 @@ import {
 } from 'lucide-react'
 import TopicToggleButton from '@/components/TopicToggleButton'
 
+type CategoryColors = {
+  iconBg: string
+  iconColor: string
+  hoverBorder: string
+  badge: string
+}
+
+const categoryColors: Record<string, CategoryColors> = {
+  'Travail': {
+    iconBg: 'bg-indigo-50 dark:bg-indigo-900/40',
+    iconColor: 'text-indigo-600 dark:text-indigo-400',
+    hoverBorder: 'hover:border-indigo-200 dark:hover:border-indigo-700',
+    badge: 'bg-indigo-50 text-indigo-500 dark:bg-indigo-900/40 dark:text-indigo-400',
+  },
+  'Finances': {
+    iconBg: 'bg-blue-50 dark:bg-blue-900/40',
+    iconColor: 'text-blue-600 dark:text-blue-400',
+    hoverBorder: 'hover:border-blue-200 dark:hover:border-blue-700',
+    badge: 'bg-blue-50 text-blue-500 dark:bg-blue-900/40 dark:text-blue-400',
+  },
+  'Sante & Medical': {
+    iconBg: 'bg-emerald-50 dark:bg-emerald-900/40',
+    iconColor: 'text-emerald-600 dark:text-emerald-400',
+    hoverBorder: 'hover:border-emerald-200 dark:hover:border-emerald-700',
+    badge: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400',
+  },
+  'Logement': {
+    iconBg: 'bg-amber-50 dark:bg-amber-900/40',
+    iconColor: 'text-amber-600 dark:text-amber-400',
+    hoverBorder: 'hover:border-amber-200 dark:hover:border-amber-700',
+    badge: 'bg-amber-50 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400',
+  },
+}
+
 const categories = [
   {
     name: 'Travail',
@@ -24,6 +58,15 @@ const categories = [
     topics: [
       { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
       { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
+    ],
+  },
+  {
+    name: 'Finances',
+    icon: FileText,
+    topics: [
+      { slug: 'impots', title: 'Impots', icon: FileText },
+      { slug: 'urssaf', title: 'URSSAF / Cotisations', icon: Briefcase },
+      { slug: 'assurances', title: 'Assurances', icon: Shield },
     ],
   },
   {
@@ -59,126 +102,101 @@ export default async function TopicsPage() {
   const selectedTopics = preferences?.selected_topics
   const hasPreferences = !!selectedTopics && selectedTopics.length > 0
 
-  // Split categories into selected and other topics
-  const selectedCategories = hasPreferences
-    ? categories
-        .map(cat => ({ ...cat, topics: cat.topics.filter(t => selectedTopics.includes(t.slug)) }))
-        .filter(cat => cat.topics.length > 0)
-    : categories
+  const allSelectedTopics = hasPreferences
+    ? categories.flatMap(cat =>
+        cat.topics
+          .filter(t => selectedTopics.includes(t.slug))
+          .map(t => ({ ...t, categoryName: cat.name, colors: categoryColors[cat.name] }))
+      )
+    : categories.flatMap(cat =>
+        cat.topics.map(t => ({ ...t, categoryName: cat.name, colors: categoryColors[cat.name] }))
+      )
 
-  const otherCategories = hasPreferences
-    ? categories
-        .map(cat => ({ ...cat, topics: cat.topics.filter(t => !selectedTopics.includes(t.slug)) }))
-        .filter(cat => cat.topics.length > 0)
+  const allOtherTopics = hasPreferences
+    ? categories.flatMap(cat =>
+        cat.topics
+          .filter(t => !selectedTopics.includes(t.slug))
+          .map(t => ({ ...t, categoryName: cat.name }))
+      )
     : []
 
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="p-6">
+      <div className="max-w-4xl mx-auto">
+
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-            {hasPreferences ? 'Mes sujets' : 'Tous les topics'}
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+            {hasPreferences ? 'Mes sujets' : 'Tous les sujets'}
           </h1>
-          <p className="text-zinc-700 dark:text-zinc-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {hasPreferences
-              ? 'Les sujets que vous suivez pour gerer votre vie administrative'
-              : 'Explorez tous les sujets disponibles pour gerer votre vie administrative'}
+              ? 'Les sujets que vous suivez pour gérer votre vie administrative'
+              : 'Explorez tous les sujets disponibles pour gérer votre vie administrative'}
           </p>
+          <div className="mt-4 h-px bg-gradient-to-r from-zinc-200 via-zinc-100 to-transparent dark:from-zinc-700 dark:via-zinc-800 dark:to-transparent" />
         </div>
 
-        {/* Selected topics */}
-        <div className="space-y-8">
-          {selectedCategories.map((category, categoryIndex) => {
-            const CategoryIcon = category.icon
-            return (
-              <div
-                key={category.name}
-                className="glass-card rounded-2xl p-6 animate-slide-up"
-                style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-                    <CategoryIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+        {/* Grille — topics sélectionnés */}
+        {allSelectedTopics.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {allSelectedTopics.map((topic, i) => {
+              const TopicIcon = topic.icon
+              return (
+                <Link
+                  key={topic.slug}
+                  href={`/topics/${topic.slug}`}
+                  className={`group glass-card rounded-xl p-4 flex flex-col gap-3 transition-all duration-150 ${topic.colors.hoverBorder} hover:-translate-y-0.5 animate-slide-up`}
+                  style={{ animationDelay: `${i * 0.04}s`, opacity: 0 }}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${topic.colors.iconBg}`}>
+                    <TopicIcon className={`w-4 h-4 ${topic.colors.iconColor}`} />
                   </div>
-                  <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{category.name}</h2>
-                </div>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors leading-snug flex-1">
+                    {topic.title}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md ${topic.colors.badge}`}>
+                      {topic.categoryName}
+                    </span>
+                    <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {category.topics.map((topic) => {
-                    const TopicIcon = topic.icon
-                    return (
-                      <Link
-                        key={topic.slug}
-                        href={`/topics/${topic.slug}`}
-                        className="group flex items-center gap-4 p-4 rounded-xl glass-card transition-all duration-150 hover:border-indigo-200 dark:hover:border-indigo-800"
-                      >
-                        <div className="w-12 h-12 rounded-lg bg-indigo-50 dark:bg-indigo-900/50 flex items-center justify-center">
-                          <TopicIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors">
-                            {topic.title}
-                          </h3>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-zinc-500 dark:text-zinc-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-all" />
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Other available topics */}
-        {otherCategories.length > 0 && (
+        {/* Autres sujets */}
+        {allOtherTopics.length > 0 && (
           <>
-            <div className="mt-12 mb-8 animate-fade-in">
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+            <div className="mt-8 mb-4">
+              <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-0.5">
                 Autres sujets disponibles
               </h2>
-              <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 Ajoutez des sujets pour les retrouver dans votre sidebar
               </p>
             </div>
-
-            <div className="space-y-8">
-              {otherCategories.map((category, categoryIndex) => {
-                const CategoryIcon = category.icon
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+              {allOtherTopics.map((topic) => {
+                const TopicIcon = topic.icon
                 return (
                   <div
-                    key={`other-${category.name}`}
-                    className="glass-card rounded-2xl p-6 opacity-70 animate-slide-up"
-                    style={{ animationDelay: `${categoryIndex * 0.1}s`, opacity: 0 }}
+                    key={topic.slug}
+                    className="glass-card rounded-xl p-4 flex flex-col gap-3 opacity-60"
                   >
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center">
-                        <CategoryIcon className="w-6 h-6 text-zinc-500 dark:text-zinc-400" />
-                      </div>
-                      <h2 className="text-2xl font-semibold text-zinc-500 dark:text-zinc-400">{category.name}</h2>
+                    <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                      <TopicIcon className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {category.topics.map((topic) => {
-                        const TopicIcon = topic.icon
-                        return (
-                          <div
-                            key={topic.slug}
-                            className="flex items-center gap-4 p-4 rounded-xl glass-card transition-all duration-300"
-                          >
-                            <div className="w-12 h-12 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                              <TopicIcon className="w-6 h-6 text-zinc-400 dark:text-zinc-500" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-zinc-500 dark:text-zinc-400">
-                                {topic.title}
-                              </h3>
-                            </div>
-                            <TopicToggleButton slug={topic.slug} />
-                          </div>
-                        )
-                      })}
+                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 leading-snug flex-1">
+                      {topic.title}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                        {topic.categoryName}
+                      </span>
+                      <TopicToggleButton slug={topic.slug} />
                     </div>
                   </div>
                 )
@@ -186,6 +204,7 @@ export default async function TopicsPage() {
             </div>
           </>
         )}
+
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import { LogOut, Menu, X, LayoutDashboard, User, Sun, Moon, HelpCircle, Wallet, Crown } from 'lucide-react'
 import NavLinks from '@/components/NavLinks'
+import GlobalSearch from '@/components/GlobalSearch'
 import { signOut } from '@/app/actions/auth'
 import { useTheme } from '@/components/ThemeProvider'
 import type { PlanName } from '@/types'
@@ -91,17 +92,20 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
   return (
     <div className="min-h-screen">
       {/* Barre supérieure mobile */}
-      <header className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 glass-card-heavy md:hidden">
-        <Link href="/dashboard" className="flex items-center gap-3">
+      <header className="fixed top-0 left-0 right-0 z-30 flex items-center gap-2 px-4 py-3 glass-card-heavy md:hidden">
+        <Link href="/dashboard" className="flex items-center gap-2 flex-shrink-0">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-md shadow-indigo-500/30 flex items-center justify-center">
             <span className="text-sm font-bold text-white">P</span>
           </div>
-          <span className="text-lg font-semibold gradient-text">
-            PayeTaVie
-          </span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <GlobalSearch
+          selectedTopics={selectedTopics}
+          plan={plan}
+          className="flex-1 min-w-0"
+        />
+
+        <div className="flex items-center gap-1 flex-shrink-0">
           {isTopicPage && <FAQButton />}
           <ThemeToggleButton />
           <form action={signOut}>
@@ -125,7 +129,12 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
       </header>
 
       {/* Top bar desktop - fixe en haut du contenu */}
-      <header className="hidden md:flex fixed top-0 left-[272px] right-0 z-20 h-14 items-center justify-end px-6 glass-card-heavy">
+      <header className="hidden md:flex fixed top-0 left-[272px] right-0 z-20 h-14 items-center justify-between px-6 glass-card-heavy">
+        <GlobalSearch
+          selectedTopics={selectedTopics}
+          plan={plan}
+          className="w-full max-w-[280px]"
+        />
         <div className="flex items-center gap-1">
           {isTopicPage && <FAQButton />}
           <ThemeToggleButton />
@@ -243,34 +252,8 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
 
         {/* User section en bas */}
         <div className="px-3 py-4 border-t border-[var(--glass-border)] flex-shrink-0">
-          <Link
-            href="/profile"
-            className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
-              pathname === '/profile'
-                ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
-                : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
-            }${plan !== 'pro' ? ' mb-3' : ''}`}
-          >
-            {userEmail ? (
-              <>
-                <UserInitials email={userEmail} />
-                <div className="flex-1 min-w-0">
-                  <span className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300 truncate block leading-tight">
-                    {userEmail.split('@')[0]}
-                  </span>
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block">
-                    {userEmail}
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                <User className="w-4 h-4 text-zinc-400" />
-              </div>
-            )}
-          </Link>
           {plan !== 'pro' && (
-            <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-purple-500/20 border border-indigo-200/50 dark:border-indigo-500/20 p-3">
+            <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-purple-500/20 border border-indigo-200/50 dark:border-indigo-500/20 p-3 mb-3">
               <div className="flex items-center gap-2 mb-1.5">
                 <Crown className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <span className="text-[12px] font-semibold text-indigo-700 dark:text-indigo-300">
@@ -290,6 +273,32 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               </Link>
             </div>
           )}
+          <Link
+            href="/profile"
+            className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
+              pathname === '/profile'
+                ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
+                : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+            }`}
+          >
+            {userEmail ? (
+              <>
+                <UserInitials email={userEmail} />
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300 truncate block leading-tight">
+                    {userEmail.split('@')[0]}
+                  </span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block">
+                    {userEmail}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                <User className="w-4 h-4 text-zinc-400" />
+              </div>
+            )}
+          </Link>
         </div>
       </aside>
 
@@ -414,35 +423,8 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
             </nav>
 
             <div className="px-3 py-4 border-t border-[var(--glass-border)]">
-              <Link
-                href="/profile"
-                onClick={() => setIsMobileNavOpen(false)}
-                className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
-                  pathname === '/profile'
-                    ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
-                    : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
-                }${plan !== 'pro' ? ' mb-3' : ''}`}
-              >
-                {userEmail ? (
-                  <>
-                    <UserInitials email={userEmail} />
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300 truncate block leading-tight">
-                        {userEmail.split('@')[0]}
-                      </span>
-                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block">
-                        {userEmail}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <User className="w-4 h-4 text-zinc-400" />
-                  </div>
-                )}
-              </Link>
               {plan !== 'pro' && (
-                <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-purple-500/20 border border-indigo-200/50 dark:border-indigo-500/20 p-3">
+                <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-purple-500/20 border border-indigo-200/50 dark:border-indigo-500/20 p-3 mb-3">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Crown className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                     <span className="text-[12px] font-semibold text-indigo-700 dark:text-indigo-300">
@@ -463,6 +445,33 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   </Link>
                 </div>
               )}
+              <Link
+                href="/profile"
+                onClick={() => setIsMobileNavOpen(false)}
+                className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
+                  pathname === '/profile'
+                    ? 'bg-gradient-to-r from-indigo-50 to-violet-50/50 dark:from-indigo-950/60 dark:to-violet-950/40'
+                    : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                }`}
+              >
+                {userEmail ? (
+                  <>
+                    <UserInitials email={userEmail} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] font-medium text-zinc-700 dark:text-zinc-300 truncate block leading-tight">
+                        {userEmail.split('@')[0]}
+                      </span>
+                      <span className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate block">
+                        {userEmail}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <User className="w-4 h-4 text-zinc-400" />
+                  </div>
+                )}
+              </Link>
             </div>
           </aside>
       </>

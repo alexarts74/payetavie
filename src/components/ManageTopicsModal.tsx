@@ -71,13 +71,17 @@ type ManageTopicsModalProps = {
   plan?: PlanName
 }
 
+const FREELANCE_SLUGS = new Set(['freelance-clients', 'freelance-facturation'])
+
 export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxTopics, plan }: ManageTopicsModalProps) {
-  const [selected, setSelected] = useState<Set<string>>(new Set(currentTopics))
+  const canAccessPro = plan === 'pro'
+  const initialTopics = canAccessPro ? currentTopics : currentTopics.filter(s => !FREELANCE_SLUGS.has(s))
+  const [selected, setSelected] = useState<Set<string>>(new Set(initialTopics))
   const [isPending, startTransition] = useTransition()
+  const [limitBump, setLimitBump] = useState<string | null>(null)
 
   if (!isOpen) return null
 
-  const canAccessPro = plan === 'pro'
   const hasTopicLimit = maxTopics !== undefined && maxTopics !== Infinity
   const isAtLimit = hasTopicLimit && selected.size >= maxTopics
 
@@ -110,7 +114,10 @@ export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxT
     })
   }
 
-  const selectAll = () => setSelected(new Set(hasTopicLimit ? ALL_TOPIC_SLUGS.slice(0, maxTopics) : ALL_TOPIC_SLUGS))
+  const selectAll = () => {
+    const slugs = canAccessPro ? ALL_TOPIC_SLUGS : ALL_TOPIC_SLUGS.filter(s => !FREELANCE_SLUGS.has(s))
+    setSelected(new Set(hasTopicLimit ? slugs.slice(0, maxTopics) : slugs))
+  }
   const resetSelection = () => setSelected(new Set(currentTopics))
 
   const handleSave = () => {
@@ -175,7 +182,10 @@ export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxT
           )}
 
           {isAtLimit && plan === 'free' && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50/80 dark:bg-red-900/15 border border-red-200/60 dark:border-red-700/30">
+            <div
+              id="limit-banner"
+              className={`mb-4 p-3 rounded-xl bg-red-50/80 dark:bg-red-900/15 border border-red-200/60 dark:border-red-700/30 transition-all ${limitBump ? 'ring-2 ring-red-400 ring-offset-1' : ''}`}
+            >
               <p className="text-sm font-medium text-red-700 dark:text-red-400">
                 Limite atteinte ! Deselectionnez un sujet ou passez au plan Essentiel.
               </p>
@@ -221,13 +231,20 @@ export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxT
                       return (
                         <button
                           key={topic.slug}
-                          onClick={() => !isDisabled && toggleSlug(topic.slug)}
-                          disabled={isDisabled}
-                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 ${
+                          onClick={() => {
+                            if (isDisabled) {
+                              setLimitBump(topic.slug)
+                              setTimeout(() => setLimitBump(null), 500)
+                            } else {
+                              toggleSlug(topic.slug)
+                            }
+                          }}
+                          title={isDisabled ? 'Limite atteinte — passez au plan Essentiel' : undefined}
+                          className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
                             isSelected
                               ? 'border-indigo-300 dark:border-indigo-500/40 bg-indigo-50/50 dark:bg-indigo-500/10'
                               : isDisabled
-                                ? 'border-zinc-200 dark:border-zinc-700/40 opacity-30 cursor-not-allowed'
+                                ? `border-zinc-200 dark:border-zinc-700/40 opacity-55 ${limitBump === topic.slug ? 'animate-shake' : ''}`
                                 : 'border-zinc-200 dark:border-zinc-700/40 opacity-50 hover:opacity-80 hover:bg-zinc-50 dark:hover:bg-zinc-800/30'
                           }`}
                         >
@@ -245,6 +262,9 @@ export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxT
                           </span>
                           {isSelected && (
                             <Check className="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                          )}
+                          {isDisabled && (
+                            <Crown className="w-3.5 h-3.5 text-amber-400 ml-auto flex-shrink-0" />
                           )}
                         </button>
                       )

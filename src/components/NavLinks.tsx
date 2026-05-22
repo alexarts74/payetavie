@@ -21,6 +21,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import ManageTopicsModal from '@/components/ManageTopicsModal'
+import { PLAN_LIMITS } from '@/lib/stripe'
 import type { PlanName } from '@/types'
 
 type NavLinksProps = {
@@ -360,6 +361,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
         onClose={() => setIsManageOpen(false)}
         currentTopics={selectedTopics ?? []}
         plan={plan}
+        maxTopics={plan ? PLAN_LIMITS[plan].topics : undefined}
       />
     </div>
   )
