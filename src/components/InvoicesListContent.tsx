@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Plus, FileText, Filter } from 'lucide-react'
+import { Plus, FileText, Filter, Download } from 'lucide-react'
 import type { BillingDocument, Client, InvoiceStatus } from '@/types'
 import { InvoiceStatusBadge } from '@/components/InvoiceStatusBadge'
+import { exportInvoicesCsv } from '@/app/actions/invoices'
 
 interface InvoicesListContentProps {
   initialInvoices: (BillingDocument & { client: Client })[]
@@ -23,6 +24,31 @@ const statusFilters: { value: InvoiceStatus | ''; label: string }[] = [
 export default function InvoicesListContent({ initialInvoices, clients }: InvoicesListContentProps) {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatus | ''>('')
   const [clientFilter, setClientFilter] = useState('')
+  const [isExporting, setIsExporting] = useState(false)
+
+  const handleExportCsv = async () => {
+    setIsExporting(true)
+    try {
+      const year = new Date().getFullYear()
+      const result = await exportInvoicesCsv(year, {
+        status: statusFilter || undefined,
+        clientId: clientFilter || undefined,
+      })
+      if ('data' in result && result.data) {
+        const blob = new Blob(['\uFEFF' + result.data], { type: 'text/csv;charset=utf-8' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `factures-${year}.csv`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   const filtered = initialInvoices.filter(inv => {
     if (statusFilter && inv.status !== statusFilter) return false
@@ -83,6 +109,16 @@ export default function InvoicesListContent({ initialInvoices, clients }: Invoic
                 <option key={c.id} value={c.id}>{c.company_name}</option>
               ))}
             </select>
+          )}
+          {initialInvoices.length > 0 && (
+            <button
+              onClick={handleExportCsv}
+              disabled={isExporting}
+              className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              CSV
+            </button>
           )}
         </div>
 

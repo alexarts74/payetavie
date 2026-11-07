@@ -431,6 +431,66 @@ export async function getInvoicingStats(year?: number) {
   return { data: stats, error: null }
 }
 
+export async function exportInvoicesCsv(year?: number, filters?: { status?: string; clientId?: string }) {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { error: planCheck.error }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Non authentifie' }
+  }
+
+  const targetYear = (year && Number.isInteger(year) && year > 1900 && year < 2200) ? year : new Date().getFullYear()
+
+  let query = supabase
+    .from('billing_documents')
+    .select('*, client:clients(*)')
+    .eq('user_id', user.id)
+    .eq('type', 'invoice')
+    .gte('document_date', `${targetYear}-01-01`)
+    .lt('document_date', `${targetYear + 1}-01-01`)
+    .order('document_date', { ascending: true })
+
+  if (filters?.status) {
+    query = query.eq('status', filters.status)
+  }
+  if (filters?.clientId) {
+    query = query.eq('client_id', filters.clientId)
+  }
+
+  const { data: invoices, error } = await query
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  const esc = (val: string) => `"${val.replace(/"/g, '""')}"`
+
+  const header = 'Numéro,Date,Échéance,Client,Statut,Montant HT (€),Taux TVA (%),Montant TVA (€),Total TTC (€),Notes'
+  const rows = (invoices || []).map((inv) => {
+    return [
+      esc(inv.document_number || ''),
+      esc(inv.document_date || ''),
+      esc(inv.due_date || ''),
+      esc(inv.client?.company_name || ''),
+      esc(inv.status || ''),
+      Number(inv.total_ht).toFixed(2),
+      Number(inv.tva_rate).toFixed(2),
+      Number(inv.tva_amount ?? 0).toFixed(2),
+      Number(inv.total_ttc).toFixed(2),
+      esc(inv.notes || ''),
+    ].join(',')
+  })
+
+  return { data: [header, ...rows].join('\n') }
+}
+
 export async function duplicateInvoice(id: string) {
   const supabase = await createClient()
   const {
