@@ -56,15 +56,6 @@ serve(async (req: Request): Promise<Response> => {
       throw error
     }
 
-    if (!reminders || reminders.length === 0) {
-      return new Response(
-        JSON.stringify({ message: 'Aucun rappel à notifier', count: 0 }),
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
-    }
-
     const emailsSent = []
     const errors = []
 
@@ -192,14 +183,125 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    // --- Factures en retard ---
+    const { data: overdueInvoices, error: overdueError } = await supabase.rpc('get_overdue_invoices_to_notify')
+
+    const invoicesSent = []
+    const invoiceErrors = []
+
+    if (!overdueError && overdueInvoices && overdueInvoices.length > 0) {
+      for (let i = 0; i < overdueInvoices.length; i++) {
+        const inv = overdueInvoices[i]
+
+        await new Promise(resolve => setTimeout(resolve, 600))
+
+        try {
+          const invoiceEmailResult = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: Deno.env.get('RESEND_FROM_EMAIL') || 'PayeTaVie <onboarding@resend.dev>',
+              to: inv.user_email,
+              subject: `⚠️ Facture ${inv.document_number} en retard – ${inv.client_name}`,
+              html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                  <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: white; margin: 0; font-size: 24px;">⚠️ Facture en retard</h1>
+                  </div>
+
+                  <div style="background: #fef2f2; padding: 25px; border-radius: 12px; margin: 20px 0; border-left: 4px solid #dc2626;">
+                    <h2 style="margin-top: 0; color: #1f2937; font-size: 20px;">Facture ${inv.document_number}</h2>
+                    <p style="color: #6b7280; margin: 10px 0;">
+                      <strong>Client :</strong> ${inv.client_name}
+                    </p>
+                    <p style="color: #6b7280; margin: 10px 0;">
+                      <strong>Montant TTC :</strong>
+                      <span style="color: #dc2626; font-weight: bold;">
+                        ${Number(inv.total_ttc).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                      </span>
+                    </p>
+                    <p style="color: #6b7280; margin: 10px 0;">
+                      <strong>Échéance :</strong>
+                      <span style="color: #dc2626; font-weight: bold;">
+                        ${new Date(inv.due_date).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </span>
+                    </p>
+                    <p style="color: #374151; margin: 15px 0;">
+                      Cette facture est en retard de <strong>${inv.days_overdue} jour${inv.days_overdue > 1 ? 's' : ''}</strong>.
+                    </p>
+                  </div>
+
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${APP_URL}/freelance/facturation/factures/${inv.invoice_id}"
+                       style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                      Voir la facture
+                    </a>
+                  </div>
+
+                  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+                  <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
+                    <a href="${APP_URL}" style="color: #667eea;">PayeTaVie</a> - Votre assistant administratif personnel
+                  </p>
+                </body>
+                </html>
+              `,
+            }),
+          })
+
+          let invoiceEmailData
+          try {
+            invoiceEmailData = await invoiceEmailResult.json()
+          } catch (e) {
+            invoiceEmailData = { message: 'Erreur lors de la lecture de la réponse' }
+          }
+
+          if (invoiceEmailResult.ok && invoiceEmailData?.id) {
+            const { error: insertError } = await supabase
+              .from('invoice_payment_notifications')
+              .insert({
+                invoice_id: inv.invoice_id,
+                user_id: inv.user_id,
+              })
+
+            if (insertError) {
+              console.error('Erreur lors de l\'enregistrement de la notification facture:', insertError)
+              invoiceErrors.push({ invoice_id: inv.invoice_id, error: insertError.message })
+            } else {
+              invoicesSent.push({ invoice_id: inv.invoice_id, user_email: inv.user_email, days_overdue: inv.days_overdue })
+            }
+          } else {
+            console.error('Erreur lors de l\'envoi de l\'email facture:', invoiceEmailData)
+            invoiceErrors.push({ invoice_id: inv.invoice_id, error: invoiceEmailData.message || 'Erreur inconnue' })
+          }
+        } catch (invoiceError) {
+          console.error('Erreur pour la facture:', inv.invoice_id, invoiceError)
+          invoiceErrors.push({ invoice_id: inv.invoice_id, error: invoiceError instanceof Error ? invoiceError.message : String(invoiceError) })
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({
-        message: `${emailsSent.length} emails envoyés avec succès`,
+        message: `${emailsSent.length} rappels et ${invoicesSent.length} relances factures envoyés`,
         sent: emailsSent.length,
         errors: errors.length,
+        invoicesSent: invoicesSent.length,
+        invoiceErrors: invoiceErrors.length,
         details: {
           emailsSent,
+          invoicesSent,
           errors: errors.length > 0 ? errors : undefined,
+          invoiceErrors: invoiceErrors.length > 0 ? invoiceErrors : undefined,
         },
       }),
       {

@@ -6,13 +6,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PayeTaVie is a French-language personal administrative assistant web application. It helps users manage various life administration aspects (taxes, insurance, healthcare, housing, etc.) through guides, checklists, document storage, reminders, and bookmarks. It also includes a freelance module (invoicing, quotations, clients) gated behind the Pro plan.
 
+## Monorepo Structure
+
+This is a **Turborepo monorepo**:
+- `apps/web/` — Next.js 16 web app
+- `apps/mobile/` — Expo React Native mobile app
+- `packages/shared/` — Shared TypeScript types and utilities (`@payetavie/shared`)
+- `packages/supabase/` — Shared Supabase client factory (`@payetavie/supabase`)
+
 ## Commands
 
 ```bash
-npm run dev          # Start development server (http://localhost:3000)
-npm run build        # Production build
-npm run lint         # Run ESLint
-npm run supabase:deploy  # Deploy Supabase edge function (send-reminder-notifications)
+# From root (all workspaces via Turbo)
+npm run dev          # Start all dev servers
+npm run dev:web      # Start web app only (http://localhost:3000)
+npm run dev:mobile   # Start Expo dev server
+npm run build        # Build all workspaces
+
+# Web app only (from root)
+npm run dev --workspace=apps/web
+npm run build --workspace=apps/web
+
+# Mobile app only
+npm run dev --workspace=apps/mobile
+# or: cd apps/mobile && npx expo start
+
+npm run supabase:deploy  # Deploy Supabase edge function
 npm run supabase:test    # Serve Supabase function locally
 ```
 
@@ -20,6 +39,7 @@ No test framework is configured — there are no unit or integration tests.
 
 ## Tech Stack
 
+### Web (`apps/web`)
 - **Next.js 16** with App Router and React 19 (React Compiler enabled via babel-plugin-react-compiler)
 - **Supabase** for database (PostgreSQL), authentication, and file storage
 - **Tailwind CSS 4** for styling (configured via `@tailwindcss/postcss`)
@@ -27,7 +47,23 @@ No test framework is configured — there are no unit or integration tests.
 - **shadcn/ui** + **Lucide React** for UI components
 - **Stripe** for subscriptions (plans: free, essentiel €4.99/mois, pro €9.99/mois)
 
+### Mobile (`apps/mobile`)
+- **Expo SDK 52** with Expo Router 4 (file-based routing)
+- **React Native 0.76** with New Architecture enabled
+- **NativeWind v4** for styling (Tailwind CSS v3 syntax)
+- **@supabase/supabase-js** + **expo-secure-store** for auth persistence
+- **expo-web-browser** for Stripe Checkout (in-app browser)
+
+### Shared (`packages/shared`, `packages/supabase`)
+- Pure TypeScript, no framework dependencies
+- `@payetavie/shared`: types, topic-utils, auth-errors, stripe constants, profile-topics, predefined-reminders
+- `@payetavie/supabase`: `createSupabaseClient()` factory
+
 ## Architecture
+
+### Web Architecture
+
+All web source code is in `apps/web/src/`. All Next.js commands run from `apps/web/` or via `--workspace=apps/web` from root.
 
 ### Route Structure
 
@@ -38,30 +74,30 @@ No test framework is configured — there are no unit or integration tests.
 
 ### Authentication Flow
 
-1. Middleware (`src/middleware.ts`) delegates to `src/lib/supabase/middleware.ts`
+1. Middleware (`apps/web/src/middleware.ts`) delegates to `apps/web/src/lib/supabase/middleware.ts`
 2. Session validated via `supabase.auth.getUser()` on every request
 3. Unauthenticated users on protected routes are redirected to `/auth/login`
-4. Cookie-based auth via `@supabase/ssr`: server client (`src/lib/supabase/server.ts`), browser client (`src/lib/supabase/client.ts`)
-5. Auth error messages translated to French in `src/lib/auth-errors.ts`
+4. Cookie-based auth via `@supabase/ssr`: server client (`apps/web/src/lib/supabase/server.ts`), browser client (`apps/web/src/lib/supabase/client.ts`)
+5. Auth error messages translated to French in `apps/web/src/lib/auth-errors.ts`
 
 ### Subscription / Plan System
 
-Plans and limits defined in `src/lib/stripe.ts`:
+Plans and limits defined in `apps/web/src/lib/stripe.ts`:
 - **free:** 3 topics, 5 documents, 10 rappels, 5 bookmarks/topic
 - **essentiel (€4.99/mois):** illimité (admin uniquement)
 - **pro (€9.99/mois):** illimité + module freelance
 
-Key helpers in `src/lib/subscription.ts`:
+Key helpers in `apps/web/src/lib/subscription.ts`:
 - `getUserSubscription()` — returns `{ plan, isActive, subscription }`
 - `canAccess(userPlan, requiredPlan)` — checks plan hierarchy
 - `requirePlan(requiredPlan)` — returns `{ allowed, error, upgradeRequired }` or `{ allowed, plan }`
 - `checkResourceLimit(resource, userId, topicSlug?)` — checks free-plan limits
 
-Stripe webhook at `src/app/api/webhooks/stripe/route.ts` handles subscription lifecycle.
+Stripe webhook at `apps/web/src/app/api/webhooks/stripe/route.ts` handles subscription lifecycle.
 
 ### Server Actions Pattern
 
-All database operations are in `src/app/actions/` using `'use server'` directive:
+All database operations are in `apps/web/src/app/actions/` using `'use server'` directive:
 
 | File | Responsibilities |
 |------|-----------------|
@@ -115,7 +151,7 @@ Core tables with Row-Level Security (RLS) policies isolating data per user:
 
 All tables have auto-updating `updated_at` triggers. Schema files are in `migrations/` (ordered `000_` to `009_`).
 
-Shared types are in `src/types/index.ts`.
+Shared types are in `apps/web/src/types/index.ts`.
 
 ### Invoice / Quotation Status Machine
 
@@ -127,21 +163,21 @@ Only `brouillon` documents can be edited or deleted. Conversion devis→facture 
 ### PDF Generation
 
 API routes generate PDFs:
-- `src/app/api/freelance/invoices/[id]/pdf/route.ts`
-- `src/app/api/freelance/quotations/[id]/pdf/route.ts`
+- `apps/web/src/app/api/freelance/invoices/[id]/pdf/route.ts`
+- `apps/web/src/app/api/freelance/quotations/[id]/pdf/route.ts`
 
-Templates: `src/lib/pdf/invoice-template.tsx`, `src/lib/pdf/quotation-template.tsx`. Les PDFs incluent le profil professionnel (logo, SIRET, IBAN) et la mention légale TVA pour micro-entrepreneurs.
+Templates: `apps/web/src/lib/pdf/invoice-template.tsx`, `apps/web/src/lib/pdf/quotation-template.tsx`. Les PDFs incluent le profil professionnel (logo, SIRET, IBAN) et la mention légale TVA pour micro-entrepreneurs.
 
 ### Topic System
 
-Slugs définis dans `src/lib/topic-utils.ts` (`topicMap`): impots, urssaf, fiches-de-paie, caf, assurances, mutuelle, medecin-generaliste, pharmacie, analyses-medicales, logement, **freelance-clients**, **freelance-facturation**.
+Slugs définis dans `apps/web/src/lib/topic-utils.ts` (`topicMap`): impots, urssaf, fiches-de-paie, caf, assurances, mutuelle, medecin-generaliste, pharmacie, analyses-medicales, logement, **freelance-clients**, **freelance-facturation**.
 
 Les slugs `freelance-*` sont routés vers `/freelance/{slug sans préfixe}` dans `NavLinks.tsx` et `ManageTopicsModal.tsx`. La catégorie Freelance dans la nav n'est visible que pour les utilisateurs pro.
 
-Each topic page (`src/app/topics/[slug]/page.tsx`) includes:
+Each topic page (`apps/web/src/app/topics/[slug]/page.tsx`) includes:
 - TL;DR summary with checklist (progress tracked in DB)
 - FAQ modal (floating button)
-- Predefined reminders from `src/lib/predefined-reminders.ts`
+- Predefined reminders from `apps/web/src/lib/predefined-reminders.ts`
 - Document uploads and bookmark management
 
 ### Key Components
