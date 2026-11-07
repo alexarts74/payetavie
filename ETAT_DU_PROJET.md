@@ -1,6 +1,6 @@
 # État du projet — PayeTaVie
 
-> Dernière mise à jour : 2026-05-21 (rappels récurrents, pages erreur, confirmation email UX)
+> Dernière mise à jour : 2026-11-08 (migration monorepo Turborepo + app mobile Expo)
 
 ---
 
@@ -8,7 +8,11 @@
 
 PayeTaVie est un assistant administratif personnel en français. L'app aide les utilisateurs à gérer leur vie admin (impôts, assurances, santé, logement, etc.) + un module freelance (facturation, devis, clients) réservé au plan Pro.
 
-**Stack :** Next.js 16 App Router · React 19 · Supabase (DB + Auth + Storage) · Tailwind CSS 4 · Stripe · shadcn/ui
+**Stack web :** Next.js 16 App Router · React 19 · Supabase (DB + Auth + Storage) · Tailwind CSS 4 · Stripe · shadcn/ui
+
+**Stack mobile :** Expo SDK 52 · React Native 0.76 · Expo Router 4 · NativeWind v4 · expo-secure-store
+
+**Monorepo :** Turborepo · npm workspaces · `apps/web` · `apps/mobile` · `packages/shared` · `packages/supabase`
 
 ---
 
@@ -212,6 +216,9 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 | Upload logo | DONE | Supabase Storage |
 | Flag micro-entrepreneur (mention TVA auto) | DONE | |
 | Dashboard facturation (stats CA) | DONE | `FacturationDashboard.tsx` |
+| Graphique CA mensuel (12 barres SVG) | DONE | `getMonthlyRevenueStats()` |
+| Top clients par CA encaissé | DONE | `getClientRevenueStats()` |
+| Export CSV comptable des factures | DONE | `exportInvoicesCsv()` filtrable par année/statut/client |
 
 ---
 
@@ -247,10 +254,31 @@ PayeTaVie est un assistant administratif personnel en français. L'app aide les 
 | RLS Supabase sur toutes les tables | DONE | Isolation par `user_id` |
 | Triggers `updated_at` auto | DONE | |
 | Edge Function cron rappels emails | DONE | Supabase Functions + Resend |
-| Migrations versionnées | DONE | `migrations/` (`000_` → `010_`) |
+| Migrations versionnées | DONE | `migrations/` (`000_` → `011_`) |
 | `revalidatePath` après chaque mutation | DONE | |
 | TypeScript strict mode | DONE | |
 | ESLint configuré | DONE | |
+
+---
+
+---
+
+### APP MOBILE (Expo React Native)
+
+| Feature | Statut | Notes |
+|---------|--------|-------|
+| Auth (login, register, logout) | DONE | `expo-secure-store` + `onAuthStateChange` |
+| Guard auth routes protégées | DONE | `(protected)/_layout.tsx` |
+| Dashboard | DONE | Stats + rappels à venir |
+| Topics list + détail | DONE | Rappels + documents |
+| Dépenses (liste, budgets, récurrentes) | DONE | |
+| Profil utilisateur | DONE | |
+| Page pricing | DONE | |
+| Freelance clients (liste + détail) | DONE | Plan Pro uniquement |
+| Freelance facturation (index, factures, devis) | DONE | Avec visionneuse PDF via web-browser |
+| Stripe Checkout | DONE | Via `expo-web-browser` |
+| Plan checks pro | DONE | `src/lib/subscription.ts` |
+| EAS Build configuré | DONE | `eas.json` |
 
 ---
 
