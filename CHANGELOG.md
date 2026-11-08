@@ -4,6 +4,253 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-08 — Parité web ↔ mobile : reset password, annuaire, profil pro
+
+### Mobile — Reset password (deep link)
+
+Complétion du flow mot de passe oublié : écran `(auth)/reset-password.tsx` gérant le deep link Supabase PKCE (`payetavie://reset-password?code=...`).
+
+- Échange du code PKCE via `supabase.auth.exchangeCodeForSession(code)` (extrait de `useLocalSearchParams`)
+- États : chargement → erreur si lien invalide/expiré → formulaire nouveau mot de passe
+- Validation (min 6 caractères, confirmation), appel `supabase.auth.updateUser({ password })`
+- Déconnexion + redirection vers login après succès
+- `forgot-password.tsx` mis à jour : ajout de `redirectTo: 'payetavie://reset-password'` dans `resetPasswordForEmail`
+
+### Web — Page `/annuaire`
+
+Nouvelle page dédiée à l'annuaire des administrations, accessible aux plans Essentiel et Pro.
+
+- `apps/web/src/app/annuaire/layout.tsx` : layout avec vérification plan Essentiel + TopicsShell
+- `apps/web/src/app/annuaire/page.tsx` : page serveur, récupère le code postal depuis les préférences
+- Réutilise le composant `AnnuaireGlobal` existant
+- Lien "Annuaire" ajouté dans la sidebar (`NavLinks`) pour les plans Essentiel+
+
+### Web — Page `/freelance/profil`
+
+Nouvelle page standalone pour le profil professionnel (précédemment uniquement accessible dans `/profile`).
+
+- `apps/web/src/app/freelance/profil/page.tsx` : page serveur dans le layout freelance (Pro requis)
+- `apps/web/src/components/ProfilProfessionnelContent.tsx` : composant client avec formulaire complet (infos générales, adresse, IBAN/BIC, préfixes facturation, taux horaire)
+- Lien "Profil pro" ajouté dans la section Freelance de la sidebar
+
+---
+
+## 2026-11-08 — Typographie Caprasimo/Jost + Application règle 60/30/10 (mobile)
+
+### Mobile — Refonte typographique
+
+Remplacement de DMSans par un duo de polices Google Fonts plus expressif :
+
+| Ancienne | Nouvelle | Usage |
+|----------|----------|-------|
+| `DMSans_700Bold` | `Caprasimo_400Regular` | Titres de page, valeurs stat, montants |
+| `DMSans_500Medium` | `Jost_500Medium` | Labels, section headers, badges, boutons |
+| `DMSans_400Regular` | `Jost_300Light` | Corps de texte, sous-titres, descriptions |
+| `DMSans_600SemiBold` | `Jost_500Medium` | Badges, texte CTA |
+
+**Packages installés :** `@expo-google-fonts/caprasimo`, `@expo-google-fonts/jost`
+
+**Fichiers modifiés :** `_layout.tsx`, `(protected)/_layout.tsx`, `dashboard.tsx`, `depenses/index.tsx`, `topics/index.tsx`, `profile.tsx`
+
+### Mobile — Application règle 60/30/10 (rose visible)
+
+Le rose `#EBA7CB` (10% accent) est maintenant utilisé aux bons endroits :
+
+- **Chips actifs** (catégories annuaire, fréquence dépenses récurrentes, récurrence rappels) : `bg-violet-600` → `bg-[#EBA7CB]`, texte `text-white` → `text-[#235037]`
+- **Icônes "Favoris" et "Rappels complétés"** (stat cards dashboard) : fond `#EEF7F1` → `#FDEEF6`
+- **Badge budget normal** (ni dépassé ni >80%) : fond `#EEF7F1` → `#FDEEF6`, couleur texte `#235037` → `#B05080`
+- **CTA "Créer un rappel"** (empty state) : fond `#235037` → `#EBA7CB`, texte `#FFFFFF` → `#235037`
+- **Icônes "Actions rapides"** et section icon : fond `#EEF7F1` → `#FDEEF6`
+
+**Tokens ajoutés dans `tailwind.config.js` :** `accent: '#EBA7CB'`, `accent-light: '#FDEEF6'`
+
+**Fichiers modifiés :** `tailwind.config.js`, `dashboard.tsx`, `annuaire.tsx`, `depenses/recurrents.tsx`, `topics/[slug].tsx`
+
+---
+
+## 2026-11-08 — Redesign palette mobile : Jaune · Rose · Vert
+
+### Mobile — Nouvelle identité visuelle
+
+Remplacement complet de la palette violette par une palette nature/warm à 3 couleurs sur toute l'app mobile.
+
+**Tokens de couleur :**
+- Fond de page : `#F3F3F1` (gris) → **`#F5E9AF`** (jaune pâle)
+- Couleur primaire (CTA, icônes, boutons) : `#7C3AED` (violet) → **`#235037`** (vert foncé)
+- Icon background (violet-50) : `#F5F3FF` → **`#EEF7F1`** (vert très clair)
+- Accent sur fond foncé (violet-200/C4B5FD) : → **`#EBA7CB`** (rose)
+- État désactivé (violet-400) : → **`#5E8A71`** (vert moyen)
+- Tab bar background : → **`#1A2F21`** (vert très foncé)
+- Muted text : → **`#5A6B61`** (gris-vert)
+
+**Stratégie :** override du scale `violet` dans `tailwind.config.js` → tous les `bg-violet-*`, `text-violet-*` existants sont mis à jour automatiquement sans toucher aux TSX.
+
+**Corrections bonus :**
+- `annuaire.tsx` : bug `border-blue-600` → `border-violet-600` sur le chip actif
+- `forgot-password.tsx` : bouton CTA `bg-blue-600` → `bg-violet-600` (désormais vert)
+
+**Fichiers modifiés :**
+`tailwind.config.js`, `_layout.tsx`, `dashboard.tsx`, `annuaire.tsx`, `forgot-password.tsx`, `pricing.tsx`, `profile.tsx`, `calendar.tsx`, `topics/index.tsx`, `topics/[slug].tsx`, `depenses/index.tsx`, `depenses/budgets.tsx`, `depenses/recurrents.tsx`, `freelance/**/*.tsx`
+
+---
+
+## 2026-11-08 — Remplacement des emojis UI par Ionicons (mobile)
+
+### Mobile — Icônes UI remplacées dans 11 écrans
+
+Tous les emojis utilisés comme chrome UI (hors données : emojis de catégories, topics, `getTopicIcon()`) remplacés par `Ionicons` de `@expo/vector-icons` pour un rendu cohérent et professionnel.
+
+**Mappings appliqués :**
+- `📂` → `folder-open-outline` (topics empty state)
+- `🔒` → `lock-closed-outline` dans un cercle `bg-violet-50` (clients, facturation, profil pro, annuaire)
+- `🔗` → `link-outline` (bookmark icon, topics/[slug])
+- `📄` → `document-text-outline` (document icon + modal preview, topics/[slug])
+- `📊` → `bar-chart-outline` (raccourci budgets, dépenses)
+- `🔄` → `sync-outline` (raccourci récurrents, dépenses)
+- `👥` → `people-outline` (avatar client, clients/[id])
+- `🧾` → `receipt-outline` (factures nav + écran nouvelle)
+- `📋` → `document-outline` / `document-text-outline` (devis nav + écran nouveau)
+- `🏢` → `business-outline` (profil pro header + nav facturation)
+- `›` text → `chevron-forward` (topics/index, facturation/index nav items)
+
+**Fichiers modifiés :**
+`topics/index.tsx`, `topics/[slug].tsx`, `depenses/index.tsx`, `freelance/clients/index.tsx`, `freelance/clients/[id].tsx`, `freelance/facturation/index.tsx`, `freelance/profil.tsx`, `annuaire.tsx`, `factures/nouvelle.tsx`, `devis/nouveau.tsx`
+
+---
+
+## 2026-11-08 — Harmonisation design system mobile (tous les écrans)
+
+### Mobile — 16 écrans harmonisés sur le design system du dashboard
+
+**Tokens appliqués globalement :**
+- Fond : `bg-gray-50` → `bg-[#F3F3F1]` sur tous les écrans
+- Couleur primaire : `bg-blue-600`/`bg-indigo-600` → `bg-violet-600` (boutons, accents)
+- Cartes : `rounded-xl` → `rounded-2xl` sur tous les conteneurs blancs
+- Scroll padding : `pb-28` ajouté partout (tab bar liquid glass)
+
+**Écrans principaux (tabs sans header natif) — grand titre ajouté :**
+- `profile.tsx` : header "Mon profil" + sous-titre, `useSafeAreaInsets`
+- `calendar.tsx` : header "Calendrier" + sous-titre mois, `useSafeAreaInsets`
+- `topics/index.tsx` : header "Mes topics" + sous-titre, `useSafeAreaInsets`
+- `depenses/index.tsx` : header "Dépenses" + sous-titre mois, `useSafeAreaInsets`
+
+**Sous-écrans (design tokens seulement) :**
+- `annuaire.tsx`, `topics/[slug].tsx`
+- `depenses/budgets.tsx`, `depenses/recurrents.tsx`
+- `freelance/clients/index.tsx`, `freelance/clients/[id].tsx`
+- `freelance/facturation/index.tsx`, `freelance/facturation/factures/index.tsx`
+- `freelance/facturation/factures/[id].tsx`, `freelance/facturation/factures/nouvelle.tsx`
+- `freelance/facturation/devis/index.tsx`, `freelance/facturation/devis/[id].tsx`
+- `freelance/facturation/devis/nouveau.tsx`, `freelance/profil.tsx`
+- `pricing.tsx`
+
+---
+
+## 2026-11-08 — Dashboard mobile redesign v2 (style référence, contenu toujours affiché)
+
+### Mobile — `dashboard.tsx` (refonte complète)
+- **Header** : grand titre "Tableau de bord" (36px bold) + "Bonjour {prénom}" + bouton cloche glassmorphique — plus de hero dark card
+- **Grille 4 stat cards 2×2** : Rappels actifs, Documents, Favoris, % complétés — chacun avec icône colorée + badge (ex: "2 en retard", "1 expirant") si pertinent
+- **Card dépenses plein largeur** : montant en grand (38px), barre de progression couleur adaptative (violet / ambre / rouge), badge "X% budget", sous-label du budget
+- **Section "À traiter"** : fusionne overdues + docs expirant ≤30j — badge "En retard" / "J-X" coloré ; si vide : empty state avec bouton CTA "Créer un rappel"
+- **Section "Prochains rappels"** : liste blanche avec icône violette, date complète
+- **Section "Documents récents"** : 4 derniers docs uploadés (nouveau — absent avant)
+- **Section "Actions rapides"** : 3 boutons toujours visibles (Topics, Documents, Calendrier) — dashboard jamais vide
+- Styles extraits dans `StyleSheet.create()` — plus de styles inline en masse
+- Chargement de 2 requêtes supplémentaires : `reminders` total + completed (pour % complétion), `documents` récents
+
+---
+
+## 2026-11-08 — Sprint 3 parité mobile — calendrier, annuaire, freelance mutations
+
+### Mobile — `calendar.tsx` (nouveau)
+- Calendrier mensuel avec navigation mois précédent/suivant
+- Grille 7 colonnes (lundi en premier), offset de début de mois
+- Dots colorés par jour : orange = rappel, violet = document expirant, rouge = rappel en retard
+- Jour courant mis en évidence (fond indigo)
+- Tap sur une cellule → liste des événements du jour dans une card
+- Données : `reminders` (non complétés) + `documents` (expires_at non null) filtrés par mois
+
+### Mobile — `annuaire.tsx` (nouveau)
+- Plan check `requirePlan('essentiel')` — upgrade prompt si plan free
+- 8 catégories : Impôts, CAF, Santé (CPAM), Emploi, Pôle Emploi, URSSAF, Logement (ADIL), Préfecture, CROUS
+- Input code postal (5 chiffres) + chips catégorie (scroll horizontal)
+- Appel direct API `api-lannuaire.service-public.fr` depuis React Native (pas de CORS mobile)
+- Parsing JSON imbriqué pour adresse, téléphone, email, horaires
+- État "Aucun résultat" si liste vide après recherche
+
+### Mobile — `freelance/profil.tsx` (nouveau)
+- Plan check `requirePlan('pro')`
+- Affichage des sections : informations générales, adresse, paiement, facturation
+- Badge "Micro-entrepreneur — TVA non applicable" si `is_micro_entrepreneur`
+- Modal d'édition unique (tous les champs) avec `Switch` pour `is_micro_entrepreneur`
+- Upsert Supabase avec `onConflict: 'user_id'`
+- Lien depuis `freelance/facturation/index.tsx` (card "Profil professionnel")
+
+### Mobile — `freelance/clients/index.tsx` (modifié)
+- Bouton "+" dans le header → modal création client
+- Champs : company_name (requis), contact_name, email, phone, address_line1, city, postal_code, siret, payment_terms_days (défaut 30), notes
+- Après création : ajout local au state trié par company_name
+
+### Mobile — `freelance/clients/[id].tsx` (modifié)
+- Bouton "Modifier" dans le header → modal édition pré-remplie
+- Bouton toggle actif/inactif en bas de page
+- Mise à jour du state local après chaque mutation
+
+### Mobile — `freelance/facturation/factures/[id].tsx` (modifié)
+- Boutons de transition de statut après "Voir le PDF" :
+  - `brouillon` → Marquer comme envoyée
+  - `envoyee` → Marquer comme payée / Marquer en retard / Annuler ⚠️
+  - `en_retard` → Marquer comme payée / Annuler ⚠️
+- Confirmation `Alert.alert` avant annulation
+
+### Mobile — `freelance/facturation/devis/[id].tsx` (modifié)
+- Badge de statut ajouté dans le header (manquant)
+- Boutons de transition :
+  - `brouillon` → Marquer comme envoyé
+  - `envoye` → Accepté ✓ / Refusé ✗ (avec confirmation)
+
+### Mobile — `_layout.tsx` (modifié)
+- Nouveaux écrans enregistrés : `calendar`, `annuaire` (dans le drawer), `freelance/profil` (hidden)
+
+---
+
+## 2026-11-08 — Sprint 2 parité mobile — catégories, récurrents, profil, dashboard, documents
+
+### Mobile — `budgets.tsx` (réécriture CRUD)
+- Lister les catégories de dépenses avec icône, couleur et budget mensuel
+- Bouton "Initialiser les catégories par défaut" si aucune catégorie (10 catégories prédéfinies)
+- Bouton "+" → modal création : nom, icône emoji, couleur (10 swatches hex), budget mensuel optionnel
+- Tap → modal édition pré-rempli ; long-press → Alert suppression
+- Helper `resolveColor()` : convertit les anciens noms Tailwind ('blue'…) vers hex (#3b82f6…)
+
+### Mobile — `recurrents.tsx` (réécriture CRUD)
+- Lister toutes les dépenses récurrentes (actives et inactives)
+- Bouton "+" → modal création : titre, montant, fréquence (weekly/monthly/quarterly/yearly), date début, catégorie (picker horizontal), jour du mois (si mensuelle/trimestrielle)
+- Tap → modal édition ; long-press → Alert suppression
+- Bouton toggle actif/inactif inline (icône ⏸/▶) par dépense
+
+### Mobile — `profile.tsx` (réécriture complète)
+- **Nom d'affichage** : affichage + édition inline via `supabase.auth.updateUser({ data: { display_name } })`
+- **Mot de passe** : section dédiée avec 2 champs (nouveau + confirmation) → `supabase.auth.updateUser({ password })`
+- **Type de profil** : 5 chips (étudiant, salarié, indépendant, recherche emploi, autre) — sauvegarde immédiate
+- **Topics** : modal liste complète avec toggles, limite 3 pour plan free, check plan avant ajout
+- Lien abonnement et déconnexion conservés
+
+### Mobile — `dashboard.tsx` (enrichissement)
+- **Card dépenses du mois** : total calculé dynamiquement + barre de progression si budget global défini
+- **Rappels en retard** : section rouge distincte (`due_date < aujourd'hui`) avant les rappels à venir
+- **Documents à renouveler** : top-3 docs avec `expires_at`, badge urgent (rouge) si ≤ 30 jours, affichage J-X
+
+### Mobile — `topics/[slug].tsx` (upload/delete documents)
+- Bouton "+" dans la section Documents → `DocumentPicker.getDocumentAsync()`
+- Modal après sélection : nom (pré-rempli), date d'expiration (optionnel), employeur/émetteur (optionnel)
+- Upload : `fetch(uri)` → blob → `supabase.storage.from('Documents').upload(filePath, blob)`
+- Insert dans `documents` avec tous les métadonnées (file_path, file_size, file_type, expires_at, employer_name)
+- Bouton × sur chaque document → Alert confirmation → delete storage + delete DB
+
+---
+
 ## 2026-11-08 — Sprint 1 parité mobile — CRUD topics, dépenses, auth
 
 ### Mobile — Auth

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Alert } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { supabase } from '@/lib/supabase'
 
@@ -14,7 +15,9 @@ export default function ForgotPasswordScreen() {
       return
     }
     setLoading(true)
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim())
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: 'payetavie://reset-password',
+    })
     setLoading(false)
     if (error) {
       Alert.alert('Erreur', error.message)
@@ -26,13 +29,15 @@ export default function ForgotPasswordScreen() {
   if (sent) {
     return (
       <View className="flex-1 bg-white justify-center px-6">
-        <Text className="text-5xl text-center mb-4">📧</Text>
+        <View className="w-20 h-20 bg-violet-50 rounded-full items-center justify-center mb-4 mx-auto">
+          <Ionicons name="mail-outline" size={36} color="#235037" />
+        </View>
         <Text className="text-2xl font-bold text-gray-900 text-center mb-2">Email envoyé !</Text>
         <Text className="text-gray-500 text-center mb-8">
           Vérifiez votre boîte mail et suivez le lien pour réinitialiser votre mot de passe.
         </Text>
         <TouchableOpacity
-          className="bg-blue-600 rounded-xl py-3.5 items-center"
+          className="bg-violet-600 rounded-xl py-3.5 items-center"
           onPress={() => router.back()}
         >
           <Text className="text-white font-semibold text-base">Retour à la connexion</Text>
@@ -73,7 +78,7 @@ export default function ForgotPasswordScreen() {
           </View>
 
           <TouchableOpacity
-            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-blue-400' : 'bg-blue-600'}`}
+            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-violet-400' : 'bg-violet-600'}`}
             onPress={handleReset}
             disabled={loading}
           >

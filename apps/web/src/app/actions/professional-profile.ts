@@ -75,5 +75,6 @@ export async function upsertProfessionalProfile(profileData: {
 
   revalidatePath('/profile')
   revalidatePath('/freelance/facturation')
+  revalidatePath('/freelance/profil')
   return { data: data as ProfessionalProfile }
 }
