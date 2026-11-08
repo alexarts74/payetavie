@@ -224,6 +224,38 @@ STRIPE_PRO_PRICE_ID=
 STRIPE_WEBHOOK_SECRET=
 ```
 
+## Règle de parité web ↔ mobile
+
+**Toute nouvelle feature doit être implémentée sur les deux plateformes.**
+
+### Si la feature est développée côté web
+1. Implémenter la feature dans `apps/web/` normalement (Server Action + composant)
+2. Implémenter l'équivalent dans `apps/mobile/` :
+   - Remplacer le Server Action par un appel Supabase direct dans un hook ou une fonction dans `apps/mobile/src/lib/`
+   - Créer l'écran correspondant dans `apps/mobile/app/(protected)/`
+   - Utiliser NativeWind (className Tailwind) pour le style — même logique visuelle que le web
+3. Si la feature introduit de nouveaux types → les ajouter dans `packages/shared/src/types.ts` (pas dans `apps/web/src/types/index.ts` uniquement)
+
+### Si la feature est développée côté mobile
+Appliquer la logique inverse : implémenter le Server Action web + page Next.js correspondants.
+
+### Exceptions acceptées (pas besoin de parité)
+- Fonctionnalités spécifiques à une plateforme : PDF en iframe (web only), expo-notifications (mobile only), iCal export (web only)
+- Pages légales / CGU / mentions légales (web only)
+- Landing page marketing (web only)
+
+### Design
+- **Web** : shadcn/ui + Tailwind CSS 4 — composants dans `apps/web/src/components/`
+- **Mobile** : composants React Native + NativeWind v4 — même palette de couleurs et hiérarchie visuelle que le web
+- Les couleurs, espacements et logique de layout doivent rester cohérents entre les deux plateformes
+- Si un composant de design est refactorisé sur web (couleurs, espacements, structure), appliquer les mêmes changements sur mobile
+
+### Mobile — règles techniques
+- Jamais de Server Actions depuis le mobile — utiliser `supabase` directement depuis `apps/mobile/src/lib/supabase.ts`
+- Toujours filtrer par `user_id` sur les requêtes de détail (défense en profondeur en plus de RLS)
+- Plan checks : utiliser `requirePlan()` de `apps/mobile/src/lib/subscription.ts`
+- Types partagés : importer depuis `@payetavie/shared`, jamais dupliquer dans le mobile
+
 ## Code Conventions
 
 - All UI text must be in **French**
