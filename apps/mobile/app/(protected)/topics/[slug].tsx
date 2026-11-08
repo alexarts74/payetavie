@@ -4,6 +4,8 @@ import {
   Modal, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native'
 import { useLocalSearchParams, useNavigation } from 'expo-router'
+import * as DocumentPicker from 'expo-document-picker'
+import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { getTopicTitle, getTopicIcon, getTopicChecklist } from '@payetavie/shared'
@@ -21,6 +23,19 @@ interface ReminderForm {
 interface BookmarkForm {
   resource_name: string
   resource_url: string
+}
+
+interface DocumentUploadForm {
+  name: string
+  expires_at: string
+  employer_name: string
+}
+
+interface PickedFile {
+  uri: string
+  name: string
+  size: number | null
+  mimeType: string | null
 }
 
 export default function TopicDetailScreen() {
@@ -44,6 +59,12 @@ export default function TopicDetailScreen() {
   const [showBookmarkModal, setShowBookmarkModal] = useState(false)
   const [bookmarkForm, setBookmarkForm] = useState<BookmarkForm>({ resource_name: '', resource_url: '' })
   const [savingBookmark, setSavingBookmark] = useState(false)
+
+  // Document upload modal
+  const [showDocModal, setShowDocModal] = useState(false)
+  const [pickedFile, setPickedFile] = useState<PickedFile | null>(null)
+  const [docForm, setDocForm] = useState<DocumentUploadForm>({ name: '', expires_at: '', employer_name: '' })
+  const [uploadingDoc, setUploadingDoc] = useState(false)
 
   const checklistItems = getTopicChecklist(slug ?? '')
 
@@ -77,15 +98,9 @@ export default function TopicDetailScreen() {
       wasCompleted ? next.delete(index) : next.add(index)
       return next
     })
-
     const { data: existing } = await supabase
-      .from('checklist_progress')
-      .select('id, completed')
-      .eq('user_id', user.id)
-      .eq('topic_slug', slug)
-      .eq('item_index', index)
-      .single()
-
+      .from('checklist_progress').select('id, completed')
+      .eq('user_id', user.id).eq('topic_slug', slug).eq('item_index', index).single()
     if (existing) {
       await supabase.from('checklist_progress').update({ completed: !wasCompleted, completed_at: !wasCompleted ? new Date().toISOString() : null }).eq('id', existing.id)
     } else {
@@ -109,21 +124,13 @@ export default function TopicDetailScreen() {
 
   function openEditReminder(reminder: Reminder) {
     setEditingReminder(reminder)
-    setReminderForm({
-      title: reminder.title,
-      description: reminder.description ?? '',
-      due_date: reminder.due_date ?? '',
-      recurrence: reminder.recurrence,
-    })
+    setReminderForm({ title: reminder.title, description: reminder.description ?? '', due_date: reminder.due_date ?? '', recurrence: reminder.recurrence })
     setShowReminderModal(true)
   }
 
   async function saveReminder() {
     if (!user || !slug) return
-    if (!reminderForm.title.trim()) {
-      Alert.alert('Erreur', 'Le titre est requis')
-      return
-    }
+    if (!reminderForm.title.trim()) { Alert.alert('Erreur', 'Le titre est requis'); return }
     setSavingReminder(true)
     const payload = {
       title: reminderForm.title.trim(),
@@ -131,7 +138,6 @@ export default function TopicDetailScreen() {
       due_date: reminderForm.due_date.trim() || null,
       recurrence: reminderForm.recurrence,
     }
-
     if (editingReminder) {
       const { error } = await supabase.from('reminders').update(payload).eq('id', editingReminder.id).eq('user_id', user.id)
       if (error) { Alert.alert('Erreur', error.message); setSavingReminder(false); return }
@@ -168,15 +174,14 @@ export default function TopicDetailScreen() {
   async function saveBookmark() {
     if (!user || !slug) return
     if (!bookmarkForm.resource_name.trim() || !bookmarkForm.resource_url.trim()) {
-      Alert.alert('Erreur', 'Le nom et l\'URL sont requis')
+      Alert.alert('Erreur', "Le nom et l'URL sont requis")
       return
     }
     setSavingBookmark(true)
     const { data, error } = await supabase
       .from('bookmarks')
       .insert({ user_id: user.id, topic_slug: slug, resource_name: bookmarkForm.resource_name.trim(), resource_url: bookmarkForm.resource_url.trim() })
-      .select()
-      .single()
+      .select().single()
     if (error) { Alert.alert('Erreur', error.message); setSavingBookmark(false); return }
     setBookmarks((prev) => [data as Bookmark, ...prev])
     setSavingBookmark(false)
@@ -196,6 +201,70 @@ export default function TopicDetailScreen() {
     setBookmarks((prev) => prev.filter((b) => b.id !== id))
   }
 
+  // ── Documents ──────────────────────────────────────────────────────────────
+
+  async function pickDocument() {
+    const result = await DocumentPicker.getDocumentAsync({ type: '*/*', copyToCacheDirectory: true })
+    if (result.canceled) return
+    const file = result.assets[0]
+    setPickedFile({ uri: file.uri, name: file.name, size: file.size ?? null, mimeType: file.mimeType ?? null })
+    setDocForm({ name: file.name, expires_at: '', employer_name: '' })
+    setShowDocModal(true)
+  }
+
+  async function uploadDocument() {
+    if (!user || !slug || !pickedFile) return
+    setUploadingDoc(true)
+    try {
+      const ext = pickedFile.name.split('.').pop() ?? 'bin'
+      const filePath = `documents/${user.id}/${slug}/${Date.now()}.${ext}`
+
+      const response = await fetch(pickedFile.uri)
+      const blob = await response.blob()
+
+      const { error: storageError } = await supabase.storage
+        .from('Documents')
+        .upload(filePath, blob, { contentType: pickedFile.mimeType ?? 'application/octet-stream' })
+
+      if (storageError) { Alert.alert('Erreur upload', storageError.message); setUploadingDoc(false); return }
+
+      const { data, error: dbError } = await supabase.from('documents').insert({
+        user_id: user.id,
+        topic_slug: slug,
+        name: docForm.name.trim() || pickedFile.name,
+        file_path: filePath,
+        file_size: pickedFile.size,
+        file_type: pickedFile.mimeType,
+        expires_at: docForm.expires_at.trim() || null,
+        employer_name: docForm.employer_name.trim() || null,
+      }).select().single()
+
+      if (dbError) { Alert.alert('Erreur', dbError.message); setUploadingDoc(false); return }
+
+      setDocuments((prev) => [data as Document, ...prev])
+      setUploadingDoc(false)
+      setShowDocModal(false)
+      setPickedFile(null)
+    } catch (err) {
+      Alert.alert('Erreur', 'Impossible de télécharger le fichier')
+      setUploadingDoc(false)
+    }
+  }
+
+  function confirmDeleteDocument(doc: Document) {
+    Alert.alert('Supprimer ce document ?', `"${doc.name}" sera supprimé définitivement.`, [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Supprimer', style: 'destructive', onPress: () => deleteDocument(doc) },
+    ])
+  }
+
+  async function deleteDocument(doc: Document) {
+    if (!user) return
+    await supabase.storage.from('Documents').remove([doc.file_path])
+    await supabase.from('documents').delete().eq('id', doc.id).eq('user_id', user.id)
+    setDocuments((prev) => prev.filter((d) => d.id !== doc.id))
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   const checklistTotal = checklistItems.length
@@ -205,14 +274,16 @@ export default function TopicDetailScreen() {
   return (
     <>
       <ScrollView
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-[#F5E9AF]"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await loadData(); setRefreshing(false) }} />}
       >
-        <View className="px-4 py-6 gap-6">
+        <View className="px-4 py-6 pb-28 gap-6">
 
           {/* Header */}
           <View className="items-center py-4">
-            <Text className="text-5xl mb-2">{getTopicIcon(slug ?? '')}</Text>
+            <View className="w-16 h-16 bg-violet-50 rounded-2xl items-center justify-center mb-2">
+              <Ionicons name="folder-open-outline" size={28} color="#235037" />
+            </View>
             <Text className="text-2xl font-bold text-gray-900">{getTopicTitle(slug ?? '')}</Text>
           </View>
 
@@ -223,9 +294,8 @@ export default function TopicDetailScreen() {
                 <Text className="text-lg font-semibold text-gray-900">Checklist</Text>
                 <Text className="text-sm text-gray-500">{checklistDone}/{checklistTotal}</Text>
               </View>
-              {/* Barre de progression */}
               <View className="h-2 bg-gray-200 rounded-full mb-3">
-                <View className="h-2 bg-blue-500 rounded-full" style={{ width: `${checklistPct}%` }} />
+                <View className="h-2 bg-violet-500 rounded-full" style={{ width: `${checklistPct}%` }} />
               </View>
               <View className="gap-2">
                 {checklistItems.map((item, index) => {
@@ -233,11 +303,11 @@ export default function TopicDetailScreen() {
                   return (
                     <TouchableOpacity
                       key={index}
-                      className="bg-white rounded-xl p-4 flex-row items-center gap-3 shadow-sm"
+                      className="bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm"
                       onPress={() => toggleChecklistItem(index)}
                     >
                       <View className={`w-6 h-6 rounded-full border-2 items-center justify-center flex-shrink-0 ${done ? 'border-green-500 bg-green-500' : 'border-gray-300'}`}>
-                        {done && <Text className="text-white text-xs font-bold">✓</Text>}
+                        {done && <Ionicons name="checkmark" size={14} color="white" />}
                       </View>
                       <Text className={`flex-1 text-sm ${done ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{item}</Text>
                     </TouchableOpacity>
@@ -251,15 +321,12 @@ export default function TopicDetailScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-lg font-semibold text-gray-900">Rappels</Text>
-              <TouchableOpacity
-                className="w-8 h-8 bg-blue-600 rounded-full items-center justify-center"
-                onPress={openCreateReminder}
-              >
+              <TouchableOpacity className="w-8 h-8 bg-violet-600 rounded-full items-center justify-center" onPress={openCreateReminder}>
                 <Text className="text-white text-xl font-bold leading-none">+</Text>
               </TouchableOpacity>
             </View>
             {reminders.length === 0 ? (
-              <View className="bg-white rounded-xl p-6 items-center">
+              <View className="bg-white rounded-2xl p-6 items-center">
                 <Text className="text-gray-500">Aucun rappel pour ce topic</Text>
               </View>
             ) : (
@@ -267,17 +334,15 @@ export default function TopicDetailScreen() {
                 {reminders.map((reminder) => (
                   <TouchableOpacity
                     key={reminder.id}
-                    className="bg-white rounded-xl p-4 flex-row items-center gap-3 shadow-sm"
+                    className="bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm"
                     onPress={() => toggleReminder(reminder.id, reminder.completed)}
                     onLongPress={() => openEditReminder(reminder)}
                   >
                     <View className={`w-6 h-6 rounded-full border-2 items-center justify-center flex-shrink-0 ${reminder.completed ? 'border-green-500 bg-green-500' : 'border-gray-300'}`}>
-                      {reminder.completed && <Text className="text-white text-xs font-bold">✓</Text>}
+                      {reminder.completed && <Ionicons name="checkmark" size={14} color="white" />}
                     </View>
                     <View className="flex-1">
-                      <Text className={`font-medium ${reminder.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-                        {reminder.title}
-                      </Text>
+                      <Text className={`font-medium ${reminder.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>{reminder.title}</Text>
                       {reminder.due_date && (
                         <Text className="text-sm text-gray-500">
                           {new Date(reminder.due_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -286,7 +351,7 @@ export default function TopicDetailScreen() {
                       )}
                     </View>
                     <TouchableOpacity onPress={() => confirmDeleteReminder(reminder.id)} className="p-1">
-                      <Text className="text-gray-400 text-lg">×</Text>
+                      <Ionicons name="close" size={18} color="#9CA3AF" />
                     </TouchableOpacity>
                   </TouchableOpacity>
                 ))}
@@ -298,30 +363,27 @@ export default function TopicDetailScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-lg font-semibold text-gray-900">Favoris</Text>
-              <TouchableOpacity
-                className="w-8 h-8 bg-blue-600 rounded-full items-center justify-center"
-                onPress={openCreateBookmark}
-              >
+              <TouchableOpacity className="w-8 h-8 bg-violet-600 rounded-full items-center justify-center" onPress={openCreateBookmark}>
                 <Text className="text-white text-xl font-bold leading-none">+</Text>
               </TouchableOpacity>
             </View>
             {bookmarks.length === 0 ? (
-              <View className="bg-white rounded-xl p-6 items-center">
+              <View className="bg-white rounded-2xl p-6 items-center">
                 <Text className="text-gray-500">Aucun favori pour ce topic</Text>
               </View>
             ) : (
               <View className="gap-2">
                 {bookmarks.map((bookmark) => (
-                  <View key={bookmark.id} className="bg-white rounded-xl p-4 flex-row items-center gap-3 shadow-sm">
-                    <View className="w-8 h-8 bg-blue-100 rounded-lg items-center justify-center flex-shrink-0">
-                      <Text className="text-blue-600 text-sm">🔗</Text>
+                  <View key={bookmark.id} className="bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm">
+                    <View className="w-8 h-8 bg-violet-100 rounded-lg items-center justify-center flex-shrink-0">
+                      <Ionicons name="link-outline" size={15} color="#235037" />
                     </View>
                     <View className="flex-1">
                       <Text className="font-medium text-gray-900">{bookmark.resource_name}</Text>
-                      <Text className="text-sm text-blue-600" numberOfLines={1}>{bookmark.resource_url}</Text>
+                      <Text className="text-sm text-violet-600" numberOfLines={1}>{bookmark.resource_url}</Text>
                     </View>
                     <TouchableOpacity onPress={() => confirmDeleteBookmark(bookmark.id)} className="p-1">
-                      <Text className="text-gray-400 text-lg">×</Text>
+                      <Ionicons name="close" size={18} color="#9CA3AF" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -331,17 +393,22 @@ export default function TopicDetailScreen() {
 
           {/* Documents */}
           <View>
-            <Text className="text-lg font-semibold text-gray-900 mb-3">Documents</Text>
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-lg font-semibold text-gray-900">Documents</Text>
+              <TouchableOpacity className="w-8 h-8 bg-violet-600 rounded-full items-center justify-center" onPress={pickDocument}>
+                <Text className="text-white text-xl font-bold leading-none">+</Text>
+              </TouchableOpacity>
+            </View>
             {documents.length === 0 ? (
-              <View className="bg-white rounded-xl p-6 items-center">
+              <View className="bg-white rounded-2xl p-6 items-center">
                 <Text className="text-gray-500">Aucun document pour ce topic</Text>
               </View>
             ) : (
               <View className="gap-2">
                 {documents.map((doc) => (
-                  <View key={doc.id} className="bg-white rounded-xl p-4 shadow-sm flex-row items-center gap-3">
+                  <View key={doc.id} className="bg-white rounded-2xl p-4 shadow-sm flex-row items-center gap-3">
                     <View className="w-8 h-8 bg-orange-100 rounded-lg items-center justify-center flex-shrink-0">
-                      <Text className="text-sm">📄</Text>
+                      <Ionicons name="document-text-outline" size={15} color="#f97316" />
                     </View>
                     <View className="flex-1">
                       <Text className="font-medium text-gray-900">{doc.name}</Text>
@@ -350,7 +417,13 @@ export default function TopicDetailScreen() {
                           Expire le {new Date(doc.expires_at).toLocaleDateString('fr-FR')}
                         </Text>
                       )}
+                      {doc.employer_name && (
+                        <Text className="text-sm text-gray-500 mt-0.5">{doc.employer_name}</Text>
+                      )}
                     </View>
+                    <TouchableOpacity onPress={() => confirmDeleteDocument(doc)} className="p-1">
+                      <Ionicons name="close" size={18} color="#9CA3AF" />
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>
@@ -412,10 +485,10 @@ export default function TopicDetailScreen() {
                     {([null, 'mensuel', 'annuel'] as RecurrenceOption[]).map((opt) => (
                       <TouchableOpacity
                         key={String(opt)}
-                        className={`flex-1 py-2.5 rounded-xl border items-center ${reminderForm.recurrence === opt ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
+                        className={`flex-1 py-2.5 rounded-xl border items-center ${reminderForm.recurrence === opt ? 'bg-[#EBA7CB] border-[#EBA7CB]' : 'bg-white border-gray-300'}`}
                         onPress={() => setReminderForm((f) => ({ ...f, recurrence: opt }))}
                       >
-                        <Text className={`text-sm font-medium ${reminderForm.recurrence === opt ? 'text-white' : 'text-gray-700'}`}>
+                        <Text className={`text-sm font-medium ${reminderForm.recurrence === opt ? 'text-[#235037]' : 'text-gray-700'}`}>
                           {opt === null ? 'Aucune' : opt === 'mensuel' ? 'Mensuelle' : 'Annuelle'}
                         </Text>
                       </TouchableOpacity>
@@ -424,7 +497,7 @@ export default function TopicDetailScreen() {
                 </View>
 
                 <TouchableOpacity
-                  className={`rounded-xl py-3.5 items-center mt-2 ${savingReminder ? 'bg-blue-400' : 'bg-blue-600'}`}
+                  className={`rounded-xl py-3.5 items-center mt-2 ${savingReminder ? 'bg-violet-400' : 'bg-violet-600'}`}
                   onPress={saveReminder}
                   disabled={savingReminder}
                 >
@@ -476,13 +549,81 @@ export default function TopicDetailScreen() {
                 </View>
 
                 <TouchableOpacity
-                  className={`rounded-xl py-3.5 items-center mt-2 ${savingBookmark ? 'bg-blue-400' : 'bg-blue-600'}`}
+                  className={`rounded-xl py-3.5 items-center mt-2 ${savingBookmark ? 'bg-violet-400' : 'bg-violet-600'}`}
                   onPress={saveBookmark}
                   disabled={savingBookmark}
                 >
                   {savingBookmark
                     ? <ActivityIndicator color="white" />
                     : <Text className="text-white font-semibold text-base">Ajouter le favori</Text>
+                  }
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Modal — Upload document */}
+      <Modal visible={showDocModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowDocModal(false)}>
+        <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView className="flex-1 bg-white" keyboardShouldPersistTaps="handled">
+            <View className="px-4 py-6">
+              <View className="flex-row items-center justify-between mb-6">
+                <Text className="text-xl font-bold text-gray-900">Ajouter un document</Text>
+                <TouchableOpacity onPress={() => { setShowDocModal(false); setPickedFile(null) }}>
+                  <Text className="text-gray-500 text-base">Annuler</Text>
+                </TouchableOpacity>
+              </View>
+
+              {pickedFile && (
+                <View className="bg-gray-50 rounded-xl p-3 mb-4 flex-row items-center gap-3">
+                  <Ionicons name="document-text-outline" size={22} color="#6b7280" />
+                  <Text className="text-sm text-gray-700 flex-1" numberOfLines={1}>{pickedFile.name}</Text>
+                  {pickedFile.size && <Text className="text-xs text-gray-400">{(pickedFile.size / 1024).toFixed(0)} Ko</Text>}
+                </View>
+              )}
+
+              <View className="gap-4">
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">Nom du document *</Text>
+                  <TextInput
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-base text-gray-900 bg-gray-50"
+                    placeholder="Ex : Fiche de paie janvier"
+                    value={docForm.name}
+                    onChangeText={(v) => setDocForm((f) => ({ ...f, name: v }))}
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">Date d'expiration (optionnel)</Text>
+                  <TextInput
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-base text-gray-900 bg-gray-50"
+                    placeholder="AAAA-MM-JJ"
+                    value={docForm.expires_at}
+                    onChangeText={(v) => setDocForm((f) => ({ ...f, expires_at: v }))}
+                    keyboardType="numeric"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-sm font-medium text-gray-700 mb-1">Employeur / Émetteur (optionnel)</Text>
+                  <TextInput
+                    className="border border-gray-300 rounded-xl px-4 py-3 text-base text-gray-900 bg-gray-50"
+                    placeholder="Ex : Société XYZ"
+                    value={docForm.employer_name}
+                    onChangeText={(v) => setDocForm((f) => ({ ...f, employer_name: v }))}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  className={`rounded-xl py-3.5 items-center mt-2 ${uploadingDoc ? 'bg-violet-400' : 'bg-violet-600'}`}
+                  onPress={uploadDocument}
+                  disabled={uploadingDoc}
+                >
+                  {uploadingDoc
+                    ? <ActivityIndicator color="white" />
+                    : <Text className="text-white font-semibold text-base">Télécharger le document</Text>
                   }
                 </TouchableOpacity>
               </View>

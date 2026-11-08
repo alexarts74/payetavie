@@ -47,7 +47,7 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="items-center mb-10">
-          <Text className="text-3xl font-bold text-blue-600">PayeTaVie</Text>
+          <Text className="text-3xl font-bold text-violet-600">PayeTaVie</Text>
           <Text className="text-base text-gray-500 mt-1">Créer un compte</Text>
         </View>
 
@@ -93,7 +93,7 @@ export default function RegisterScreen() {
           </View>
 
           <TouchableOpacity
-            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-blue-400' : 'bg-blue-600'}`}
+            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-violet-400' : 'bg-violet-600'}`}
             onPress={handleRegister}
             disabled={loading}
           >
@@ -108,7 +108,7 @@ export default function RegisterScreen() {
             <TouchableOpacity>
               <Text className="text-gray-600">
                 Déjà un compte ?{' '}
-                <Text className="text-blue-600 font-medium">Se connecter</Text>
+                <Text className="text-violet-600 font-medium">Se connecter</Text>
               </Text>
             </TouchableOpacity>
           </Link>

@@ -33,14 +33,14 @@ export default function FacturesListScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-gray-50"
+      className="flex-1 bg-[#F5E9AF]"
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await loadInvoices(); setRefreshing(false) }} />}
     >
-      <View className="px-4 py-6 gap-3">
+      <View className="px-4 py-6 pb-28 gap-3">
         <View className="flex-row items-center justify-between mb-1">
           <Text className="text-lg font-semibold text-gray-900">Factures</Text>
           <TouchableOpacity
-            className="bg-blue-600 rounded-xl px-4 py-2"
+            className="bg-violet-600 rounded-2xl px-4 py-2"
             onPress={() => router.push('/(protected)/freelance/facturation/factures/nouvelle')}
           >
             <Text className="text-white font-medium text-sm">+ Nouvelle</Text>
@@ -56,7 +56,7 @@ export default function FacturesListScreen() {
             return (
               <TouchableOpacity
                 key={invoice.id}
-                className="bg-white rounded-xl p-4 shadow-sm"
+                className="bg-white rounded-2xl p-4 shadow-sm"
                 onPress={() => router.push(`/(protected)/freelance/facturation/factures/${invoice.id}`)}
               >
                 <View className="flex-row items-center justify-between mb-1">

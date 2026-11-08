@@ -3,6 +3,8 @@ import {
   View, Text, ScrollView, TouchableOpacity, RefreshControl,
   Modal, TextInput, Alert, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -22,6 +24,7 @@ function todayISO() {
 
 export default function DepensesScreen() {
   const { user } = useAuth()
+  const insets = useSafeAreaInsets()
   const [expenses, setExpenses] = useState<ExpenseWithCategory[]>([])
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
   const [totalMonth, setTotalMonth] = useState(0)
@@ -145,31 +148,40 @@ export default function DepensesScreen() {
   return (
     <>
       <ScrollView
-        className="flex-1 bg-gray-50"
+        className="flex-1 bg-[#F5E9AF]"
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
       >
-        <View className="px-4 py-6 gap-5">
+        {/* Header */}
+        <View style={{ paddingTop: insets.top + 20 }} className="px-6 pb-5">
+          <Text className="text-4xl font-bold text-[#0D0D0D] tracking-tight" style={{ fontFamily: 'Caprasimo_400Regular', lineHeight: 42 }}>
+            Dépenses
+          </Text>
+          <Text className="text-sm text-[#71717A] mt-1.5" style={{ fontFamily: 'Jost_300Light' }}>
+            {monthLabel}
+          </Text>
+        </View>
+        <View className="px-4 pb-28 gap-5">
           {/* Total du mois */}
-          <View className="bg-blue-600 rounded-2xl p-5">
-            <Text className="text-blue-200 text-sm mb-1 capitalize">{monthLabel}</Text>
+          <View className="bg-violet-600 rounded-2xl p-5">
+            <Text className="text-violet-200 text-sm mb-1 capitalize">{monthLabel}</Text>
             <Text className="text-white text-4xl font-bold">{totalMonth.toFixed(2)} €</Text>
-            <Text className="text-blue-200 text-sm mt-1">Dépenses du mois</Text>
+            <Text className="text-violet-200 text-sm mt-1">Dépenses du mois</Text>
           </View>
 
           {/* Raccourcis */}
           <View className="flex-row gap-3">
             <TouchableOpacity
-              className="flex-1 bg-white rounded-xl p-3 items-center shadow-sm"
+              className="flex-1 bg-white rounded-2xl p-3 items-center shadow-sm"
               onPress={() => router.push('/(protected)/depenses/budgets')}
             >
-              <Text className="text-2xl mb-1">📊</Text>
+              <Ionicons name="bar-chart-outline" size={22} color="#235037" style={{ marginBottom: 4 }} />
               <Text className="text-xs font-medium text-gray-700">Budgets</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-1 bg-white rounded-xl p-3 items-center shadow-sm"
+              className="flex-1 bg-white rounded-2xl p-3 items-center shadow-sm"
               onPress={() => router.push('/(protected)/depenses/recurrents')}
             >
-              <Text className="text-2xl mb-1">🔄</Text>
+              <Ionicons name="sync-outline" size={22} color="#235037" style={{ marginBottom: 4 }} />
               <Text className="text-xs font-medium text-gray-700">Récurrents</Text>
             </TouchableOpacity>
           </View>
@@ -179,7 +191,7 @@ export default function DepensesScreen() {
             <View className="flex-row items-center justify-between mb-3">
               <Text className="text-lg font-semibold text-gray-900">Dépenses récentes</Text>
               <TouchableOpacity
-                className="w-8 h-8 bg-blue-600 rounded-full items-center justify-center"
+                className="w-8 h-8 bg-violet-600 rounded-full items-center justify-center"
                 onPress={openCreate}
               >
                 <Text className="text-white text-xl font-bold leading-none">+</Text>
@@ -187,7 +199,7 @@ export default function DepensesScreen() {
             </View>
 
             {expenses.length === 0 ? (
-              <View className="bg-white rounded-xl p-6 items-center">
+              <View className="bg-white rounded-2xl p-6 items-center">
                 <Text className="text-gray-500">Aucune dépense ce mois-ci</Text>
               </View>
             ) : (
@@ -195,7 +207,7 @@ export default function DepensesScreen() {
                 {expenses.map((expense) => (
                   <TouchableOpacity
                     key={expense.id}
-                    className="bg-white rounded-xl p-4 flex-row items-center shadow-sm"
+                    className="bg-white rounded-2xl p-4 flex-row items-center shadow-sm"
                     onPress={() => openEdit(expense)}
                     onLongPress={() => confirmDelete(expense)}
                   >
@@ -203,7 +215,7 @@ export default function DepensesScreen() {
                       className="w-10 h-10 rounded-xl items-center justify-center mr-3"
                       style={{ backgroundColor: expense.category?.color ?? '#e5e7eb' }}
                     >
-                      <Text className="text-lg">{expense.category?.icon ?? '💰'}</Text>
+                      <Ionicons name="pricetag-outline" size={16} color="white" />
                     </View>
                     <View className="flex-1">
                       <Text className="font-medium text-gray-900">{expense.title}</Text>
@@ -272,7 +284,7 @@ export default function DepensesScreen() {
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
                       <View className="flex-row gap-2 pb-1">
                         <TouchableOpacity
-                          className={`px-3 py-2 rounded-xl border ${!form.category_id ? 'bg-blue-600 border-blue-600' : 'bg-white border-gray-300'}`}
+                          className={`px-3 py-2 rounded-xl border ${!form.category_id ? 'bg-violet-600 border-violet-600' : 'bg-white border-gray-300'}`}
                           onPress={() => setForm((f) => ({ ...f, category_id: '' }))}
                         >
                           <Text className={`text-sm font-medium ${!form.category_id ? 'text-white' : 'text-gray-700'}`}>Aucune</Text>
@@ -280,11 +292,10 @@ export default function DepensesScreen() {
                         {categories.map((cat) => (
                           <TouchableOpacity
                             key={cat.id}
-                            className={`px-3 py-2 rounded-xl border flex-row items-center gap-1 ${form.category_id === cat.id ? 'border-blue-600' : 'bg-white border-gray-300'}`}
+                            className={`px-3 py-2 rounded-xl border flex-row items-center gap-1 ${form.category_id === cat.id ? 'border-violet-600' : 'bg-white border-gray-300'}`}
                             style={form.category_id === cat.id ? { backgroundColor: cat.color } : {}}
                             onPress={() => setForm((f) => ({ ...f, category_id: cat.id }))}
                           >
-                            <Text className="text-sm">{cat.icon ?? '📁'}</Text>
                             <Text className={`text-sm font-medium ${form.category_id === cat.id ? 'text-white' : 'text-gray-700'}`}>{cat.name}</Text>
                           </TouchableOpacity>
                         ))}
@@ -306,7 +317,7 @@ export default function DepensesScreen() {
                 </View>
 
                 <TouchableOpacity
-                  className={`rounded-xl py-3.5 items-center mt-2 ${saving ? 'bg-blue-400' : 'bg-blue-600'}`}
+                  className={`rounded-xl py-3.5 items-center mt-2 ${saving ? 'bg-violet-400' : 'bg-violet-600'}`}
                   onPress={saveExpense}
                   disabled={saving}
                 >

@@ -35,7 +35,7 @@ export default function LoginScreen() {
       >
         {/* Logo / titre */}
         <View className="items-center mb-10">
-          <Text className="text-3xl font-bold text-blue-600">PayeTaVie</Text>
+          <Text className="text-3xl font-bold text-violet-600">PayeTaVie</Text>
           <Text className="text-base text-gray-500 mt-1">Votre assistant administratif</Text>
         </View>
 
@@ -69,7 +69,7 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity
-            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-blue-400' : 'bg-blue-600'}`}
+            className={`rounded-xl py-3.5 items-center mt-2 ${loading ? 'bg-violet-400' : 'bg-violet-600'}`}
             onPress={handleLogin}
             disabled={loading}
           >
@@ -83,14 +83,14 @@ export default function LoginScreen() {
         <View className="mt-8 items-center gap-3">
           <Link href="/(auth)/forgot-password" asChild>
             <TouchableOpacity>
-              <Text className="text-blue-600 font-medium">Mot de passe oublié ?</Text>
+              <Text className="text-violet-600 font-medium">Mot de passe oublié ?</Text>
             </TouchableOpacity>
           </Link>
           <Link href="/(auth)/register" asChild>
             <TouchableOpacity>
               <Text className="text-gray-600">
                 Pas encore de compte ?{' '}
-                <Text className="text-blue-600 font-medium">S'inscrire</Text>
+                <Text className="text-violet-600 font-medium">S'inscrire</Text>
               </Text>
             </TouchableOpacity>
           </Link>

@@ -42,7 +42,7 @@ export default function InvoiceDetailScreen() {
 
   if (!invoice) {
     return (
-      <View className="flex-1 bg-gray-50 items-center justify-center">
+      <View className="flex-1 bg-[#F5E9AF] items-center justify-center">
         <Text className="text-gray-500">Chargement...</Text>
       </View>
     )
@@ -51,8 +51,8 @@ export default function InvoiceDetailScreen() {
   const status = STATUS_LABELS[invoice.status] ?? STATUS_LABELS.brouillon
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="px-4 py-6 gap-5">
+    <ScrollView className="flex-1 bg-[#F5E9AF]">
+      <View className="px-4 py-6 pb-28 gap-5">
         {/* Header */}
         <View className="bg-white rounded-2xl p-5 shadow-sm">
           <View className="flex-row items-start justify-between mb-3">
@@ -101,12 +101,70 @@ export default function InvoiceDetailScreen() {
 
         {/* Actions */}
         <TouchableOpacity
-          className="bg-blue-600 rounded-xl py-4 items-center"
+          className="bg-violet-600 rounded-2xl py-4 items-center"
           onPress={viewPdf}
         >
           <Text className="text-white font-semibold">Voir le PDF</Text>
         </TouchableOpacity>
+
+        {/* Transitions de statut */}
+        <StatusTransitions invoice={invoice} onUpdate={setInvoice} userId={user?.id} />
       </View>
     </ScrollView>
   )
+}
+
+function StatusTransitions({
+  invoice,
+  onUpdate,
+  userId,
+}: {
+  invoice: BillingDocumentWithItems
+  onUpdate: (inv: BillingDocumentWithItems) => void
+  userId: string | undefined
+}) {
+  async function transition(newStatus: string) {
+    if (!userId) return
+    const { data, error } = await supabase
+      .from('billing_documents')
+      .update({ status: newStatus })
+      .eq('id', invoice.id)
+      .eq('user_id', userId)
+      .select('*, items:billing_document_items(*), client:clients(*)')
+      .single()
+    if (!error && data) onUpdate(data as unknown as BillingDocumentWithItems)
+  }
+
+  function confirmTransition(newStatus: string, label: string) {
+    Alert.alert(label, `Confirmer le passage à "${label}" ?`, [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Confirmer', style: 'destructive', onPress: () => transition(newStatus) },
+    ])
+  }
+
+  if (invoice.status === 'brouillon') {
+    return (
+      <TouchableOpacity className="bg-violet-600 rounded-2xl py-3 items-center" onPress={() => transition('envoyee')}>
+        <Text className="text-white font-semibold">Marquer comme envoyée</Text>
+      </TouchableOpacity>
+    )
+  }
+  if (invoice.status === 'envoyee' || invoice.status === 'en_retard') {
+    return (
+      <View className="gap-2">
+        <TouchableOpacity className="bg-green-600 rounded-2xl py-3 items-center" onPress={() => transition('payee')}>
+          <Text className="text-white font-semibold">Marquer comme payée</Text>
+        </TouchableOpacity>
+        {invoice.status === 'envoyee' && (
+          <TouchableOpacity className="bg-orange-500 rounded-2xl py-3 items-center" onPress={() => transition('en_retard')}>
+            <Text className="text-white font-semibold">Marquer en retard</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity className="bg-gray-200 rounded-2xl py-3 items-center" onPress={() => confirmTransition('annulee', 'Annuler la facture')}>
+          <Text className="text-gray-700 font-semibold">Annuler la facture</Text>
+        </TouchableOpacity>
+      </View>
+    )
+  }
+  return null
 }
