@@ -81,6 +81,11 @@ export default function LoginScreen() {
 
         {/* Liens */}
         <View className="mt-8 items-center gap-3">
+          <Link href="/(auth)/forgot-password" asChild>
+            <TouchableOpacity>
+              <Text className="text-blue-600 font-medium">Mot de passe oublié ?</Text>
+            </TouchableOpacity>
+          </Link>
           <Link href="/(auth)/register" asChild>
             <TouchableOpacity>
               <Text className="text-gray-600">

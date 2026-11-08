@@ -4,6 +4,29 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-08 — Sprint 1 parité mobile — CRUD topics, dépenses, auth
+
+### Mobile — Auth
+- Écran "Mot de passe oublié" (`app/(auth)/forgot-password.tsx`) : envoi d'un email de réinitialisation via `supabase.auth.resetPasswordForEmail()`
+- Lien "Mot de passe oublié ?" ajouté sur l'écran de connexion
+
+### Mobile — Topics `[slug].tsx` (réécriture complète)
+- **Checklist** : affichage de la checklist par topic (items depuis `@payetavie/shared`), barre de progression, toggle persisté dans `checklist_progress`
+- **Rappels CRUD** : créer (modal), modifier (long press → modal pré-rempli), supprimer (bouton ×), avec champs titre / description / date / récurrence (aucune, mensuelle, annuelle)
+- **Favoris CRUD** : lister, ajouter (modal nom + URL), supprimer
+- Pull-to-refresh sur toutes les sections
+
+### Mobile — Dépenses `index.tsx` (CRUD)
+- Créer une dépense : modal avec titre, montant, date, catégorie (picker horizontal), notes
+- Modifier une dépense : tap sur un item ouvre le modal pré-rempli
+- Supprimer une dépense : long-press → Alert, ou bouton "Supprimer" dans le modal d'édition
+- Total du mois mis à jour optimistement après chaque mutation
+
+### Shared — `@payetavie/shared`
+- Ajout de `getTopicChecklist(slug: string): string[]` dans `topic-utils.ts` : retourne les items de checklist pour chaque topic (impots, urssaf, fiches-de-paie, caf, assurances, mutuelle, medecin-generaliste, pharmacie, analyses-medicales, logement)
+
+---
+
 ## 2026-11-07 — Monorepo Turborepo + App Mobile Expo React Native
 
 ### Migration vers un monorepo Turborepo
