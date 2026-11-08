@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabase'
 
 const ACTIVE_COLOR = '#235037'
 const INACTIVE_COLOR = 'rgba(35,80,55,0.35)'
@@ -142,13 +143,31 @@ const SUB_SCREEN_HEADER = {
 }
 
 export default function ProtectedLayout() {
-  const { session, loading } = useAuth()
+  const { session, loading, user } = useAuth()
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true)
 
   useEffect(() => {
-    if (!loading && !session) router.replace('/(auth)/login')
-  }, [session, loading])
+    if (!loading && !session) {
+      router.replace('/(auth)/login')
+      return
+    }
+    if (!loading && session && user) {
+      supabase
+        .from('user_preferences')
+        .select('onboarding_completed')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (!data || !data.onboarding_completed) {
+            router.replace('/onboarding')
+          } else {
+            setCheckingOnboarding(false)
+          }
+        })
+    }
+  }, [session, loading, user])
 
-  if (loading) {
+  if (loading || (session && checkingOnboarding)) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5E9AF' }}>
         <ActivityIndicator size="large" color="#235037" />

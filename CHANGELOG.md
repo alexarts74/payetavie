@@ -4,6 +4,29 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-08 — Onboarding mobile (wizard 4 étapes)
+
+### Mobile — Wizard d'onboarding (`app/onboarding.tsx`)
+
+Wizard d'onboarding 4 étapes pour les nouveaux utilisateurs mobiles, avec design system 60/30/10 (Caprasimo/Jost, palette `#F5E9AF`/`#235037`/`#EBA7CB`).
+
+- **Step 0 — Bienvenue** : présentation des 3 features clés (guides, documents, rappels) avec cartes illustrées
+- **Step 1 — Profil** : sélection parmi 5 profils (Étudiant, Salarié, Indépendant, En recherche, Autre) + infos optionnelles collapsibles (date de naissance, code postal). Bouton "Passer" disponible
+- **Step 2 — Topics** : topics du profil pré-sélectionnés (non décochez), topics additionnels toggleables par catégorie (Travail / Santé / Logement / Freelance)
+- **Step 3 — Résumé** : récap profil + sujets sélectionnés + bouton "Lancer mon espace"
+- Barre de progression en dots animés (4 points, actif vert foncé)
+- `completeOnboarding()` : upsert `user_preferences` (profile_type, selected_topics, onboarding_completed: true, birth_date, postal_code)
+- `skipOnboarding()` : profile `autre`, tous les slugs, onboarding_completed: true
+
+### Mobile — Guard onboarding dans `(protected)/_layout.tsx`
+
+Après vérification de session, query `user_preferences.onboarding_completed` :
+- Si absent ou `false` → `router.replace('/onboarding')`
+- État `checkingOnboarding` pour éviter le flash de contenu protégé
+- Reconnexion d'un utilisateur déjà onboardé → pas de re-onboarding
+
+---
+
 ## 2026-11-08 — Parité web ↔ mobile : reset password, annuaire, profil pro
 
 ### Mobile — Reset password (deep link)
