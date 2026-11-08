@@ -258,6 +258,7 @@ Appliquer la logique inverse : implémenter le Server Action web + page Next.js 
 | Feature | Web | Mobile | Notes |
 |---------|-----|--------|-------|
 | Auth login/register | ✅ | ✅ | |
+| Onboarding wizard | ✅ 5 étapes dans `/auth/register` | ✅ `app/onboarding.tsx` 4 étapes | Guard dans `(protected)/_layout.tsx` |
 | Reset password | ✅ `/auth/reset-password` | ✅ `(auth)/reset-password` | Deep link PKCE |
 | Dashboard | ✅ | ✅ | |
 | Topics + [slug] | ✅ | ✅ | |
