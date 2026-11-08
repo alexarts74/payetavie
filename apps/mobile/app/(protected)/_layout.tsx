@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Tabs, router } from 'expo-router'
-import { View, Text, TouchableOpacity, ActivityIndicator, Animated, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator, Animated } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { BlurView } from 'expo-blur'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '@/contexts/AuthContext'
+
+const ACTIVE_COLOR = '#235037'
+const INACTIVE_COLOR = 'rgba(35,80,55,0.35)'
+const BAR_BG = '#FFFFFF'
+const LINE_W = 24
 
 type BottomTab = {
   name: string
@@ -15,11 +19,11 @@ type BottomTab = {
 }
 
 const BOTTOM_TABS: BottomTab[] = [
-  { name: 'dashboard',      icon: 'home-outline',     iconActive: 'home',     label: 'Accueil'  },
-  { name: 'topics/index',   icon: 'grid-outline',     iconActive: 'grid',     label: 'Topics'   },
-  { name: 'calendar',       icon: 'calendar-outline', iconActive: 'calendar', label: 'Agenda'   },
-  { name: 'depenses/index', icon: 'wallet-outline',   iconActive: 'wallet',   label: 'Budget'   },
-  { name: 'profile',        icon: 'person-outline',   iconActive: 'person',   label: 'Profil'   },
+  { name: 'dashboard',      icon: 'home-outline',     iconActive: 'home',     label: 'Accueil' },
+  { name: 'topics/index',   icon: 'grid-outline',     iconActive: 'grid',     label: 'Topics'  },
+  { name: 'calendar',       icon: 'calendar-outline', iconActive: 'calendar', label: 'Agenda'  },
+  { name: 'depenses/index', icon: 'wallet-outline',   iconActive: 'wallet',   label: 'Budget'  },
+  { name: 'profile',        icon: 'person-outline',   iconActive: 'person',   label: 'Profil'  },
 ]
 
 function TabBar({ state, navigation }: { state: any; navigation: any }) {
@@ -29,18 +33,17 @@ function TabBar({ state, navigation }: { state: any; navigation: any }) {
 
   const [containerWidth, setContainerWidth] = useState(0)
   const animX = useRef(new Animated.Value(0)).current
-
   const activeIndex = BOTTOM_TABS.findIndex((t) => t.name === currentName)
   const slotWidth = containerWidth > 0 ? containerWidth / BOTTOM_TABS.length : 0
 
   useEffect(() => {
     if (slotWidth > 0 && activeIndex >= 0) {
       Animated.spring(animX, {
-        toValue: activeIndex * slotWidth,
+        toValue: activeIndex * slotWidth + slotWidth / 2 - LINE_W / 2,
         useNativeDriver: true,
-        stiffness: 300,
-        damping: 30,
-        mass: 0.8,
+        stiffness: 350,
+        damping: 35,
+        mass: 0.7,
       }).start()
     }
   }, [activeIndex, slotWidth])
@@ -51,66 +54,24 @@ function TabBar({ state, navigation }: { state: any; navigation: any }) {
     <View
       style={{
         position: 'absolute',
-        bottom: insets.bottom + 12,
+        bottom: insets.bottom + 10,
         left: 16,
         right: 16,
-        borderRadius: 28,
-        overflow: 'hidden',
-        // Subtle border via shadow trick on iOS
+        borderRadius: 26,
+        backgroundColor: BAR_BG,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.18,
-        shadowRadius: 24,
-        elevation: 12,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.10,
+        shadowRadius: 16,
+        elevation: 10,
+        paddingTop: 10,
+        paddingBottom: 8,
       }}
     >
-      {/* Frosted glass base */}
-      <BlurView intensity={72} tint="dark" style={StyleSheet.absoluteFill} />
-
-      {/* Dark tinted overlay for depth */}
-      <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(8, 8, 12, 0.45)' }]} />
-
-      {/* Thin top highlight (glass edge) */}
-      <View style={[StyleSheet.absoluteFill, {
-        borderRadius: 28,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.12)',
-      }]} pointerEvents="none" />
-
       <View
         onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-        style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, paddingVertical: 6 }}
+        style={{ flexDirection: 'row' }}
       >
-        {/* Animated glass pill */}
-        {slotWidth > 0 && (
-          <Animated.View
-            style={{
-              position: 'absolute',
-              left: 6,
-              width: slotWidth,
-              height: '100%',
-              transform: [{ translateX: animX }],
-            }}
-            pointerEvents="none"
-          >
-            <View
-              style={{
-                flex: 1,
-                marginHorizontal: 2,
-                borderRadius: 20,
-                backgroundColor: 'rgba(255,255,255,0.14)',
-                borderWidth: 1,
-                borderColor: 'rgba(255,255,255,0.28)',
-                // Inner shimmer top highlight
-                shadowColor: '#fff',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.15,
-                shadowRadius: 4,
-              }}
-            />
-          </Animated.View>
-        )}
-
         {BOTTOM_TABS.map((tab) => {
           const route = state.routes.find((r: any) => r.name === tab.name)
           if (!route) return null
@@ -129,30 +90,44 @@ function TabBar({ state, navigation }: { state: any; navigation: any }) {
             <TouchableOpacity
               key={tab.name}
               onPress={onPress}
-              activeOpacity={0.75}
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingVertical: 10,
-                flexDirection: 'row',
-                gap: 6,
-              }}
+              activeOpacity={0.7}
+              style={{ flex: 1, alignItems: 'center', paddingVertical: 8, gap: 5 }}
             >
               <Ionicons
                 name={isFocused ? tab.iconActive : tab.icon}
-                size={isFocused ? 18 : 22}
-                color={isFocused ? '#FFFFFF' : 'rgba(255,255,255,0.4)'}
+                size={22}
+                color={isFocused ? ACTIVE_COLOR : INACTIVE_COLOR}
               />
-              {isFocused && (
-                <Text style={{ color: '#FFFFFF', fontFamily: 'Jost_500Medium', fontSize: 14 }}>
-                  {tab.label}
-                </Text>
-              )}
+              <Text
+                style={{
+                  fontFamily: isFocused ? 'Jost_500Medium' : 'Jost_300Light',
+                  fontSize: 10,
+                  color: isFocused ? ACTIVE_COLOR : INACTIVE_COLOR,
+                  letterSpacing: 0.2,
+                }}
+              >
+                {tab.label}
+              </Text>
             </TouchableOpacity>
           )
         })}
       </View>
+
+      {/* Animated line indicator at the bottom */}
+      {slotWidth > 0 && (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            bottom: 5,
+            width: LINE_W,
+            height: 2.5,
+            borderRadius: 2,
+            backgroundColor: ACTIVE_COLOR,
+            transform: [{ translateX: animX }],
+          }}
+        />
+      )}
     </View>
   )
 }
