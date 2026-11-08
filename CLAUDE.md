@@ -67,18 +67,30 @@ All web source code is in `apps/web/src/`. All Next.js commands run from `apps/w
 
 ### Route Structure
 
-- **Public:** `/` (landing), `/auth/login`, `/auth/register` — redirect authenticated users away
+- **Public:** `/` (landing), `/auth/login`, `/auth/register`, `/auth/forgot-password`, `/auth/reset-password` — redirect authenticated users away
 - **Protected (all plans):** `/dashboard`, `/topics`, `/topics/[slug]`, `/profile`, `/pricing`, `/depenses`, `/depenses/budgets`, `/depenses/recurrents`
-- **Protected (pro plan only):** `/freelance/clients`, `/freelance/clients/[id]`, `/freelance/facturation`, `/freelance/facturation/factures`, `/freelance/facturation/factures/nouvelle`, `/freelance/facturation/factures/[id]`, `/freelance/facturation/devis`, `/freelance/facturation/devis/nouveau`, `/freelance/facturation/devis/[id]`
+- **Protected (essentiel+ plans):** `/annuaire` — annuaire des administrations par code postal
+- **Protected (pro plan only):** `/freelance/clients`, `/freelance/clients/[id]`, `/freelance/facturation`, `/freelance/facturation/factures`, `/freelance/facturation/factures/nouvelle`, `/freelance/facturation/factures/[id]`, `/freelance/facturation/devis`, `/freelance/facturation/devis/nouveau`, `/freelance/facturation/devis/[id]`, `/freelance/profil`
 - All pages are **Server Components** that fetch data via Server Actions, then pass props to Client Components
 
 ### Authentication Flow
 
+**Web:**
 1. Middleware (`apps/web/src/middleware.ts`) delegates to `apps/web/src/lib/supabase/middleware.ts`
 2. Session validated via `supabase.auth.getUser()` on every request
 3. Unauthenticated users on protected routes are redirected to `/auth/login`
 4. Cookie-based auth via `@supabase/ssr`: server client (`apps/web/src/lib/supabase/server.ts`), browser client (`apps/web/src/lib/supabase/client.ts`)
 5. Auth error messages translated to French in `apps/web/src/lib/auth-errors.ts`
+6. Reset password : `/auth/reset-password` — `supabase.auth.updateUser({ password })` (session auto-détectée depuis URL)
+
+**Mobile auth screens** (`apps/mobile/app/(auth)/`):
+- `login.tsx` — connexion email/password
+- `register.tsx` — inscription
+- `forgot-password.tsx` — envoi email reset avec `redirectTo: 'payetavie://reset-password'`
+- `reset-password.tsx` — deep link PKCE : extrait `code` via `useLocalSearchParams()`, appelle `supabase.auth.exchangeCodeForSession(code)`, puis `updateUser({ password })`
+
+**Deep link scheme mobile** : `payetavie://` (configuré dans `apps/mobile/app.config.js`).
+⚠️ Le deep link `payetavie://reset-password` doit être dans la liste des **Redirect URLs autorisées** dans le dashboard Supabase (Authentication → URL Configuration).
 
 ### Subscription / Plan System
 
@@ -183,9 +195,11 @@ Each topic page (`apps/web/src/app/topics/[slug]/page.tsx`) includes:
 ### Key Components
 
 - **`TopicsShell`** — Layout wrapper for all protected pages. Fixed sidebar (desktop) with collapsible topic categories, hamburger menu (mobile), user info + sign out
-- **`NavLinks`** — Sidebar navigation with topic categories, filtré par plan et selected_topics
+- **`NavLinks`** — Sidebar navigation with topic categories, filtré par plan et selected_topics. Inclut lien Annuaire (essentiel+) et liens Freelance (pro: Clients, Facturation, Profil pro)
 - **`ChecklistSection`** — Checklist with progress bar, optimistic updates via `useTransition`
 - **`CalendarView`** — Monthly calendar with event dots (orange=reminder, purple=expiring doc, red=overdue)
+- **`AnnuaireGlobal`** — Recherche d'administrations par code postal (service-public.fr API), sauvegarde code postal dans préférences
+- **`ProfilProfessionnelContent`** — Formulaire profil pro (SIRET, IBAN, adresse, préfixes, taux horaire) pour `/freelance/profil`
 - **`FacturationDashboard`** — Vue d'ensemble facturation (stats CA, factures/devis récents)
 - **`InvoiceForm`** / **`InvoiceDetailContent`** — Création/détail facture avec transitions de statut
 - **`QuotationsListContent`** / **`QuotationDetailContent`** — Liste/détail devis
@@ -239,6 +253,23 @@ STRIPE_WEBHOOK_SECRET=
 ### Si la feature est développée côté mobile
 Appliquer la logique inverse : implémenter le Server Action web + page Next.js correspondants.
 
+### État de parité actuel (2026-11-08)
+
+| Feature | Web | Mobile | Notes |
+|---------|-----|--------|-------|
+| Auth login/register | ✅ | ✅ | |
+| Reset password | ✅ `/auth/reset-password` | ✅ `(auth)/reset-password` | Deep link PKCE |
+| Dashboard | ✅ | ✅ | |
+| Topics + [slug] | ✅ | ✅ | |
+| Dépenses / budgets / récurrents | ✅ | ✅ | |
+| Annuaire administrations | ✅ `/annuaire` | ✅ `(protected)/annuaire` | Essentiel+ |
+| Profil utilisateur | ✅ `/profile` | ✅ `(protected)/profile` | |
+| Profil professionnel | ✅ `/freelance/profil` | ✅ `(protected)/freelance/profil` | Pro only |
+| Clients freelance | ✅ | ✅ | Pro only |
+| Facturation (factures/devis) | ✅ | ✅ | Pro only |
+| Calendrier | ✅ (dans dashboard) | ✅ `(protected)/calendar` | Mobile = page standalone |
+| Pricing / abonnement | ✅ | ✅ | |
+
 ### Exceptions acceptées (pas besoin de parité)
 - Fonctionnalités spécifiques à une plateforme : PDF en iframe (web only), expo-notifications (mobile only), iCal export (web only)
 - Pages légales / CGU / mentions légales (web only)
@@ -255,6 +286,27 @@ Appliquer la logique inverse : implémenter le Server Action web + page Next.js 
 - Toujours filtrer par `user_id` sur les requêtes de détail (défense en profondeur en plus de RLS)
 - Plan checks : utiliser `requirePlan()` de `apps/mobile/src/lib/subscription.ts`
 - Types partagés : importer depuis `@payetavie/shared`, jamais dupliquer dans le mobile
+
+### Mobile — Palette 60/30/10
+
+| Rôle | Token | Valeur | Usage |
+|------|-------|--------|-------|
+| **60% — Dominante** | `surface` / `#F5E9AF` | Jaune pâle | Fonds de page, grandes surfaces |
+| **30% — Secondaire** | `violet-600` / `#235037` | Vert foncé | Navigation, boutons primaires, icônes, texte |
+| **10% — Accent** | `accent` / `#EBA7CB` | Rose | Chips actifs, badges normaux, icônes actions rapides, CTA secondaires |
+
+Fonds pour icônes accent : `accent-light` / `#FDEEF6` (rose-50).
+Couleurs sémantiques conservées : rouge erreurs/retard `#EF4444`, orange expiration `#D97706`, vert payé.
+
+### Mobile — Typographie
+
+| Police | Usage | Famille |
+|--------|-------|---------|
+| `Caprasimo_400Regular` | Titres de page, valeurs stat (gros chiffres), montants | `fontFamily: heading` |
+| `Jost_500Medium` | Labels, section headers, badges, boutons | `fontFamily: medium` |
+| `Jost_300Light` | Corps de texte, sous-titres, descriptions | `fontFamily: body` |
+
+Ne jamais utiliser DMSans dans le mobile — les 3 polices ci-dessus couvrent tous les cas.
 
 ## Code Conventions
 
