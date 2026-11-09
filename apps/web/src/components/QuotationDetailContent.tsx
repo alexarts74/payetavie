@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Download, Send, CheckCircle, XCircle, FileText, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Send, CheckCircle, XCircle, FileText, Trash2, Loader2 } from 'lucide-react'
 import type { BillingDocumentWithItems, ProfessionalProfile, QuotationStatus } from '@/types'
 import { QuotationStatusBadge } from '@/components/InvoiceStatusBadge'
 import InvoicePreview from '@/components/InvoicePreview'
@@ -90,7 +90,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
                 disabled={isPending}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               >
-                <Trash2 className="w-4 h-4" />
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 Supprimer
               </button>
             )}
@@ -108,7 +108,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
                 disabled={isPending}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-[#235037] transition-all shadow-sm disabled:opacity-50"
               >
-                <FileText className="w-4 h-4" />
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                 Convertir en facture
               </button>
             )}
@@ -121,7 +121,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
                   disabled={isPending}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r ${action.color} transition-all shadow-sm disabled:opacity-50`}
                 >
-                  <Icon className="w-4 h-4" />
+                  {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
                   {action.label}
                 </button>
               )

@@ -4,6 +4,28 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-09 — UX Premium : loaders, spinners, skeletons
+
+- `nextjs-toploader` : barre de progression verte (#235037) en haut d'écran sur toutes les navigations Next.js
+- `components/ui/Button.tsx` : nouveau composant `Button` avec `loading` prop (Loader2 animate-spin), variants `primary/secondary/ghost/danger`, sizes `sm/md/lg`
+- `ProfilePageContent` : boutons "Passer à Essentiel/Pro" avec état `checkoutLoading` — spinner inline, `disabled` pendant l'appel, pas de reset si redirect Stripe
+- `PricingCards` : spinner Loader2 sur le CTA au lieu du texte "Redirection..."
+- `dashboard/loading.tsx` : squelette animé (4 stat cards + 2 colonnes + bottom row)
+- `profile/loading.tsx` : squelette header + 4 sections
+- `freelance/clients/loading.tsx` : squelette header + 6 cards
+- `freelance/facturation/factures/loading.tsx` : squelette 4 stats + liste
+
+---
+
+## 2026-11-09 — Fix bouton "Gérer mon abonnement" sur /profile
+
+- `createPortalSession` : redirect vers `/pricing` si `stripe_customer_id` est null (compte sans abo Stripe)
+- `createPortalSession` : try/catch autour de l'appel Stripe — log erreur + retour message lisible au lieu d'erreur silencieuse
+- `ProfilePageContent` : bouton async avec état `portalLoading` (disabled + "Chargement..." pendant l'appel)
+- `ProfilePageContent` : message d'erreur affiché sous le bouton si l'appel Stripe échoue
+
+---
+
 ## 2026-11-09 — Redesign web — identité visuelle nature (parité mobile)
 
 Refonte visuelle complète du web pour adopter exactement la même identité que l'app mobile. Suppression totale du glass morphism, du dark mode et de la palette indigo/violet/purple. ~40 fichiers modifiés en 8 phases.

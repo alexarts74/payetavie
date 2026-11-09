@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, FileText, Receipt } from 'lucide-react'
+import { ArrowLeft, FileText, Receipt, Loader2 } from 'lucide-react'
 import type { Client, ProfessionalProfile } from '@/types'
 import LineItemsEditor, { type LineItemData } from '@/components/LineItemsEditor'
 import { createInvoice } from '@/app/actions/invoices'
@@ -216,9 +216,10 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
             <button
               type="submit"
               disabled={isPending}
-              className="px-6 py-2.5 bg-[#235037] text-white rounded-xl font-medium text-sm  transition-all shadow-md  disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#235037] text-white rounded-xl font-medium text-sm transition-all shadow-md disabled:opacity-50"
             >
-              {isPending ? 'Creation...' : isInvoice ? 'Creer la facture' : 'Creer le devis'}
+              {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isPending ? (isInvoice ? 'Création...' : 'Création...') : isInvoice ? 'Créer la facture' : 'Créer le devis'}
             </button>
           </div>
         </form>

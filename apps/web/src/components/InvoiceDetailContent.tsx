@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Download, Copy, Send, CheckCircle, XCircle, AlertCircle, Trash2 } from 'lucide-react'
+import { ArrowLeft, Download, Copy, Send, CheckCircle, XCircle, AlertCircle, Trash2, Loader2 } from 'lucide-react'
 import type { BillingDocumentWithItems, ProfessionalProfile, InvoiceStatus } from '@/types'
 import { InvoiceStatusBadge } from '@/components/InvoiceStatusBadge'
 import InvoicePreview from '@/components/InvoicePreview'
@@ -94,7 +94,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
                 disabled={isPending}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               >
-                <Trash2 className="w-4 h-4" />
+                {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 Supprimer
               </button>
             )}
@@ -103,7 +103,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
               disabled={isPending}
               className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E8]  text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]/50  transition-all disabled:opacity-50"
             >
-              <Copy className="w-4 h-4" />
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
               Dupliquer
             </button>
             <Link
@@ -123,7 +123,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
                   disabled={isPending}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r ${action.color} transition-all shadow-sm disabled:opacity-50`}
                 >
-                  <Icon className="w-4 h-4" />
+                  {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
                   {action.label}
                 </button>
               )

@@ -104,6 +104,36 @@ export default function ProfilePageContent({ data, professionalProfile, planTier
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [isPasswordPending, startPasswordTransition] = useTransition()
 
+  // Section — Portal loading
+  const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState<string | null>(null)
+
+  // Section — Checkout loading
+  const [checkoutLoading, setCheckoutLoading] = useState<'essentiel' | 'pro' | null>(null)
+
+  const handleCheckout = async (plan: 'essentiel' | 'pro') => {
+    setCheckoutLoading(plan)
+    const result = await createCheckoutSession(plan)
+    if (result && 'url' in result && result.url) {
+      window.location.href = result.url
+    } else {
+      setCheckoutLoading(null)
+    }
+  }
+
+  const handleManageSubscription = async () => {
+    setPortalLoading(true)
+    setPortalError(null)
+    try {
+      const result = await createPortalSession()
+      if (result?.error) {
+        setPortalError(result.error)
+      }
+    } finally {
+      setPortalLoading(false)
+    }
+  }
+
   // Section 5 — Professional profile
   const [proProfile, setProProfile] = useState({
     business_name: professionalProfile?.business_name || '',
@@ -521,27 +551,35 @@ export default function ProfilePageContent({ data, professionalProfile, planTier
                   </div>
                   {planTier !== 'free' && (
                     <button
-                      onClick={() => createPortalSession()}
-                      className="px-4 py-2 bg-[#235037] hover:bg-[#1a3d2a] text-white rounded-lg text-sm font-medium transition-all"
+                      onClick={handleManageSubscription}
+                      disabled={portalLoading}
+                      className="px-4 py-2 bg-[#235037] hover:bg-[#1a3d2a] text-white rounded-lg text-sm font-medium transition-all disabled:opacity-50"
                     >
-                      Gerer mon abonnement
+                      {portalLoading ? 'Chargement...' : 'Gerer mon abonnement'}
                     </button>
                   )}
                 </div>
+                {portalError && (
+                  <p className="text-sm text-red-600 mt-2">{portalError}</p>
+                )}
               </div>
 
               {planTier === 'free' && (
                 <div className="grid sm:grid-cols-2 gap-3">
                   <button
-                    onClick={() => createCheckoutSession('essentiel')}
-                    className="w-full px-4 py-3 bg-[#235037] hover:bg-[#1a3d2a] text-white rounded-xl font-medium text-sm transition-all"
+                    onClick={() => handleCheckout('essentiel')}
+                    disabled={checkoutLoading !== null}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#235037] hover:bg-[#1a3d2a] text-white rounded-xl font-medium text-sm transition-all disabled:opacity-70"
                   >
+                    {checkoutLoading === 'essentiel' && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0" />}
                     Passer a Essentiel — 4,99€/mois
                   </button>
                   <button
-                    onClick={() => createCheckoutSession('pro')}
-                    className="w-full px-4 py-3 bg-[#1A3D2A] hover:bg-[#122d1f] text-white rounded-xl font-medium text-sm transition-all"
+                    onClick={() => handleCheckout('pro')}
+                    disabled={checkoutLoading !== null}
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[#1A3D2A] hover:bg-[#122d1f] text-white rounded-xl font-medium text-sm transition-all disabled:opacity-70"
                   >
+                    {checkoutLoading === 'pro' && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0" />}
                     Passer a Pro — 9,99€/mois
                   </button>
                 </div>

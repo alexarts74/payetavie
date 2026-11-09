@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Caprasimo, Jost } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 
 import "./globals.css";
 
@@ -30,6 +31,13 @@ export default function RootLayout({
       <body
         className={`${caprasimo.variable} ${jost.variable} font-sans antialiased min-h-screen`}
       >
+        <NextTopLoader
+          color="#235037"
+          height={3}
+          crawlSpeed={200}
+          showSpinner={false}
+          shadow="0 0 10px #235037, 0 0 5px #235037"
+        />
         {children}
       </body>
     </html>

@@ -73,17 +73,23 @@ export async function createPortalSession() {
     .single()
 
   if (!subscription?.stripe_customer_id) {
-    return { error: 'Aucun abonnement trouvé' }
+    redirect('/pricing')
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-  const session = await stripe.billingPortal.sessions.create({
-    customer: subscription.stripe_customer_id,
-    return_url: `${appUrl}/profile`,
-  })
-
-  redirect(session.url)
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: subscription.stripe_customer_id,
+      return_url: `${appUrl}/profile`,
+    })
+    redirect(session.url)
+  } catch (error) {
+    // Re-throw Next.js redirect errors
+    if (error instanceof Error && 'digest' in error) throw error
+    console.error('Stripe portal error:', error)
+    return { error: 'Impossible d\'ouvrir le portail de gestion. Vérifiez la configuration Stripe.' }
+  }
 }
 
 export async function getSubscriptionInfo() {

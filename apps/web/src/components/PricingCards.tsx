@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, X, Sparkles, Shield, Rocket } from 'lucide-react'
+import { Check, X, Sparkles, Shield, Rocket, Loader2 } from 'lucide-react'
 import { createCheckoutSession } from '@/app/actions/subscription'
 import type { PlanName } from '@/types'
 
@@ -183,7 +183,7 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
                 <button
                   onClick={() => handleSelectPlan(plan.key)}
                   disabled={isCurrentPlan || loading !== null}
-                  className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                  className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 inline-flex items-center justify-center gap-2 ${
                     isCurrentPlan
                       ? isPro || isEssentiel
                         ? 'bg-white/20 text-white/60 cursor-default'
@@ -191,14 +191,15 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
                       : plan.key === 'free'
                       ? 'bg-[#EEF7F1] text-[#235037] hover:bg-[#235037]/10'
                       : isPro || isEssentiel
-                      ? 'bg-white text-[#235037] hover:bg-white/90 shadow-sm'
-                      : 'bg-[#235037] text-white hover:bg-[#1a3d2a] shadow-sm'
+                      ? 'bg-white text-[#235037] hover:bg-white/90 shadow-sm disabled:opacity-70'
+                      : 'bg-[#235037] text-white hover:bg-[#1a3d2a] shadow-sm disabled:opacity-70'
                   }`}
                 >
+                  {loading === plan.key && (
+                    <Loader2 className={`w-4 h-4 animate-spin flex-shrink-0 ${isPro || isEssentiel ? 'text-[#235037]' : 'text-white'}`} />
+                  )}
                   {isCurrentPlan
                     ? 'Plan actuel'
-                    : loading === plan.key
-                    ? 'Redirection...'
                     : plan.key === 'free'
                     ? 'Plan actuel'
                     : `Passer à ${plan.name}`}
