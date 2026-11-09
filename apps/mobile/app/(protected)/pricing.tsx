@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, Linking } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import * as WebBrowser from 'expo-web-browser'
 import Constants from 'expo-constants'
 import { PLAN_PRICES, PLAN_LIMITS } from '@payetavie/shared'
+import { supabase } from '@/lib/supabase'
 import { getUserSubscription } from '@/lib/subscription'
 import type { UserSubscription } from '@/lib/subscription'
 
@@ -11,14 +12,36 @@ const APP_URL = (Constants.expoConfig?.extra?.appUrl as string | undefined) ?? '
 
 export default function PricingScreen() {
   const [subscription, setSubscription] = useState<UserSubscription | null>(null)
+  const [managingSubscription, setManagingSubscription] = useState(false)
 
   useEffect(() => {
     getUserSubscription().then(setSubscription)
   }, [])
 
   async function handleUpgrade(plan: 'essentiel' | 'pro') {
-    // Open Stripe Checkout in in-app browser
     await WebBrowser.openBrowserAsync(`${APP_URL}/pricing?plan=${plan}`)
+    // Refresh after browser closes — user may have subscribed
+    const updated = await getUserSubscription()
+    setSubscription(updated)
+    if (updated.plan !== subscription?.plan) {
+      Alert.alert('Abonnement activé', `Bienvenue sur le plan ${updated.plan} !`)
+    }
+  }
+
+  async function handleManageSubscription() {
+    setManagingSubscription(true)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      await WebBrowser.openBrowserAsync(`${APP_URL}/api/stripe/portal?token=${session.access_token}`)
+      // Refresh after browser closes — user may have cancelled or changed plan
+      const updated = await getUserSubscription()
+      setSubscription(updated)
+    } catch {
+      Alert.alert('Erreur', "Impossible d'ouvrir le portail de gestion.")
+    } finally {
+      setManagingSubscription(false)
+    }
   }
 
   const plans = [
@@ -100,6 +123,20 @@ export default function PricingScreen() {
             </View>
           )
         })}
+
+        {subscription && subscription.plan !== 'free' && subscription.isActive && (
+          <TouchableOpacity
+            className={`bg-white rounded-2xl p-4 flex-row items-center justify-center gap-2 shadow-sm mt-2 ${managingSubscription ? 'opacity-60' : ''}`}
+            onPress={handleManageSubscription}
+            disabled={managingSubscription}
+          >
+            {managingSubscription
+              ? <ActivityIndicator size="small" color="#235037" />
+              : <Ionicons name="settings-outline" size={18} color="#235037" />
+            }
+            <Text className="font-medium text-[#235037]">Gérer mon abonnement</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   )

@@ -4,6 +4,15 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-09 — Stripe mobile : refresh + portail client
+
+- `apps/web/src/app/api/stripe/portal/route.ts` (nouveau) : endpoint GET `GET /api/stripe/portal?token=<access_token>` — valide le JWT Supabase, récupère le `stripe_customer_id` via service role, crée une session portail Stripe et redirige
+- `apps/mobile/app/(protected)/pricing.tsx` : refresh automatique de l'abonnement après fermeture du browser (`openBrowserAsync` await + `getUserSubscription()`) — alert "Bienvenue sur le plan X" si plan changé
+- `apps/mobile/app/(protected)/pricing.tsx` : bouton "Gérer mon abonnement" (visible si `plan !== 'free' && isActive`) — ouvre le portail via l'endpoint web + refresh plan au retour
+- `apps/mobile/app/(protected)/profile.tsx` : `useFocusEffect` pour re-fetch le plan à chaque activation d'écran — plan toujours à jour quand on revient depuis pricing
+
+---
+
 ## 2026-11-09 — UX Premium : loaders, spinners, skeletons
 
 - `nextjs-toploader` : barre de progression verte (#235037) en haut d'écran sur toutes les navigations Next.js

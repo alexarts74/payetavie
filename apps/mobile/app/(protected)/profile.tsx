@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { useFocusEffect } from 'expo-router'
 import {
   View, Text, ScrollView, TouchableOpacity, Alert, Modal, TextInput,
   KeyboardAvoidingView, Platform, ActivityIndicator,
@@ -54,8 +55,11 @@ export default function ProfileScreen() {
           setSelectedTopics(data.selected_topics ?? [])
         }
       })
-    getUserSubscription().then(({ plan: p }) => setPlan(p))
   }, [user])
+
+  useFocusEffect(useCallback(() => {
+    getUserSubscription().then(({ plan: p }) => setPlan(p))
+  }, []))
 
   async function handleSignOut() {
     Alert.alert('Déconnexion', 'Voulez-vous vraiment vous déconnecter ?', [
