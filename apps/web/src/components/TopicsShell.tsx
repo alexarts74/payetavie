@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { LogOut, Menu, X, LayoutDashboard, User, HelpCircle, Wallet, Crown } from 'lucide-react'
+import { LogOut, Menu, X, LayoutDashboard, User, HelpCircle, Wallet, Crown, PanelLeft } from 'lucide-react'
 import NavLinks from '@/components/NavLinks'
 import GlobalSearch from '@/components/GlobalSearch'
 import { signOut } from '@/app/actions/auth'
@@ -25,7 +25,7 @@ function UserInitials({ email }: { email: string }) {
     .join('')
 
   return (
-    <div className="w-8 h-8 rounded-lg bg-[#235037] flex items-center justify-center">
+    <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
       <span className="text-xs font-semibold text-white">{initials || <User className="w-3.5 h-3.5" />}</span>
     </div>
   )
@@ -46,10 +46,23 @@ function FAQButton() {
 export default function TopicsShell({ userEmail, selectedTopics, plan, children }: TopicsShellProps) {
   const canAccessEssentiel = plan === 'essentiel' || plan === 'pro'
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const pathname = usePathname()
   const prevPathnameRef = useRef(pathname)
 
   const isTopicPage = (pathname.startsWith('/topics/') && pathname !== '/topics') || pathname.startsWith('/freelance/')
+
+  useEffect(() => {
+    const stored = localStorage.getItem('payetavie-sidebar')
+    if (stored !== null) setIsSidebarOpen(stored === 'true')
+  }, [])
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prev => {
+      localStorage.setItem('payetavie-sidebar', String(!prev))
+      return !prev
+    })
+  }
 
   useEffect(() => {
     if (prevPathnameRef.current !== pathname) {
@@ -97,176 +110,163 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
         </div>
       </header>
 
-      {/* Top bar desktop */}
-      <header className="hidden md:flex fixed top-0 left-[272px] right-0 z-20 h-14 items-center justify-between px-6 bg-white border-b border-[#E8E8E8]">
-        <GlobalSearch
-          selectedTopics={selectedTopics}
-          plan={plan}
-          className="w-full max-w-[280px]"
-        />
-        <div className="flex items-center gap-1">
-          {isTopicPage && <FAQButton />}
-          <form action={signOut}>
-            <button
-              type="submit"
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-[#5A6B61] hover:text-red-600 hover:bg-red-50 transition-all duration-200"
-              aria-label="Déconnexion"
-            >
-              <LogOut className="w-[18px] h-[18px]" />
-            </button>
-          </form>
-        </div>
-      </header>
-
-      {/* Sidebar desktop fixe */}
-      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[272px] bg-white border-r border-[#E8E8E8] flex-col z-20">
+      {/* Sidebar desktop flottante */}
+      <aside className={`hidden md:flex fixed left-4 top-4 bottom-4 bg-[#235037] rounded-2xl shadow-xl flex-col z-20 overflow-hidden transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-[260px]' : 'w-[72px]'}`}>
         {/* Logo/Header */}
-        <div className="px-5 py-5 border-b border-[#E8E8E8] flex-shrink-0">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-[22px] bg-[#235037] flex items-center justify-center">
-              <span className="text-lg font-bold text-white" style={{ fontFamily: 'var(--font-caprasimo)' }}>P</span>
+        <div className={`border-b border-white/10 flex-shrink-0 transition-all duration-300 ${isSidebarOpen ? 'px-5 py-5 flex items-center justify-between' : 'py-5 flex flex-col items-center gap-2'}`}>
+          <Link href="/dashboard" className={`flex items-center gap-3 min-w-0 ${!isSidebarOpen ? 'justify-center' : ''}`}>
+            <div className="w-9 h-9 rounded-[18px] bg-white/20 flex items-center justify-center flex-shrink-0">
+              <span className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-caprasimo)' }}>P</span>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-[#235037] leading-tight" style={{ fontFamily: 'var(--font-caprasimo)' }}>
-                PayeTaVie
-              </h1>
-              <p className="text-[10px] text-[#5A6B61] font-medium tracking-wide">
-                Ton assistant administratif
-              </p>
-            </div>
+            {isSidebarOpen && (
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-white leading-tight" style={{ fontFamily: 'var(--font-caprasimo)' }}>PayeTaVie</h1>
+                <p className="text-[10px] text-white/50 font-medium tracking-wide">Ton assistant administratif</p>
+              </div>
+            )}
           </Link>
+          {isSidebarOpen && (
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all duration-200 flex-shrink-0"
+              aria-label="Réduire le menu"
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Navigation scrollable */}
         <nav className="flex-1 px-3 py-4 overflow-y-auto">
           <div className="space-y-1">
             {/* Dashboard link */}
-            <Link
-              href="/dashboard"
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
-                pathname === '/dashboard'
-                  ? 'bg-[#EEF7F1]'
-                  : 'hover:bg-[#F5E9AF]/60'
-              }`}
-            >
-              {pathname === '/dashboard' && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#235037]" />
-              )}
-              <LayoutDashboard
-                className={`w-[18px] h-[18px] transition-colors ${
-                  pathname === '/dashboard'
-                    ? 'text-[#235037]'
-                    : 'text-[#5A6B61] group-hover:text-[#235037]'
-                }`}
-              />
-              <span
-                className={`text-[12px] font-semibold tracking-wide transition-colors ${
-                  pathname === '/dashboard'
-                    ? 'text-[#235037]'
-                    : 'text-[#5A6B61] group-hover:text-[#235037]'
-                }`}
+            {isSidebarOpen ? (
+              <Link
+                href="/dashboard"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${pathname === '/dashboard' ? 'bg-white/15' : 'hover:bg-white/10'}`}
               >
-                Tableau de bord
-              </span>
-            </Link>
+                {pathname === '/dashboard' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />}
+                <LayoutDashboard className="w-[18px] h-[18px] text-white/80 transition-colors group-hover:text-white" />
+                <span className="text-[12px] font-semibold tracking-wide transition-colors text-white/80 group-hover:text-white">Tableau de bord</span>
+              </Link>
+            ) : (
+              <Link href="/dashboard" title="Tableau de bord" className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${pathname === '/dashboard' ? 'bg-white/20' : 'hover:bg-white/10'}`}>
+                <LayoutDashboard className="w-[18px] h-[18px] text-white" />
+              </Link>
+            )}
 
             {/* Dépenses link */}
             {canAccessEssentiel && (
-              <Link
-                href="/depenses"
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
-                  pathname.startsWith('/depenses')
-                    ? 'bg-[#EEF7F1]'
-                    : 'hover:bg-[#F5E9AF]/60'
-                }`}
-              >
-                {pathname.startsWith('/depenses') && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#235037]" />
-                )}
-                <Wallet
-                  className={`w-[18px] h-[18px] transition-colors ${
-                    pathname.startsWith('/depenses')
-                      ? 'text-[#235037]'
-                      : 'text-[#5A6B61] group-hover:text-[#235037]'
-                  }`}
-                />
-                <span
-                  className={`text-[12px] font-semibold tracking-wide transition-colors ${
-                    pathname.startsWith('/depenses')
-                      ? 'text-[#235037]'
-                      : 'text-[#5A6B61] group-hover:text-[#235037]'
-                  }`}
+              isSidebarOpen ? (
+                <Link
+                  href="/depenses"
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${pathname.startsWith('/depenses') ? 'bg-white/15' : 'hover:bg-white/10'}`}
                 >
-                  Dépenses
-                </span>
-              </Link>
+                  {pathname.startsWith('/depenses') && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />}
+                  <Wallet className="w-[18px] h-[18px] text-white/80 transition-colors group-hover:text-white" />
+                  <span className="text-[12px] font-semibold tracking-wide transition-colors text-white/80 group-hover:text-white">Dépenses</span>
+                </Link>
+              ) : (
+                <Link href="/depenses" title="Dépenses" className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${pathname.startsWith('/depenses') ? 'bg-white/20' : 'hover:bg-white/10'}`}>
+                  <Wallet className="w-[18px] h-[18px] text-white" />
+                </Link>
+              )
             )}
 
-            {/* Séparateur */}
+            {/* Séparateur + titre section */}
             <div className="py-2 px-3">
-              <div className="h-px bg-[#E8E8E8]" />
+              <div className="h-px bg-white/10" />
             </div>
+            {isSidebarOpen && (
+              <div className="px-3 pb-1">
+                <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">Categories</span>
+              </div>
+            )}
 
-            {/* Titre section */}
-            <div className="px-3 pb-1">
-              <span className="text-[10px] font-semibold text-[#5A6B61] uppercase tracking-widest">
-                Categories
-              </span>
-            </div>
-
-            <NavLinks selectedTopics={selectedTopics} plan={plan} />
+            <NavLinks selectedTopics={selectedTopics} plan={plan} isCollapsed={!isSidebarOpen} />
           </div>
         </nav>
 
+        {/* Bouton rouvrir — visible uniquement en mode réduit */}
+        {!isSidebarOpen && (
+          <div className="px-2 pb-2 flex justify-center">
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all duration-200"
+              aria-label="Ouvrir le menu"
+            >
+              <PanelLeft className="w-4 h-4 rotate-180" />
+            </button>
+          </div>
+        )}
+
         {/* User section en bas */}
-        <div className="px-3 py-4 border-t border-[#E8E8E8] flex-shrink-0">
-          {plan !== 'pro' && (
-            <div className="rounded-xl bg-[#EEF7F1] border border-[#235037]/15 p-3 mb-3">
-              <div className="flex items-center gap-2 mb-1.5">
-                <Crown className="w-4 h-4 text-[#235037]" />
-                <span className="text-[12px] font-semibold text-[#235037]">
-                  {plan === 'essentiel' ? 'Passer au Pro' : 'Débloquer plus'}
-                </span>
-              </div>
-              <p className="text-[11px] text-[#5A6B61] mb-2.5 leading-relaxed">
-                {plan === 'essentiel'
-                  ? 'Accédez à la facturation et aux outils freelance.'
-                  : 'Suivez vos dépenses, gérez vos documents et plus encore.'}
-              </p>
-              <Link
-                href="/pricing"
-                className="block w-full text-center px-3 py-1.5 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-[12px] font-medium transition-colors duration-200"
-              >
-                Voir les plans
-              </Link>
-            </div>
-          )}
-          <Link
-            href="/profile"
-            className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
-              pathname === '/profile'
-                ? 'bg-[#EEF7F1]'
-                : 'hover:bg-[#F5E9AF]/60'
-            }`}
-          >
-            {userEmail ? (
-              <>
-                <UserInitials email={userEmail} />
-                <div className="flex-1 min-w-0">
-                  <span className="text-[13px] font-medium text-[#235037] truncate block leading-tight">
-                    {userEmail.split('@')[0]}
-                  </span>
-                  <span className="text-[10px] text-[#5A6B61] truncate block">
-                    {userEmail}
-                  </span>
+        <div className={`border-t border-white/10 flex-shrink-0 transition-all duration-300 ${isSidebarOpen ? 'px-3 py-4' : 'px-2 py-4 flex justify-center'}`}>
+          {isSidebarOpen ? (
+            <>
+              {plan !== 'pro' && (
+                <div className="rounded-xl bg-white/10 border border-white/15 p-3 mb-3">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Crown className="w-4 h-4 text-white/80" />
+                    <span className="text-[12px] font-semibold text-white">
+                      {plan === 'essentiel' ? 'Passer au Pro' : 'Débloquer plus'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-white/60 mb-2.5 leading-relaxed">
+                    {plan === 'essentiel'
+                      ? 'Accédez à la facturation et aux outils freelance.'
+                      : 'Suivez vos dépenses, gérez vos documents et plus encore.'}
+                  </p>
+                  <Link
+                    href="/pricing"
+                    className="block w-full text-center px-3 py-1.5 rounded-lg bg-white hover:bg-white/90 text-[#235037] text-[12px] font-semibold transition-colors duration-200"
+                  >
+                    Voir les plans
+                  </Link>
                 </div>
-              </>
-            ) : (
-              <div className="w-8 h-8 rounded-lg bg-[#EEF7F1] flex items-center justify-center">
-                <User className="w-4 h-4 text-[#5A6B61]" />
-              </div>
-            )}
-          </Link>
+              )}
+              <Link
+                href="/profile"
+                className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
+                  pathname === '/profile' ? 'bg-white/15' : 'hover:bg-white/10'
+                }`}
+              >
+                {userEmail ? (
+                  <>
+                    <UserInitials email={userEmail} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] font-medium text-white truncate block leading-tight">
+                        {userEmail.split('@')[0]}
+                      </span>
+                      <span className="text-[10px] text-white/50 truncate block">
+                        {userEmail}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white/70" />
+                  </div>
+                )}
+              </Link>
+            </>
+          ) : (
+            <Link
+              href="/profile"
+              title="Profil"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                pathname === '/profile' ? 'bg-white/15' : 'hover:bg-white/10'
+              }`}
+            >
+              {userEmail ? (
+                <UserInitials email={userEmail} />
+              ) : (
+                <User className="w-4 h-4 text-white/70" />
+              )}
+            </Link>
+          )}
         </div>
       </aside>
 
@@ -284,24 +284,24 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
 
         {/* Panneau latéral */}
         <aside
-          className={`fixed left-0 top-0 h-screen w-72 max-w-[80%] bg-white z-50 flex flex-col md:hidden transition-transform duration-300 ease-in-out ${
+          className={`fixed left-0 top-0 h-screen w-72 max-w-[80%] bg-[#235037] z-50 flex flex-col md:hidden transition-transform duration-300 ease-in-out ${
             isMobileNavOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
         >
-            <div className="px-5 py-4 border-b border-[#E8E8E8] flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
               <Link
                 href="/dashboard"
                 className="flex items-center gap-3"
                 onClick={() => setIsMobileNavOpen(false)}
               >
-                <div className="w-9 h-9 rounded-[18px] bg-[#235037] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[18px] bg-white/20 flex items-center justify-center">
                   <span className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-caprasimo)' }}>P</span>
                 </div>
                 <div>
-                  <span className="text-lg font-bold text-[#235037] leading-tight block" style={{ fontFamily: 'var(--font-caprasimo)' }}>
+                  <span className="text-lg font-bold text-white leading-tight block" style={{ fontFamily: 'var(--font-caprasimo)' }}>
                     PayeTaVie
                   </span>
-                  <span className="text-[9px] text-[#5A6B61] font-medium tracking-wide">
+                  <span className="text-[9px] text-white/50 font-medium tracking-wide">
                     Ton assistant administratif
                   </span>
                 </div>
@@ -309,7 +309,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               <button
                 type="button"
                 onClick={() => setIsMobileNavOpen(false)}
-                className="inline-flex items-center justify-center rounded-lg p-2 text-[#5A6B61] hover:text-[#235037] hover:bg-[#EEF7F1] transition-colors"
+                className="inline-flex items-center justify-center rounded-lg p-2 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
                 aria-label="Fermer le menu"
               >
                 <X className="w-5 h-5" />
@@ -323,27 +323,15 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   onClick={() => setIsMobileNavOpen(false)}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                     pathname === '/dashboard'
-                      ? 'bg-[#EEF7F1]'
-                      : 'hover:bg-[#F5E9AF]/60'
+                      ? 'bg-white/15'
+                      : 'hover:bg-white/10'
                   }`}
                 >
                   {pathname === '/dashboard' && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#235037]" />
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
                   )}
-                  <LayoutDashboard
-                    className={`w-[18px] h-[18px] transition-colors ${
-                      pathname === '/dashboard'
-                        ? 'text-[#235037]'
-                        : 'text-[#5A6B61] group-hover:text-[#235037]'
-                    }`}
-                  />
-                  <span
-                    className={`text-[12px] font-semibold tracking-wide transition-colors ${
-                      pathname === '/dashboard'
-                        ? 'text-[#235037]'
-                        : 'text-[#5A6B61] group-hover:text-[#235037]'
-                    }`}
-                  >
+                  <LayoutDashboard className="w-[18px] h-[18px] text-white/80 group-hover:text-white transition-colors" />
+                  <span className="text-[12px] font-semibold tracking-wide text-white/80 group-hover:text-white transition-colors">
                     Tableau de bord
                   </span>
                 </Link>
@@ -353,36 +341,24 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                     onClick={() => setIsMobileNavOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${
                       pathname.startsWith('/depenses')
-                        ? 'bg-[#EEF7F1]'
-                        : 'hover:bg-[#F5E9AF]/60'
+                        ? 'bg-white/15'
+                        : 'hover:bg-white/10'
                     }`}
                   >
                     {pathname.startsWith('/depenses') && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#235037]" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
                     )}
-                    <Wallet
-                      className={`w-[18px] h-[18px] transition-colors ${
-                        pathname.startsWith('/depenses')
-                          ? 'text-[#235037]'
-                          : 'text-[#5A6B61] group-hover:text-[#235037]'
-                      }`}
-                    />
-                    <span
-                      className={`text-[12px] font-semibold tracking-wide transition-colors ${
-                        pathname.startsWith('/depenses')
-                          ? 'text-[#235037]'
-                          : 'text-[#5A6B61] group-hover:text-[#235037]'
-                      }`}
-                    >
+                    <Wallet className="w-[18px] h-[18px] text-white/80 group-hover:text-white transition-colors" />
+                    <span className="text-[12px] font-semibold tracking-wide text-white/80 group-hover:text-white transition-colors">
                       Dépenses
                     </span>
                   </Link>
                 )}
                 <div className="py-2 px-3">
-                  <div className="h-px bg-[#E8E8E8]" />
+                  <div className="h-px bg-white/10" />
                 </div>
                 <div className="px-3 pb-1">
-                  <span className="text-[10px] font-semibold text-[#5A6B61] uppercase tracking-widest">
+                  <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">
                     Categories
                   </span>
                 </div>
@@ -390,16 +366,16 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               </div>
             </nav>
 
-            <div className="px-3 py-4 border-t border-[#E8E8E8]">
+            <div className="px-3 py-4 border-t border-white/10">
               {plan !== 'pro' && (
-                <div className="rounded-xl bg-[#EEF7F1] border border-[#235037]/15 p-3 mb-3">
+                <div className="rounded-xl bg-white/10 border border-white/15 p-3 mb-3">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Crown className="w-4 h-4 text-[#235037]" />
-                    <span className="text-[12px] font-semibold text-[#235037]">
+                    <Crown className="w-4 h-4 text-white/80" />
+                    <span className="text-[12px] font-semibold text-white">
                       {plan === 'essentiel' ? 'Passer au Pro' : 'Débloquer plus'}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#5A6B61] mb-2.5 leading-relaxed">
+                  <p className="text-[11px] text-white/60 mb-2.5 leading-relaxed">
                     {plan === 'essentiel'
                       ? 'Accédez à la facturation et aux outils freelance.'
                       : 'Suivez vos dépenses, gérez vos documents et plus encore.'}
@@ -407,7 +383,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   <Link
                     href="/pricing"
                     onClick={() => setIsMobileNavOpen(false)}
-                    className="block w-full text-center px-3 py-1.5 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-[12px] font-medium transition-colors duration-200"
+                    className="block w-full text-center px-3 py-1.5 rounded-lg bg-white hover:bg-white/90 text-[#235037] text-[12px] font-semibold transition-colors duration-200"
                   >
                     Voir les plans
                   </Link>
@@ -418,25 +394,25 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                 onClick={() => setIsMobileNavOpen(false)}
                 className={`flex items-center gap-3 px-2 rounded-xl py-2 transition-all duration-200 ${
                   pathname === '/profile'
-                    ? 'bg-[#EEF7F1]'
-                    : 'hover:bg-[#F5E9AF]/60'
+                    ? 'bg-white/15'
+                    : 'hover:bg-white/10'
                 }`}
               >
                 {userEmail ? (
                   <>
                     <UserInitials email={userEmail} />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[13px] font-medium text-[#235037] truncate block leading-tight">
+                      <span className="text-[13px] font-medium text-white truncate block leading-tight">
                         {userEmail.split('@')[0]}
                       </span>
-                      <span className="text-[10px] text-[#5A6B61] truncate block">
+                      <span className="text-[10px] text-white/50 truncate block">
                         {userEmail}
                       </span>
                     </div>
                   </>
                 ) : (
-                  <div className="w-8 h-8 rounded-lg bg-[#EEF7F1] flex items-center justify-center">
-                    <User className="w-4 h-4 text-[#5A6B61]" />
+                  <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                    <User className="w-4 h-4 text-white/70" />
                   </div>
                 )}
               </Link>
@@ -445,7 +421,24 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
       </>
 
       {/* Contenu principal */}
-      <main className="pt-14 md:pt-14 md:ml-[272px] bg-[#F5E9AF]">
+      <main className={`pt-14 md:pt-0 bg-[#F5E9AF] transition-all duration-300 ease-in-out ${isSidebarOpen ? 'md:ml-[292px]' : 'md:ml-[88px]'}`}>
+        {/* Top bar desktop — dans le flux, pas sticky */}
+        <div className="hidden md:flex h-14 items-center justify-between px-6">
+          <GlobalSearch
+            selectedTopics={selectedTopics}
+            plan={plan}
+            className="w-full max-w-[360px]"
+          />
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-[#5A6B61] hover:text-red-600 hover:bg-red-50 transition-all duration-200"
+              aria-label="Déconnexion"
+            >
+              <LogOut className="w-[18px] h-[18px]" />
+            </button>
+          </form>
+        </div>
         {children}
       </main>
     </div>

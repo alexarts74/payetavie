@@ -90,11 +90,7 @@ export default async function DashboardPage() {
       <div className="max-w-7xl mx-auto relative">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF7F1] border border-[#235037]/20 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#235037]" />
-            <span className="text-[11px] font-semibold text-[#235037] uppercase tracking-wider">Vue d&apos;ensemble</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#235037] mb-1" style={{ fontFamily: 'var(--font-caprasimo)' }}>
+<h1 className="text-2xl sm:text-3xl font-bold text-[#235037] mb-1" style={{ fontFamily: 'var(--font-caprasimo)' }}>
             Tableau de bord
           </h1>
           <p className="text-[#5A6B61] text-sm">

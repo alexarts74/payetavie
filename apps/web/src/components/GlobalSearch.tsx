@@ -341,7 +341,7 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Rechercher un module..."
-          className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-xl bg-[#F5E9AF]/60 border border-[#E8E8E8] text-[#1a2e22] placeholder:text-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all duration-200"
+          className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-xl bg-white border border-[#E8E8E8] text-[#1a2e22] placeholder:text-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all duration-200"
         />
       </div>
 
