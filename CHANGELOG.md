@@ -4,6 +4,16 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-09 — Fix Stripe : bouton portail + webhooks cancel_at
+
+- Bouton "Gérer mon abonnement" : async avec loading state + affichage erreur Stripe
+- `createPortalSession` : redirect `/pricing` si pas de customer, try/catch sur appel Stripe
+- Webhook `customer.subscription.updated` : détecte `cancel_at !== null` pour "Annulation programmée" (Stripe Customer Portal utilise `cancel_at` pas `cancel_at_period_end`)
+- DB : colonne `stripe_customer_id` rendue nullable (migration)
+- Note dev : `stripe listen --forward-to http://127.0.0.1:3000/api/webhooks/stripe` sur macOS
+
+---
+
 ## 2026-11-09 — Redesign web — identité visuelle nature (parité mobile)
 
 Refonte visuelle complète du web pour adopter exactement la même identité que l'app mobile. Suppression totale du glass morphism, du dark mode et de la palette indigo/violet/purple. ~40 fichiers modifiés en 8 phases.

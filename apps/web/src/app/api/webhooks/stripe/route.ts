@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
           status: subscription.status as string,
           current_period_start: startDate,
           current_period_end: endDate,
-          cancel_at_period_end: subscription.cancel_at_period_end,
+          cancel_at_period_end: subscription.cancel_at_period_end || subscription.cancel_at !== null,
         })
         .eq('stripe_customer_id', customerId)
 
