@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Building2, Mail, Phone, ChevronRight, UserX, UserCheck } from 'lucide-react'
+import { Search, Plus, Building2, Mail, Phone, ChevronRight, UserX, UserCheck, Loader2 } from 'lucide-react'
 import type { Client } from '@/types'
 import ClientForm from '@/components/ClientForm'
 
@@ -16,6 +16,7 @@ export default function ClientsPageContent({ initialClients }: ClientsPageConten
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [showInactive, setShowInactive] = useState(false)
+  const [navigatingToId, setNavigatingToId] = useState<string | null>(null)
 
   const filteredClients = clients.filter(c => {
     const matchesSearch = !search ||
@@ -100,10 +101,14 @@ export default function ClientsPageContent({ initialClients }: ClientsPageConten
             {filteredClients.map((client) => (
               <button
                 key={client.id}
-                onClick={() => router.push(`/freelance/clients/${client.id}`)}
+                onClick={() => {
+                  setNavigatingToId(client.id)
+                  router.push(`/freelance/clients/${client.id}`)
+                }}
+                disabled={navigatingToId !== null}
                 className={`w-full card rounded-xl p-4 sm:p-5 text-left hover:border-[#235037]/20 transition-all group ${
                   !client.is_active ? 'opacity-60' : ''
-                }`}
+                } disabled:cursor-default`}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl bg-[#235037] flex items-center justify-center flex-shrink-0">
@@ -141,7 +146,10 @@ export default function ClientsPageContent({ initialClients }: ClientsPageConten
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-[#E8E8E8] group-hover:text-[#235037] transition-colors flex-shrink-0" />
+                  {navigatingToId === client.id
+                    ? <Loader2 className="w-5 h-5 text-[#235037] animate-spin flex-shrink-0" />
+                    : <ChevronRight className="w-5 h-5 text-[#E8E8E8] group-hover:text-[#235037] transition-colors flex-shrink-0" />
+                  }
                 </div>
               </button>
             ))}

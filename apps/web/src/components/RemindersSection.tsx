@@ -8,6 +8,7 @@ import type { PredefinedReminder } from '@/lib/predefined-reminders'
 import { Clock, Check, Calendar, Trash2, Plus, Sparkles, Download, RefreshCw } from 'lucide-react'
 import type { PlanName } from '@/types'
 import UpgradePrompt from '@/components/UpgradePrompt'
+import Button from '@/components/ui/Button'
 
 interface RemindersSectionProps {
   topicSlug: string
@@ -200,13 +201,15 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
             >
               Annuler
             </button>
-            <button
+            <Button
               onClick={handleAddCustomReminder}
-              disabled={!newTitle.trim() || addingReminder}
-              className="px-4 py-1.5 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-xs font-medium transition-colors disabled:opacity-50"
+              disabled={!newTitle.trim()}
+              loading={addingReminder}
+              variant="primary"
+              size="sm"
             >
-              {addingReminder ? 'Ajout...' : 'Ajouter'}
-            </button>
+              Ajouter
+            </Button>
           </div>
         </div>
       )}

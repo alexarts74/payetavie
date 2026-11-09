@@ -14,6 +14,11 @@ Historique des features implémentées, par ordre antichronologique.
 - `profile/loading.tsx` : squelette header + 4 sections
 - `freelance/clients/loading.tsx` : squelette header + 6 cards
 - `freelance/facturation/factures/loading.tsx` : squelette 4 stats + liste
+- `GlobalSearch` : `useTransition` sur `navigate()` — Loader2 remplace l'icône Search pendant la navigation
+- `ClientsPageContent` : spinner Loader2 sur la card client cliquée (remplace ChevronRight)
+- `RemindersSection` : bouton "Ajouter" migré vers `<Button loading={addingReminder}>`
+- `depenses/loading.tsx` : squelette header + 4 stat cards + table
+- `topics/[slug]/loading.tsx` : squelette header + checklist + 2 colonnes + bookmarks
 
 ---
 

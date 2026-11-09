@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Search,
+  Loader2,
   LayoutDashboard,
   User,
   Crown,
@@ -145,6 +146,7 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
   const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [isPending, startTransition] = useTransition()
 
   const canAccessEssentiel = plan === 'essentiel' || plan === 'pro'
   const canAccessPro = plan === 'pro'
@@ -286,8 +288,10 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
   const navigate = useCallback((href: string) => {
     setIsOpen(false)
     setQuery('')
-    router.push(href)
-  }, [router])
+    startTransition(() => {
+      router.push(href)
+    })
+  }, [router, startTransition])
 
   // Fermer au clic extérieur
   useEffect(() => {
@@ -329,7 +333,10 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
   return (
     <div ref={containerRef} className={`relative ${className ?? ''}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5A6B61] pointer-events-none" />
+        {isPending
+          ? <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#235037] animate-spin pointer-events-none" />
+          : <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5A6B61] pointer-events-none" />
+        }
         <input
           ref={inputRef}
           type="text"
