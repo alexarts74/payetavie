@@ -17,12 +17,13 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
-## 2026-11-09 — Fix bouton "Gérer mon abonnement" sur /profile
+## 2026-11-09 — Fix Stripe : bouton portail + webhooks cancel_at
 
-- `createPortalSession` : redirect vers `/pricing` si `stripe_customer_id` est null (compte sans abo Stripe)
-- `createPortalSession` : try/catch autour de l'appel Stripe — log erreur + retour message lisible au lieu d'erreur silencieuse
-- `ProfilePageContent` : bouton async avec état `portalLoading` (disabled + "Chargement..." pendant l'appel)
-- `ProfilePageContent` : message d'erreur affiché sous le bouton si l'appel Stripe échoue
+- Bouton "Gérer mon abonnement" : async avec loading state + affichage erreur Stripe
+- `createPortalSession` : redirect `/pricing` si pas de customer, try/catch sur appel Stripe
+- Webhook `customer.subscription.updated` : détecte `cancel_at !== null` pour "Annulation programmée" (Stripe Customer Portal utilise `cancel_at` pas `cancel_at_period_end`)
+- DB : colonne `stripe_customer_id` rendue nullable (migration)
+- Note dev : `stripe listen --forward-to http://127.0.0.1:3000/api/webhooks/stripe` sur macOS
 
 ---
 
