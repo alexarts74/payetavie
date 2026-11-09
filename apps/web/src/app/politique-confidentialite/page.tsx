@@ -7,19 +7,19 @@ export const metadata = {
 
 export default function PolitiqueConfidentialitePage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-[#F5E9AF]">
       {/* Navbar */}
-      <header className="border-b border-zinc-200 dark:border-zinc-800 py-4 px-6">
+      <header className="border-b border-[#E8E8E8] py-4 px-6">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#235037] flex items-center justify-center">
               <span className="text-xs font-bold text-white">PTV</span>
             </div>
-            <span className="font-semibold text-zinc-900 dark:text-zinc-100">PayeTaVie</span>
+            <span className="font-semibold text-[#1a2e22]">PayeTaVie</span>
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-[#5A6B61] hover:text-[#1a2e22] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour
@@ -28,20 +28,20 @@ export default function PolitiqueConfidentialitePage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Politique de confidentialité</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-10">Dernière mise à jour : mai 2026</p>
+        <h1 className="text-3xl font-bold text-[#1a2e22] mb-2">Politique de confidentialité</h1>
+        <p className="text-sm text-[#5A6B61] mb-10">Dernière mise à jour : mai 2026</p>
 
-        <div className="space-y-8 text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <div className="space-y-8 text-sm text-[#1a2e22] leading-relaxed">
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">1. Responsable du traitement</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">1. Responsable du traitement</h2>
             <p>
               Le responsable du traitement des données personnelles collectées via PayeTaVie est : [À compléter — nom, adresse, email de contact].
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">2. Données collectées</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">2. Données collectées</h2>
             <p className="mb-3">Nous collectons les données suivantes :</p>
             <ul className="list-disc list-inside space-y-1.5">
               <li><strong>Données de compte :</strong> adresse email, mot de passe (haché)</li>
@@ -54,7 +54,7 @@ export default function PolitiqueConfidentialitePage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">3. Finalités du traitement</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">3. Finalités du traitement</h2>
             <p className="mb-2">Vos données sont utilisées pour :</p>
             <ul className="list-disc list-inside space-y-1.5">
               <li>Fournir et améliorer le service PayeTaVie</li>
@@ -66,15 +66,15 @@ export default function PolitiqueConfidentialitePage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">4. Base légale</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">4. Base légale</h2>
             <p>
               Le traitement de vos données repose sur l&apos;exécution du contrat (utilisation du service), votre consentement (notifications), et nos obligations légales (facturation).
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">5. Sous-traitants et transferts</h2>
-            <div className="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 space-y-2">
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">5. Sous-traitants et transferts</h2>
+            <div className="bg-[#FAFAFA] rounded-xl p-4 border border-[#E8E8E8] space-y-2">
               <p><strong>Supabase</strong> — Stockage des données et authentification (hébergé dans l&apos;UE)</p>
               <p><strong>Stripe</strong> — Paiements et facturation (conforme PCI DSS)</p>
               <p><strong>Vercel</strong> — Hébergement de l&apos;application (USA — clauses contractuelles types)</p>
@@ -86,14 +86,14 @@ export default function PolitiqueConfidentialitePage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">6. Durée de conservation</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">6. Durée de conservation</h2>
             <p>
               Vos données sont conservées pendant toute la durée de votre compte, puis supprimées dans un délai de 30 jours suivant la clôture, sauf obligation légale contraire (données comptables conservées 10 ans).
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">7. Vos droits (RGPD)</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">7. Vos droits (RGPD)</h2>
             <p className="mb-2">Conformément au RGPD et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
             <ul className="list-disc list-inside space-y-1.5">
               <li><strong>Droit d&apos;accès</strong> — obtenir une copie de vos données</li>
@@ -108,21 +108,21 @@ export default function PolitiqueConfidentialitePage() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">8. Sécurité</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">8. Sécurité</h2>
             <p>
               Vos données sont protégées par des mesures de sécurité techniques (chiffrement HTTPS, Row-Level Security en base de données, mots de passe hachés). Vous êtes responsable de la confidentialité de votre mot de passe.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">9. Cookies</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">9. Cookies</h2>
             <p>
               PayeTaVie utilise uniquement des cookies strictement nécessaires au fonctionnement du service (session d&apos;authentification, préférences de thème). Aucun cookie tiers à des fins publicitaires ou analytiques n&apos;est déposé.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3">10. Modifications</h2>
+            <h2 className="text-xl font-semibold text-[#1a2e22] mb-3">10. Modifications</h2>
             <p>
               Cette politique peut être mise à jour. En cas de modification substantielle, vous serez informé par email. La version en vigueur est toujours disponible sur cette page.
             </p>
@@ -131,13 +131,13 @@ export default function PolitiqueConfidentialitePage() {
         </div>
       </main>
 
-      <footer className="border-t border-zinc-200 dark:border-zinc-800 py-6 mt-12">
-        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-400">
-          <Link href="/mentions-legales" className="hover:text-zinc-600 transition-colors">Mentions légales</Link>
+      <footer className="border-t border-[#E8E8E8] py-6 mt-12">
+        <div className="max-w-4xl mx-auto px-6 flex flex-wrap items-center justify-center gap-4 text-xs text-[#5A6B61]">
+          <Link href="/mentions-legales" className="hover:text-[#1a2e22] transition-colors">Mentions légales</Link>
           <span>·</span>
-          <Link href="/cgu" className="hover:text-zinc-600 transition-colors">CGU</Link>
+          <Link href="/cgu" className="hover:text-[#1a2e22] transition-colors">CGU</Link>
           <span>·</span>
-          <Link href="/politique-confidentialite" className="hover:text-zinc-600 transition-colors">Politique de confidentialité</Link>
+          <Link href="/politique-confidentialite" className="hover:text-[#1a2e22] transition-colors">Politique de confidentialité</Link>
         </div>
       </footer>
     </div>

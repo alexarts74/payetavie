@@ -23,8 +23,8 @@ interface ExpenseChartsProps {
 export default function ExpenseCharts({ summary }: ExpenseChartsProps) {
   if (summary.totalSpent === 0) {
     return (
-      <div className="glass-card rounded-2xl p-12 text-center">
-        <p className="text-zinc-500 dark:text-zinc-400">
+      <div className="card rounded-2xl p-12 text-center">
+        <p className="text-[#5A6B61] ">
           Aucune donnee a afficher pour ce mois
         </p>
       </div>
@@ -34,16 +34,16 @@ export default function ExpenseCharts({ summary }: ExpenseChartsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Donut chart */}
-      <div className="glass-card rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-6">
+      <div className="card rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-[#1a2e22]  mb-6">
           Repartition par categorie
         </h3>
         <DonutChart data={summary.byCategory} total={summary.totalSpent} />
       </div>
 
       {/* Bar chart */}
-      <div className="glass-card rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-6">
+      <div className="card rounded-2xl p-6">
+        <h3 className="text-lg font-semibold text-[#1a2e22]  mb-6">
           Depenses par jour
         </h3>
         <BarChart data={summary.dailyTotals} />
@@ -91,7 +91,7 @@ function DonutChart({
             r={radius}
             fill="none"
             stroke="currentColor"
-            className="text-zinc-200 dark:text-zinc-700"
+            className="text-[#E8E8E8]"
             strokeWidth={strokeWidth}
           />
           {/* Segments */}
@@ -112,10 +112,10 @@ function DonutChart({
           ))}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+          <span className="text-xl font-bold text-[#1a2e22] ">
             {total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
           </span>
-          <span className="text-xs text-zinc-500 dark:text-zinc-400">Total</span>
+          <span className="text-xs text-[#5A6B61] ">Total</span>
         </div>
       </div>
 
@@ -128,16 +128,16 @@ function DonutChart({
                 className="w-3 h-3 rounded-full flex-shrink-0"
                 style={{ backgroundColor: seg.color }}
               />
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">
+              <span className="text-sm text-[#5A6B61] ">
                 {seg.category?.icon && `${seg.category.icon} `}
                 {seg.category?.name || 'Sans categorie'}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              <span className="text-sm font-semibold text-[#1a2e22] ">
                 {seg.spent.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
               </span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 w-10 text-right">
+              <span className="text-xs text-[#5A6B61]  w-10 text-right">
                 {Math.round(seg.percentage * 100)}%
               </span>
             </div>
@@ -151,7 +151,7 @@ function DonutChart({
 function BarChart({ data }: { data: MonthlyExpenseSummary['dailyTotals'] }) {
   if (data.length === 0) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center py-8">
+      <p className="text-sm text-[#5A6B61]  text-center py-8">
         Aucune donnee
       </p>
     )
@@ -172,17 +172,17 @@ function BarChart({ data }: { data: MonthlyExpenseSummary['dailyTotals'] }) {
             <div key={day.date} className="flex flex-col items-center gap-1">
               <div className="relative group">
                 <div
-                  className="rounded-t-md bg-indigo-500 transition-all duration-300 hover:bg-indigo-600"
+                  className="rounded-t-md bg-[#EEF7F1]0 transition-all duration-300 hover:bg-[#235037]"
                   style={{ width: barWidth, height: Math.max(2, height) }}
                 />
                 {/* Tooltip */}
                 <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block z-10">
-                  <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs font-medium px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                  <div className="bg-[#1a2e22] text-white text-xs font-medium px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
                     {day.total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                   </div>
                 </div>
               </div>
-              <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{dayNum}</span>
+              <span className="text-[10px] text-[#5A6B61] ">{dayNum}</span>
             </div>
           )
         })}

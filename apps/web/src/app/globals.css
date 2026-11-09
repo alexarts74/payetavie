@@ -1,44 +1,20 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
-
 /* ========================================
-   CSS Variables (light/dark)
-   Les variables sont necessaires pour le theming dynamique.
-   Tout le reste est en Tailwind via @theme et @utility.
+   CSS Variables
    ======================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --glass-bg: #ffffff;
-  --glass-bg-heavy: #ffffff;
-  --glass-border: rgba(0, 0, 0, 0.12);
-  --glass-border-accent: rgba(99, 102, 241, 0.4);
-  --shadow-glass: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-glass-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --gradient-primary: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-  --gradient-page: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
-  --glass-overlay-bg: rgba(0, 0, 0, 0.4);
-  --glass-input-focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  --background: #F5E9AF;
+  --foreground: #1a2e22;
+  --primary: #235037;
+  --primary-light: #EEF7F1;
+  --accent: #EBA7CB;
+  --accent-light: #FDEEF6;
+  --muted: #5A6B61;
+  --border: #E8E8E8;
+  --card-bg: #ffffff;
   --scrollbar-thumb: rgba(161, 161, 170, 0.3);
   --scrollbar-thumb-hover: rgba(161, 161, 170, 0.5);
-}
-
-.dark {
-  --background: #0a0a0f;
-  --foreground: #ededed;
-  --glass-bg: #1e1e28;
-  --glass-bg-heavy: #1a1a24;
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-border-accent: rgba(129, 140, 248, 0.3);
-  --shadow-glass: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-glass-lg: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  --gradient-page: linear-gradient(135deg, #0f0f1a 0%, #0a0a0f 50%, #0f0a1a 100%);
-  --glass-overlay-bg: rgba(0, 0, 0, 0.6);
-  --glass-input-focus-ring: 0 0 0 3px rgba(129, 140, 248, 0.2);
-  --scrollbar-thumb: rgba(113, 113, 122, 0.3);
-  --scrollbar-thumb-hover: rgba(113, 113, 122, 0.5);
 }
 
 /* ========================================
@@ -47,7 +23,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-jost), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-caprasimo), serif;
 
   --animate-fade-in: fade-in 0.4s ease-out forwards;
   --animate-slide-up: slide-up 0.5s ease-out forwards;
@@ -58,7 +35,7 @@
 }
 
 /* ========================================
-   Keyframes (necessaires, pas d'equivalent Tailwind)
+   Keyframes
    ======================================== */
 @keyframes fade-in {
   from { opacity: 0; }
@@ -90,26 +67,6 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-28px) scale(1.04); }
-}
-@keyframes float-slow-reverse {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(20px) scale(0.97); }
-}
-
-@keyframes gradient-pan {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-@keyframes pulse-ring {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.25); }
-  50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); }
-}
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20%       { transform: translateX(-4px); }
@@ -117,158 +74,141 @@
   60%       { transform: translateX(-3px); }
   80%       { transform: translateX(3px); }
 }
-.animate-shake {
-  animation: shake 0.4s ease-in-out;
-}
 
 /* ========================================
-   @utility — classes custom en pur Tailwind 4
+   @utility — classes custom
    ======================================== */
+
+/* Cartes plates */
+@utility card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E8E8E8;
+}
+
+@utility card-lg {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E8E8E8;
+}
+
+/* Compatibilité — glass-card remplacé par card */
 @utility glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass);
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E8E8E8;
 }
 
 @utility glass-card-heavy {
-  background: var(--glass-bg-heavy);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E8E8E8;
 }
 
 @utility glass-sidebar {
-  background: var(--glass-bg-heavy);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass);
+  background: white;
+  border-right: 1px solid #E8E8E8;
 }
 
 @utility glass-input {
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
+  background: white;
+  border: 1px solid #E8E8E8;
 
   &:focus {
-    border-color: var(--glass-border-accent);
-    box-shadow: var(--glass-input-focus-ring);
+    border-color: #235037;
+    box-shadow: 0 0 0 3px rgba(35, 80, 55, 0.08);
   }
 }
 
 @utility glass-modal {
-  background: var(--glass-bg-heavy);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass-lg);
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid #E8E8E8;
 }
 
 @utility glass-overlay {
-  background: var(--glass-overlay-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.35);
 }
 
+/* Sidebar */
+@utility sidebar {
+  background: white;
+  border-right: 1px solid #E8E8E8;
+}
+
+/* Bouton primaire */
+@utility btn-primary {
+  background: #235037;
+  color: white;
+  border-radius: 14px;
+}
+
+/* Gradient text — adapté vert */
 @utility gradient-text {
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #235037 0%, #3a7a5a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* Hover lift */
+@utility hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Animation delays */
 @utility stagger-1 { animation-delay: 0.1s; }
 @utility stagger-2 { animation-delay: 0.2s; }
 @utility stagger-3 { animation-delay: 0.3s; }
 @utility stagger-4 { animation-delay: 0.4s; }
 @utility stagger-5 { animation-delay: 0.5s; }
 
-/* Hero dot grid */
-.landing-dot-grid {
-  background-image: radial-gradient(circle, rgba(99,102,241,0.18) 1.5px, transparent 1.5px);
-  background-size: 30px 30px;
-  pointer-events: none;
+/* Shake */
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
 }
 
-/* Noise texture overlay */
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* CTA mesh gradient animation */
-@keyframes mesh-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.cta-mesh {
-  background: linear-gradient(135deg, #4338ca, #6d28d9, #7c3aed, #4f46e5, #2563eb);
-  background-size: 300% 300%;
-  animation: mesh-shift 8s ease infinite;
-}
-
-/* Pricing glow for highlighted card */
-.pricing-glow {
-  box-shadow: 0 0 0 1px rgba(99,102,241,0.5), 0 8px 32px rgba(99,102,241,0.2), 0 0 60px rgba(99,102,241,0.08);
-}
-
-/* Step connector */
+/* Step connector (onboarding) */
 .step-connector {
   position: absolute;
   top: 28px;
   left: calc(50% + 36px);
   right: calc(-50% + 36px);
   height: 1px;
-  background: repeating-linear-gradient(90deg, #e0e7ff 0, #e0e7ff 6px, transparent 6px, transparent 12px);
+  background: repeating-linear-gradient(90deg, #E8E8E8 0, #E8E8E8 6px, transparent 6px, transparent 12px);
 }
 
-/* App interior subtle background */
-.app-bg {
-  background-image: radial-gradient(circle, rgba(99,102,241,0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
+/* Dot grid pour landing */
+.landing-dot-grid {
+  background-image: radial-gradient(circle, rgba(35, 80, 55, 0.12) 1.5px, transparent 1.5px);
+  background-size: 30px 30px;
+  pointer-events: none;
 }
 
-/* White dot grid for dark/gradient backgrounds */
+/* White dot grid */
 .dot-grid-white {
   background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
   background-size: 24px 24px;
   pointer-events: none;
 }
 
-/* Hero background orbs */
-.hero-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  opacity: 0.35;
+/* App bg — fond subtil */
+.app-bg {
+  background-color: #F5E9AF;
 }
 
-.dark .hero-orb {
-  opacity: 0.2;
-}
-
-.hero-orb-1 {
-  width: 650px;
-  height: 650px;
-  top: -220px;
-  left: calc(50% - 450px);
-  background: radial-gradient(circle, #6366f1, #4f46e5, transparent);
-  animation: float-slow 9s ease-in-out infinite;
-}
-
-.hero-orb-2 {
-  width: 520px;
-  height: 520px;
-  top: -80px;
-  left: calc(50% + 20px);
-  background: radial-gradient(circle, #a855f7, #7c3aed, transparent);
-  animation: float-slow-reverse 11s ease-in-out infinite;
+/* Pricing glow pour la carte mise en avant */
+.pricing-glow {
+  box-shadow: 0 0 0 1px rgba(35, 80, 55, 0.3), 0 8px 32px rgba(35, 80, 55, 0.15);
 }
 
 /* ========================================
@@ -278,16 +218,16 @@
   html {
     height: 100%;
     overflow: hidden;
-    background: var(--background);
+    background: #F5E9AF;
   }
 
   body {
     height: 100%;
     overflow-y: auto;
     overscroll-behavior: none;
-    background: var(--gradient-page);
+    background: #F5E9AF;
     color: var(--foreground);
-    font-family: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+    font-family: var(--font-jost), system-ui, -apple-system, sans-serif;
   }
 
   ::-webkit-scrollbar {

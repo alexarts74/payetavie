@@ -95,7 +95,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
   const canAccessPro = plan === 'pro'
   const canAccessEssentiel = plan === 'essentiel' || plan === 'pro'
 
-  // Filter categories based on selectedTopics
   const filteredCategories = useMemo(() => {
     if (!selectedTopics) return categories
     return categories
@@ -103,7 +102,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
       .filter(cat => cat.topics.length > 0)
   }, [selectedTopics])
 
-  // Helper to check if a topic is active
   const isTopicActive = (slug: string) => {
     if (slug.startsWith('freelance-')) {
       return pathname.startsWith(`/freelance/${slug.replace('freelance-', '')}`)
@@ -111,7 +109,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
     return pathname === `/topics/${slug}`
   }
 
-  // Determine which category should be open based on pathname
   const activeCategoryName = useMemo(() => {
     const activeCategory = filteredCategories.find(cat =>
       cat.topics.some(topic => isTopicActive(topic.slug))
@@ -123,7 +120,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
     return activeCategoryName ? new Set([activeCategoryName]) : new Set()
   })
 
-  // Ouvrir automatiquement la categorie qui contient le topic actif quand le pathname change
   useEffect(() => {
     if (prevPathnameRef.current !== pathname && activeCategoryName) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- Necessary to sync state with URL changes
@@ -145,10 +141,10 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
     <div className="space-y-0.5">
       {filteredCategories.length === 0 && !canAccessPro && (
         <div className="px-3 py-4 text-center">
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">Aucun sujet selectionne</p>
+          <p className="text-xs text-[#5A6B61] mb-2">Aucun sujet selectionne</p>
           <button
             onClick={() => setIsManageOpen(true)}
-            className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+            className="text-xs font-medium text-[#235037] hover:text-[#1a3d2a]"
           >
             Gerer mes sujets
           </button>
@@ -162,7 +158,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
           topic => isTopicActive(topic.slug)
         )
 
-        // Categorie avec un seul topic identique au nom → lien direct
         if (isSingleTopic) {
           const topic = category.topics[0]
           const isActive = isTopicActive(topic.slug)
@@ -173,25 +168,25 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                 onClick={onNavigate}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
                   isActive
-                    ? 'bg-indigo-50/50 dark:bg-indigo-500/10'
-                    : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                    ? 'bg-[#EEF7F1]'
+                    : 'hover:bg-[#F5E9AF]/60'
                 }`}
               >
                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
                   isActive
-                    ? 'bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/20'
-                    : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
+                    ? 'bg-[#235037]'
+                    : 'bg-[#EEF7F1] group-hover:bg-[#235037]/10'
                 }`}>
                   <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                     isActive
                       ? 'text-white'
-                      : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                      : 'text-[#235037]'
                   }`} />
                 </div>
                 <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 text-left truncate ${
                   isActive
-                    ? 'text-zinc-800 dark:text-zinc-200'
-                    : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                    ? 'text-[#235037]'
+                    : 'text-[#5A6B61] group-hover:text-[#235037]'
                 }`}>
                   {category.name}
                 </span>
@@ -205,49 +200,47 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
 
         return (
           <div key={category.name}>
-            {/* En-tete de categorie (cliquable) */}
             <button
               onClick={() => toggleCategory(category.name)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all duration-200 group relative ${
                 hasActiveTopic && !isOpen
-                  ? 'bg-indigo-50/50 dark:bg-indigo-500/10'
-                  : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                  ? 'bg-[#EEF7F1]'
+                  : 'hover:bg-[#F5E9AF]/60'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
                   isOpen || hasActiveTopic
-                    ? 'bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/20'
-                    : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
+                    ? 'bg-[#235037]'
+                    : 'bg-[#EEF7F1] group-hover:bg-[#235037]/10'
                 }`}>
                   <CategoryIcon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                     isOpen || hasActiveTopic
                       ? 'text-white'
-                      : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                      : 'text-[#235037]'
                   }`} />
                 </div>
                 <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 text-left truncate ${
                   isOpen || hasActiveTopic
-                    ? 'text-zinc-800 dark:text-zinc-200'
-                    : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                    ? 'text-[#235037]'
+                    : 'text-[#5A6B61] group-hover:text-[#235037]'
                 }`}>
                   {category.name}
                 </span>
               </div>
               <ChevronDown
-                className={`w-3.5 h-3.5 text-zinc-400 dark:text-zinc-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-all duration-200 ${
+                className={`w-3.5 h-3.5 text-[#5A6B61] group-hover:text-[#235037] transition-all duration-200 ${
                   isOpen ? 'rotate-180' : ''
                 }`}
               />
             </button>
 
-            {/* Topics de la categorie (avec transition) */}
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="py-1 ml-[22px] border-l border-zinc-200/80 dark:border-zinc-700/40">
+              <div className="py-1 ml-[22px] border-l border-[#E8E8E8]">
                 {category.topics.map((topic) => {
                   const TopicIcon = topic.icon
                   const isActive = isTopicActive(topic.slug)
@@ -259,25 +252,25 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                         onClick={onNavigate}
                         className={`flex items-center gap-2.5 px-3 py-2 ml-3 mr-1 rounded-lg transition-all duration-200 group relative ${
                           isActive
-                            ? 'bg-indigo-50 dark:bg-indigo-950/50'
-                            : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                            ? 'bg-[#EEF7F1]'
+                            : 'hover:bg-[#F5E9AF]/60'
                         }`}
                       >
                         {isActive && (
-                          <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-indigo-600" />
+                          <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-[#235037]" />
                         )}
                         <TopicIcon
                           className={`w-4 h-4 flex-shrink-0 transition-colors duration-200 ${
                             isActive
-                              ? 'text-indigo-600 dark:text-indigo-400'
-                              : 'text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-400'
+                              ? 'text-[#235037]'
+                              : 'text-[#5A6B61] group-hover:text-[#235037]'
                           }`}
                         />
                         <span
                           className={`text-[12px] tracking-wide leading-tight transition-colors duration-200 ${
                             isActive
-                              ? 'text-indigo-700 dark:text-indigo-300 font-semibold'
-                              : 'text-zinc-600 dark:text-zinc-400 font-semibold group-hover:text-zinc-800 dark:group-hover:text-zinc-200'
+                              ? 'text-[#235037] font-semibold'
+                              : 'text-[#5A6B61] font-semibold group-hover:text-[#235037]'
                           }`}
                         >
                           {topic.title}
@@ -289,7 +282,6 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
               </div>
             </div>
 
-            {/* Espacement entre categories (sauf la derniere) */}
             {!isLastCategory && (
               <div className="h-1" />
             )}
@@ -300,31 +292,31 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
       {/* Section Annuaire (Essentiel+) */}
       {canAccessEssentiel && (
         <>
-          <div className="my-3 border-t border-zinc-200/80 dark:border-zinc-700/40" />
+          <div className="my-3 border-t border-[#E8E8E8]" />
           <Link
             href="/annuaire"
             onClick={onNavigate}
             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
               pathname === '/annuaire'
-                ? 'bg-indigo-50/50 dark:bg-indigo-500/10'
-                : 'hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40'
+                ? 'bg-[#EEF7F1]'
+                : 'hover:bg-[#F5E9AF]/60'
             }`}
           >
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
               pathname === '/annuaire'
-                ? 'bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/20'
-                : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-zinc-200/80 dark:group-hover:bg-zinc-700/60'
+                ? 'bg-[#235037]'
+                : 'bg-[#EEF7F1] group-hover:bg-[#235037]/10'
             }`}>
               <MapPin className={`w-3.5 h-3.5 transition-colors duration-200 ${
                 pathname === '/annuaire'
                   ? 'text-white'
-                  : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                  : 'text-[#235037]'
               }`} />
             </div>
             <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
               pathname === '/annuaire'
-                ? 'text-zinc-800 dark:text-zinc-200'
-                : 'text-zinc-500 dark:text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-300'
+                ? 'text-[#235037]'
+                : 'text-[#5A6B61] group-hover:text-[#235037]'
             }`}>
               Annuaire
             </span>
@@ -335,12 +327,12 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
       {/* Section Freelance (Pro uniquement) */}
       {canAccessPro && (
         <>
-          <div className="my-3 border-t border-zinc-200/80 dark:border-zinc-700/40" />
+          <div className="my-3 border-t border-[#E8E8E8]" />
           <div className="px-3 pb-1">
             <div className="flex items-center gap-2 mb-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">Freelance</span>
-              <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-md bg-purple-100 dark:bg-purple-900/30 text-[9px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Pro</span>
+              <Briefcase className="w-3.5 h-3.5 text-[#235037]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#235037]">Freelance</span>
+              <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-md bg-[#EBA7CB] text-[9px] font-bold text-[#235037] uppercase tracking-wider">Pro</span>
             </div>
             <div className="space-y-0.5">
               {freelanceLinks.map(({ slug, title, icon: Icon, href }) => {
@@ -352,25 +344,25 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
                     onClick={onNavigate}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group ${
                       isActive
-                        ? 'bg-purple-50 dark:bg-purple-950/40 border border-purple-200/60 dark:border-purple-700/30'
-                        : 'hover:bg-purple-50/60 dark:hover:bg-purple-900/20 border border-transparent'
+                        ? 'bg-[#EEF7F1] border border-[#235037]/15'
+                        : 'hover:bg-[#EEF7F1]/60 border border-transparent'
                     }`}
                   >
                     <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
                       isActive
-                        ? 'bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm shadow-purple-500/20'
-                        : 'bg-zinc-100/80 dark:bg-zinc-800/60 group-hover:bg-purple-100/80 dark:group-hover:bg-purple-900/30'
+                        ? 'bg-[#235037]'
+                        : 'bg-[#EEF7F1] group-hover:bg-[#235037]/10'
                     }`}>
                       <Icon className={`w-3.5 h-3.5 transition-colors duration-200 ${
                         isActive
                           ? 'text-white'
-                          : 'text-zinc-500 dark:text-zinc-500 group-hover:text-purple-600 dark:group-hover:text-purple-400'
+                          : 'text-[#235037]'
                       }`} />
                     </div>
                     <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
                       isActive
-                        ? 'text-purple-700 dark:text-purple-300'
-                        : 'text-zinc-500 dark:text-zinc-500 group-hover:text-purple-700 dark:group-hover:text-purple-300'
+                        ? 'text-[#235037]'
+                        : 'text-[#5A6B61] group-hover:text-[#235037]'
                     }`}>
                       {title}
                     </span>
@@ -387,7 +379,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan }: NavLinksP
         <div className="pt-2">
           <button
             onClick={() => setIsManageOpen(true)}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 transition-all duration-200"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[12px] font-medium text-[#5A6B61] hover:text-[#235037] hover:bg-[#EEF7F1] transition-all duration-200"
           >
             <Settings className="w-3.5 h-3.5" />
             Gerer mes sujets

@@ -17,10 +17,6 @@ const plans = [
     price: '0',
     period: 'pour toujours',
     icon: Sparkles,
-    gradient: 'from-zinc-500/10 to-zinc-600/5',
-    iconBg: 'bg-zinc-100 dark:bg-zinc-800',
-    iconColor: 'text-zinc-500 dark:text-zinc-400',
-    accent: 'zinc',
     features: [
       { label: '3 thématiques', included: true },
       { label: '5 documents', included: true },
@@ -36,10 +32,6 @@ const plans = [
     price: '4,99',
     period: '/mois',
     icon: Shield,
-    gradient: 'from-indigo-500/15 to-violet-500/10',
-    iconBg: 'bg-indigo-500/10 dark:bg-indigo-500/20',
-    iconColor: 'text-indigo-500 dark:text-indigo-400',
-    accent: 'indigo',
     popular: true,
     features: [
       { label: 'Tout illimité', included: true },
@@ -56,10 +48,6 @@ const plans = [
     price: '9,99',
     period: '/mois',
     icon: Rocket,
-    gradient: 'from-purple-500/15 to-fuchsia-500/10',
-    iconBg: 'bg-purple-500/10 dark:bg-purple-500/20',
-    iconColor: 'text-purple-500 dark:text-purple-400',
-    accent: 'purple',
     features: [
       { label: 'Tout d\'Essentiel', included: true },
       { label: 'Factures & devis', included: true },
@@ -85,15 +73,14 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
     }
   }
 
-  const visiblePlans = plans
-  const cols = 'md:grid-cols-3 max-w-[1200px]'
-
   return (
-    <div className={`grid ${cols} gap-5 lg:gap-6 w-full mx-auto items-stretch`}>
-      {visiblePlans.map((plan, index) => {
+    <div className="grid md:grid-cols-3 gap-5 lg:gap-6 w-full max-w-[1200px] mx-auto items-stretch">
+      {plans.map((plan, index) => {
         const isCurrentPlan = currentPlan === plan.key
         const isHighlighted = highlightPlan === plan.key || (!highlightPlan && plan.popular)
         const Icon = plan.icon
+        const isPro = plan.key === 'pro'
+        const isEssentiel = plan.key === 'essentiel'
 
         return (
           <div
@@ -102,50 +89,63 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
             style={{ opacity: 0, animationDelay: `${index * 0.1}s` }}
           >
             <div
-              className={`relative h-full rounded-2xl overflow-hidden transition-all duration-300 ${
-                isHighlighted
-                  ? 'ring-2 ring-indigo-500/60 dark:ring-indigo-400/50 shadow-lg shadow-indigo-500/10 dark:shadow-indigo-500/5 scale-[1.02]'
-                  : 'ring-1 ring-[var(--glass-border)] hover:ring-[var(--glass-border-accent)] hover:shadow-md'
+              className={`relative h-full rounded-2xl overflow-hidden transition-all duration-300 flex flex-col ${
+                isPro
+                  ? 'bg-[#1A3D2A] border border-[#1A3D2A]'
+                  : isEssentiel
+                  ? 'bg-[#235037] border border-[#235037]'
+                  : 'bg-white border border-[#E8E8E8]'
+              } ${
+                isHighlighted && !isPro && !isEssentiel
+                  ? 'ring-2 ring-[#235037]/30 shadow-lg scale-[1.02]'
+                  : isHighlighted
+                  ? 'scale-[1.02] shadow-lg'
+                  : 'hover:shadow-md'
               }`}
             >
-              {/* Gradient background layer */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${plan.gradient} pointer-events-none`} />
-              <div className="absolute inset-0 bg-[var(--glass-bg)] opacity-80 backdrop-blur-xl pointer-events-none" />
-              <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full pointer-events-none opacity-30 blur-3xl ${
-                plan.accent === 'indigo' ? 'bg-indigo-400 dark:bg-indigo-600'
-                : plan.accent === 'purple' ? 'bg-purple-400 dark:bg-purple-600'
-                : 'bg-zinc-300 dark:bg-zinc-600'
-              }`} />
-
               {/* Popular badge */}
               {plan.popular && (
                 <div className="absolute top-0 right-0">
-                  <div className="bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl">
+                  <div className="bg-[#EBA7CB] text-[#235037] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-bl-xl">
                     Populaire
                   </div>
                 </div>
               )}
 
-              <div className="relative p-6 lg:p-8 flex flex-col h-full">
+              <div className="p-6 lg:p-8 flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-xl ${plan.iconBg} flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${plan.iconColor}`} />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    isPro || isEssentiel ? 'bg-white/20' : 'bg-[#EEF7F1]'
+                  }`}>
+                    <Icon className={`w-5 h-5 ${
+                      isPro || isEssentiel ? 'text-white' : 'text-[#235037]'
+                    }`} />
                   </div>
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{plan.name}</h3>
+                  <h3 className={`text-lg font-bold ${
+                    isPro || isEssentiel ? 'text-white' : 'text-[#1a2e22]'
+                  }`}>{plan.name}</h3>
                 </div>
 
                 {/* Price */}
                 <div className="flex items-baseline gap-1 mb-5">
-                  <span className="text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
+                  <span className={`text-4xl lg:text-5xl font-extrabold tracking-tight ${
+                    isPro || isEssentiel ? 'text-white' : 'text-[#235037]'
+                  }`} style={{ fontFamily: 'var(--font-caprasimo)' }}>
                     {plan.price}
                   </span>
-                  <span className="text-xl font-bold text-zinc-900 dark:text-zinc-50">€</span>
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400 ml-0.5">{plan.period}</span>
+                  <span className={`text-xl font-bold ${
+                    isPro || isEssentiel ? 'text-white' : 'text-[#235037]'
+                  }`}>€</span>
+                  <span className={`text-sm ml-0.5 ${
+                    isPro || isEssentiel ? 'text-white/70' : 'text-[#5A6B61]'
+                  }`}>{plan.period}</span>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-gradient-to-r from-transparent via-[var(--glass-border)] to-transparent mb-5" />
+                <div className={`h-px mb-5 ${
+                  isPro || isEssentiel ? 'bg-white/20' : 'bg-[#E8E8E8]'
+                }`} />
 
                 {/* Features */}
                 <ul className="space-y-3 mb-6 flex-1">
@@ -153,29 +153,25 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
                     <li key={feature.label} className="flex items-center gap-3">
                       {feature.included ? (
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          plan.accent === 'indigo'
-                            ? 'bg-indigo-500/15 dark:bg-indigo-500/25'
-                            : plan.accent === 'purple'
-                            ? 'bg-purple-500/15 dark:bg-purple-500/25'
-                            : 'bg-emerald-500/15 dark:bg-emerald-500/25'
+                          isPro || isEssentiel ? 'bg-white/20' : 'bg-[#EEF7F1]'
                         }`}>
                           <Check className={`w-3 h-3 ${
-                            plan.accent === 'indigo'
-                              ? 'text-indigo-600 dark:text-indigo-400'
-                              : plan.accent === 'purple'
-                              ? 'text-purple-600 dark:text-purple-400'
-                              : 'text-emerald-600 dark:text-emerald-400'
+                            isPro || isEssentiel ? 'text-white' : 'text-[#235037]'
                           }`} />
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-zinc-100 dark:bg-zinc-800">
-                          <X className="w-3 h-3 text-zinc-400 dark:text-zinc-600" />
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          isPro || isEssentiel ? 'bg-white/10' : 'bg-[#E8E8E8]'
+                        }`}>
+                          <X className={`w-3 h-3 ${
+                            isPro || isEssentiel ? 'text-white/40' : 'text-[#5A6B61]/40'
+                          }`} />
                         </div>
                       )}
                       <span className={`text-sm ${
                         feature.included
-                          ? 'text-zinc-700 dark:text-zinc-300'
-                          : 'text-zinc-400 dark:text-zinc-600'
+                          ? isPro || isEssentiel ? 'text-white' : 'text-[#1a2e22]'
+                          : isPro || isEssentiel ? 'text-white/40' : 'text-[#5A6B61]/40'
                       }`}>
                         {feature.label}
                       </span>
@@ -189,12 +185,14 @@ export default function PricingCards({ currentPlan, highlightPlan }: PricingCard
                   disabled={isCurrentPlan || loading !== null}
                   className={`w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     isCurrentPlan
-                      ? 'bg-zinc-100 dark:bg-zinc-800/80 text-zinc-400 dark:text-zinc-500 cursor-default'
+                      ? isPro || isEssentiel
+                        ? 'bg-white/20 text-white/60 cursor-default'
+                        : 'bg-[#EEF7F1] text-[#5A6B61] cursor-default'
                       : plan.key === 'free'
-                      ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
-                      : plan.accent === 'indigo'
-                      ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white shadow-md shadow-indigo-600/20 hover:shadow-lg hover:shadow-indigo-600/30'
-                      : 'bg-gradient-to-r from-purple-600 to-violet-500 hover:from-purple-700 hover:to-violet-600 text-white shadow-md shadow-purple-600/20 hover:shadow-lg hover:shadow-purple-600/30'
+                      ? 'bg-[#EEF7F1] text-[#235037] hover:bg-[#235037]/10'
+                      : isPro || isEssentiel
+                      ? 'bg-white text-[#235037] hover:bg-white/90 shadow-sm'
+                      : 'bg-[#235037] text-white hover:bg-[#1a3d2a] shadow-sm'
                   }`}
                 >
                   {isCurrentPlan

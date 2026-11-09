@@ -36,16 +36,16 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 animate-fade-in">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-[#1a2e22] mb-1">
               Devis
             </h1>
-            <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+            <p className="text-[#5A6B61] text-sm">
               {initialQuotations.length} devis
             </p>
           </div>
           <Link
             href="/freelance/facturation/devis/nouveau"
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all shadow-md shadow-purple-500/30"
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#235037] hover:bg-[#1a3d2a] text-white rounded-xl font-medium text-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             Nouveau devis
@@ -55,7 +55,7 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6 animate-slide-up">
           <div className="flex items-center gap-2 flex-1">
-            <Filter className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+            <Filter className="w-4 h-4 text-[#5A6B61] flex-shrink-0" />
             <div className="flex gap-2 flex-wrap">
               {statusFilters.map((s) => (
                 <button
@@ -63,8 +63,8 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
                   onClick={() => setStatusFilter(s.value)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     statusFilter === s.value
-                      ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300'
-                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                      ? 'bg-[#EEF7F1] text-[#235037]'
+                      : 'bg-white border border-[#E8E8E8] text-[#5A6B61] hover:bg-[#EEF7F1]/40'
                   }`}
                 >
                   {s.label}
@@ -76,7 +76,7 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
             <select
               value={clientFilter}
               onChange={(e) => setClientFilter(e.target.value)}
-              className="px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/40 bg-white dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-100 text-sm"
+              className="px-4 py-2 rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] text-[#1a2e22] text-sm focus:outline-none focus:ring-2 focus:ring-[#235037]/20"
             >
               <option value="">Tous les clients</option>
               {clients.map((c) => (
@@ -88,10 +88,10 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
 
         {/* List */}
         {filtered.length === 0 ? (
-          <div className="glass-card rounded-2xl p-12 text-center animate-fade-in">
-            <Receipt className="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-600 mb-4" />
-            <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">Aucun devis</h3>
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+          <div className="card rounded-2xl p-12 text-center animate-fade-in">
+            <Receipt className="w-12 h-12 mx-auto text-[#E8E8E8] mb-4" />
+            <h3 className="text-lg font-medium text-[#1a2e22] mb-2">Aucun devis</h3>
+            <p className="text-[#5A6B61] text-sm">
               {statusFilter ? 'Aucun devis avec ce statut' : 'Creez votre premier devis'}
             </p>
           </div>
@@ -101,25 +101,25 @@ export default function QuotationsListContent({ initialQuotations, clients }: Qu
               <Link
                 key={q.id}
                 href={`/freelance/facturation/devis/${q.id}`}
-                className="glass-card rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all block"
+                className="card rounded-xl p-4 flex items-center justify-between hover:border-[#235037]/20 transition-all block"
               >
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="hidden sm:block w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center flex-shrink-0">
-                    <Receipt className="w-5 h-5 text-purple-500" />
+                  <div className="hidden sm:flex w-10 h-10 rounded-lg bg-[#EEF7F1] items-center justify-center flex-shrink-0">
+                    <Receipt className="w-5 h-5 text-[#235037]" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{q.document_number}</span>
+                      <span className="text-sm font-semibold text-[#1a2e22]">{q.document_number}</span>
                       <QuotationStatusBadge status={q.status as QuotationStatus} />
                     </div>
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400">{q.client?.company_name}</span>
+                    <span className="text-xs text-[#5A6B61]">{q.client?.company_name}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-6 flex-shrink-0 ml-4">
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400 hidden sm:block">
+                  <span className="text-xs text-[#5A6B61] hidden sm:block">
                     {new Date(q.document_date).toLocaleDateString('fr-FR')}
                   </span>
-                  <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                  <span className="text-sm font-semibold text-[#1a2e22]">
                     {Number(q.total_ttc).toFixed(2)} €
                   </span>
                 </div>

@@ -62,34 +62,34 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
     })
   }
 
-  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700/40 bg-white dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-[#E8E8E8]  bg-white text-[#1a2e22]  text-sm focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all placeholder:text-[#5A6B61]/60"
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 glass-overlay"
+        className="absolute inset-0 bg-black/35"
         onClick={onClose}
         aria-label="Fermer"
       />
-      <div className="relative glass-modal rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/30">
+            <div className="w-10 h-10 rounded-xl bg-[#235037] flex items-center justify-center shadow-md ">
               <Building2 className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+            <h2 className="text-lg font-semibold text-[#1a2e22] ">
               {isEdit ? 'Modifier le client' : 'Nouveau client'}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-            <X className="w-5 h-5 text-zinc-500" />
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#EEF7F1]  transition-colors">
+            <X className="w-5 h-5 text-[#5A6B61]" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
               Nom de l&apos;entreprise *
             </label>
             <input
@@ -104,7 +104,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 Nom du contact
               </label>
               <input
@@ -116,7 +116,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 Email
               </label>
               <input
@@ -131,7 +131,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 Telephone
               </label>
               <input
@@ -143,7 +143,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 SIRET
               </label>
               <input
@@ -157,7 +157,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
               Adresse
             </label>
             <input
@@ -171,7 +171,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 Code postal
               </label>
               <input
@@ -183,7 +183,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+              <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                 Ville
               </label>
               <input
@@ -197,7 +197,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
               Delai de paiement (jours)
             </label>
             <input
@@ -210,7 +210,7 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
               Notes
             </label>
             <textarea
@@ -223,21 +223,21 @@ export default function ClientForm({ client, onClose, onSaved }: ClientFormProps
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600">{error}</p>
           )}
 
           <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]  transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium text-sm hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md shadow-indigo-500/30 disabled:opacity-50"
+              className="px-5 py-2.5 bg-[#235037] text-white rounded-xl font-medium text-sm  transition-all shadow-md  disabled:opacity-50"
             >
               {isPending ? 'Enregistrement...' : isEdit ? 'Modifier' : 'Creer le client'}
             </button>

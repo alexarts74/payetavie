@@ -83,15 +83,15 @@ export default async function MutuellePage() {
       <div className="max-w-7xl mx-auto">
         {/* Page header */}
         <div className="mb-6 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/60 dark:border-indigo-500/20 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF7F1] border border-[#235037]/20 mb-3">
             <span className="text-sm">{topic.icon}</span>
-            <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Sujet</span>
+            <span className="text-[11px] font-semibold text-[#235037] uppercase tracking-wider">Sujet</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold gradient-text">{topic.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#235037]">{topic.title}</h1>
         </div>
 
         <div className="relative mb-8">
-          <div className="relative bg-indigo-600 rounded-[2rem] p-6 text-white overflow-hidden">
+          <div className="relative bg-[#235037] rounded-[2rem] p-6 text-white overflow-hidden">
             <div className="relative z-10">
               <div className="flex items-start gap-4 mb-4">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shadow-md">

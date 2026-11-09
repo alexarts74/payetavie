@@ -16,8 +16,8 @@ interface QuotationDetailContentProps {
 
 const statusActions: Record<QuotationStatus, { label: string; next: QuotationStatus; icon: typeof Send; color: string }[]> = {
   brouillon: [
-    { label: 'Marquer envoye', next: 'envoye', icon: Send, color: 'from-blue-600 to-indigo-600' },
-    { label: 'Refuser', next: 'refuse', icon: XCircle, color: 'from-zinc-600 to-zinc-700' },
+    { label: 'Marquer envoye', next: 'envoye', icon: Send, color: 'bg-[#235037]' },
+    { label: 'Refuser', next: 'refuse', icon: XCircle, color: '[#5A6B61] to-[#5A6B61]' },
   ],
   envoye: [
     { label: 'Accepter', next: 'accepte', icon: CheckCircle, color: 'from-green-600 to-emerald-600' },
@@ -69,7 +69,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
         {/* Back */}
         <button
           onClick={() => router.push('/freelance/facturation/devis')}
-          className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors mb-6"
+          className="flex items-center gap-2 text-sm text-[#5A6B61]  hover:text-[#5A6B61] transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour aux devis
@@ -78,7 +78,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 animate-fade-in">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1a2e22] ">
               {quotation.document_number}
             </h1>
             <QuotationStatusBadge status={quotation.status as QuotationStatus} />
@@ -88,7 +88,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
               <button
                 onClick={handleDelete}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-500/30 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               >
                 <Trash2 className="w-4 h-4" />
                 Supprimer
@@ -97,7 +97,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
             <Link
               href={`/api/freelance/quotations/${quotation.id}/pdf`}
               target="_blank"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/40 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E8]  text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]/50  transition-all"
             >
               <Download className="w-4 h-4" />
               PDF
@@ -106,7 +106,7 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
               <button
                 onClick={handleConvert}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 transition-all shadow-sm disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white bg-[#235037] transition-all shadow-sm disabled:opacity-50"
               >
                 <FileText className="w-4 h-4" />
                 Convertir en facture
@@ -131,9 +131,9 @@ export default function QuotationDetailContent({ quotation: initial, profile }: 
 
         {/* Invoice link */}
         {quotation.source_document_id && (
-          <div className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="mb-6 text-sm text-[#5A6B61] ">
             Converti en facture{' '}
-            <Link href={`/freelance/facturation/factures/${quotation.source_document_id}`} className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link href={`/freelance/facturation/factures/${quotation.source_document_id}`} className="text-[#235037] hover:underline">
               voir la facture
             </Link>
           </div>

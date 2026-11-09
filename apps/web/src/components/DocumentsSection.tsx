@@ -90,14 +90,16 @@ function UploadModal({
     onClose()
   }
 
+  const inputClass = "w-full p-3 rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] text-[#1a2e22] placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40"
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center glass-overlay animate-fade-in">
-      <div className="glass-modal rounded-[2rem] p-6 w-full max-w-md mx-4 animate-scale-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 animate-fade-in">
+      <div className="bg-white rounded-[2rem] p-6 w-full max-w-md mx-4 animate-scale-in shadow-xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+          <h3 className="text-lg font-semibold text-[#1a2e22]">{title}</h3>
           <button
             onClick={handleClose}
-            className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-all"
+            className="p-2 rounded-lg hover:bg-[#EEF7F1] text-[#5A6B61] transition-all"
             disabled={isUploading}
           >
             <X className="w-5 h-5" />
@@ -106,14 +108,14 @@ function UploadModal({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-[#235037] mb-2">
               {categoryLabel} <span className="text-red-500">*</span>
             </label>
             {useSelect && categoryOptions ? (
               <select
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
-                className="w-full p-3 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                className={inputClass}
                 required
                 disabled={isUploading}
               >
@@ -130,7 +132,7 @@ function UploadModal({
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
                 placeholder={categoryPlaceholder}
-                className="w-full p-3 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                className={inputClass}
                 required
                 disabled={isUploading}
               />
@@ -139,24 +141,24 @@ function UploadModal({
 
           {showExpiresAt && (
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+              <label className="block text-sm font-medium text-[#235037] mb-2">
                 Date d&apos;expiration (optionnel)
               </label>
               <input
                 type="date"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="w-full p-3 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                className={inputClass}
                 disabled={isUploading}
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-[#235037] mb-2">
               Fichier <span className="text-red-500">*</span>
             </label>
-            <label className="block w-full p-4 rounded-xl border-2 border-dashed border-zinc-300 dark:border-zinc-600 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors cursor-pointer">
+            <label className="block w-full p-4 rounded-xl border-2 border-dashed border-[#E8E8E8] hover:border-[#235037]/40 transition-colors cursor-pointer">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -167,12 +169,12 @@ function UploadModal({
               />
               <div className="text-center">
                 {selectedFile ? (
-                  <div className="flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400">
+                  <div className="flex items-center justify-center gap-2 text-[#235037]">
                     <FileText className="w-5 h-5" />
                     <span className="text-sm font-medium truncate max-w-[200px]">{selectedFile.name}</span>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-zinc-700 dark:text-zinc-400">
+                  <div className="flex flex-col items-center gap-2 text-[#5A6B61]">
                     <Upload className="w-8 h-8" />
                     <span className="text-sm">Cliquez pour selectionner un fichier</span>
                     <span className="text-xs">PDF, PNG, JPG</span>
@@ -186,19 +188,19 @@ function UploadModal({
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+              className="flex-1 px-4 py-3 rounded-xl bg-[#EEF7F1] text-[#235037] font-medium hover:bg-[#235037]/10 transition-all"
               disabled={isUploading}
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-sm text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-3 rounded-xl bg-[#235037] hover:bg-[#1a3d2a] text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               disabled={isUploading || !categoryName.trim() || !selectedFile}
             >
               {isUploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Upload...
                 </>
               ) : (
@@ -439,19 +441,21 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
     return <FileText className="w-5 h-5" />
   }
 
+  const editInputClass = "w-full p-2 rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] text-[#1a2e22] placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40"
+
   return (
-    <div className="glass-card rounded-[2rem] p-6">
+    <div className="card rounded-[2rem] p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-            <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-12 h-12 rounded-full bg-[#EEF7F1] flex items-center justify-center">
+            <FileText className="w-5 h-5 text-[#235037]" />
           </div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Documents & Pieces justificatives</h2>
+          <h2 className="text-lg font-semibold text-[#235037]">Documents & Pièces justificatives</h2>
         </div>
         {!limitReached && (
           <button
             onClick={() => needsCategory ? setShowUploadModal(true) : fileInputRef.current?.click()}
-            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 shadow-sm text-white text-sm font-medium transition-all flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-[#235037] hover:bg-[#1a3d2a] text-white text-sm font-medium transition-all flex items-center gap-2"
             disabled={isUploading}
           >
             <Upload className="w-4 h-4" />
@@ -482,14 +486,14 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
 
       {needsCategory && categories.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 mb-4">
-          <div className="flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-400">
+          <div className="flex items-center gap-2 text-xs text-[#5A6B61]">
             <span className="font-medium">{getFilterLabel()} :</span>
             <button
               onClick={() => setSelectedCategory('all')}
               className={`px-2.5 py-1 rounded-full border text-xs transition-all ${
                 selectedCategory === 'all'
-                  ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
+                  ? 'bg-[#235037] text-white border-[#235037]'
+                  : 'bg-white text-[#5A6B61] border-[#E8E8E8] hover:bg-[#EEF7F1]'
               }`}
             >
               Toutes
@@ -500,8 +504,8 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-2.5 py-1 rounded-full border text-xs transition-all max-w-[120px] truncate ${
                   selectedCategory === cat
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700'
+                    ? 'bg-[#235037] text-white border-[#235037]'
+                    : 'bg-white text-[#5A6B61] border-[#E8E8E8] hover:bg-[#EEF7F1]'
                 }`}
                 title={(isLogementTopic || isAssurancesTopic) ? getTypeLabel(cat) || cat : cat}
               >
@@ -514,7 +518,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
 
       <div className="space-y-3">
         {filteredDocuments.length === 0 ? (
-          <p className="text-zinc-700 dark:text-zinc-400 text-sm text-center py-8">
+          <p className="text-[#5A6B61] text-sm text-center py-8">
             Aucun document pour le moment. Ajoutez votre premier document !
           </p>
         ) : (
@@ -525,8 +529,8 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                 key={doc.id}
                 className={`group relative p-4 rounded-[1.25rem] border transition-all duration-300 ${
                   expired
-                    ? 'border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-900/30'
-                    : 'border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600/50 bg-white dark:bg-zinc-800/30 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                    ? 'border-red-200 bg-red-50'
+                    : 'border-[#E8E8E8] hover:border-[#235037]/20 bg-white hover:bg-[#EEF7F1]/20'
                 }`}
               >
                 {editingId === doc.id ? (
@@ -536,7 +540,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                       value={editForm.name}
                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                       placeholder="Nom du document"
-                      className="w-full p-2 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                      className={editInputClass}
                       autoFocus
                     />
                     {isPayslipTopic && (
@@ -545,14 +549,14 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                         value={editForm.employerName}
                         onChange={(e) => setEditForm({ ...editForm, employerName: e.target.value })}
                         placeholder="Nom de l&#39;entreprise"
-                        className="w-full p-2 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                        className={editInputClass}
                       />
                     )}
                     {(isLogementTopic || isAssurancesTopic) && (
                       <select
                         value={editForm.documentType}
                         onChange={(e) => setEditForm({ ...editForm, documentType: e.target.value })}
-                        className="w-full p-2 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                        className={editInputClass}
                       >
                         <option value="">Selectionner un type</option>
                         {(isLogementTopic ? documentTypesLogement : documentTypesAssurances).map((type) => (
@@ -566,7 +570,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                       value={editForm.description}
                       onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                       placeholder="Description (optionnel)"
-                      className="w-full p-2 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none resize-none"
+                      className={`${editInputClass} resize-none`}
                       rows={2}
                     />
                     <input
@@ -574,12 +578,12 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                       value={editForm.expiresAt}
                       onChange={(e) => setEditForm({ ...editForm, expiresAt: e.target.value })}
                       placeholder="Date d'expiration (optionnel)"
-                      className="w-full p-2 rounded-xl glass-input text-zinc-900 dark:text-zinc-100 focus:outline-none"
+                      className={editInputClass}
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveEdit(doc.id)}
-                        className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-all flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-xs font-medium transition-all flex items-center gap-1"
                       >
                         <Check className="w-3 h-3" />
                         Enregistrer
@@ -589,7 +593,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                           setEditingId(null)
                           setEditForm({ name: '', description: '', expiresAt: '', employerName: '', documentType: '' })
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-xs font-medium hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-lg bg-[#EEF7F1] text-[#5A6B61] text-xs font-medium hover:bg-[#235037]/10 transition-all flex items-center gap-1"
                       >
                         <XIcon className="w-3 h-3" />
                         Annuler
@@ -599,36 +603,35 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                 ) : (
                   <>
                     <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#EEF7F1] flex items-center justify-center text-[#235037]">
                         {getFileIcon(doc.file_type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-1 truncate">
+                        <h3 className="text-sm font-semibold text-[#1a2e22] mb-1 truncate">
                           {doc.name}
                         </h3>
                         {isPayslipTopic && doc.employer_name && (
-                          <p className="text-[11px] text-indigo-700 dark:text-indigo-300 font-medium mb-1">
+                          <p className="text-[11px] text-[#235037] font-medium mb-1">
                             {doc.employer_name}
                           </p>
                         )}
                         {(isLogementTopic || isAssurancesTopic) && doc.document_type && (
-                          <p className="text-[11px] text-indigo-700 dark:text-indigo-300 font-medium mb-1">
+                          <p className="text-[11px] text-[#235037] font-medium mb-1">
                             {getTypeLabel(doc.document_type)}
                           </p>
                         )}
                         {doc.description && (
-                          <p className="text-xs text-zinc-700 dark:text-zinc-400 mb-2">{doc.description}</p>
+                          <p className="text-xs text-[#5A6B61] mb-2">{doc.description}</p>
                         )}
-                        <div className="flex items-center gap-4 text-xs text-zinc-700 dark:text-zinc-400">
+                        <div className="flex items-center gap-4 text-xs text-[#5A6B61]">
                           <span>{formatFileSize(doc.file_size)}</span>
                           {doc.expires_at && (
                             <div className={`flex items-center gap-1 ${
-                              expired ? 'text-red-600 dark:text-red-400 font-semibold' : ''
+                              expired ? 'text-red-600 font-semibold' : ''
                             }`}>
                               <Calendar className="w-3 h-3" />
                               <span>
-                                {expired ? 'Expire le ' : 'Expire le '}
-                                {new Date(doc.expires_at).toLocaleDateString('fr-FR')}
+                                Expire le {new Date(doc.expires_at).toLocaleDateString('fr-FR')}
                               </span>
                             </div>
                           )}
@@ -638,21 +641,21 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                         <a
                           href={doc.public_url}
                           download
-                          className="p-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 transition-all"
+                          className="p-2 rounded-lg hover:bg-[#EEF7F1] text-[#235037] transition-all"
                           title="Telecharger"
                         >
                           <Download className="w-4 h-4" />
                         </a>
                         <button
                           onClick={() => handleEdit(doc)}
-                          className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+                          className="p-2 rounded-lg hover:bg-[#EEF7F1] text-[#5A6B61] hover:text-[#235037] transition-all"
                           title="Modifier"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(doc.id)}
-                          className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-all"
+                          className="p-2 rounded-lg hover:bg-red-50 text-red-500 transition-all"
                           title="Supprimer"
                         >
                           <Trash2 className="w-4 h-4" />

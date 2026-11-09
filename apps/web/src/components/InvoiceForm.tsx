@@ -81,7 +81,7 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
     })
   }
 
-  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700/40 bg-white dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+  const inputClass = "w-full px-4 py-2.5 rounded-xl border border-[#E8E8E8]  bg-white text-[#1a2e22]  text-sm focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all"
 
   return (
     <div className="p-4 sm:p-8">
@@ -89,7 +89,7 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
         {/* Back */}
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors mb-6"
+          className="flex items-center gap-2 text-sm text-[#5A6B61]  hover:text-[#5A6B61] transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour
@@ -99,20 +99,20 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
         <div className="flex items-center gap-3 mb-8 animate-fade-in">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-md ${
             isInvoice
-              ? 'bg-gradient-to-br from-indigo-500 to-purple-600 shadow-indigo-500/30'
-              : 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/30'
+              ? 'bg-[#235037] '
+              : 'bg-[#EEF7F1] '
           }`}>
             {isInvoice ? <FileText className="w-5 h-5 text-white" /> : <Receipt className="w-5 h-5 text-white" />}
           </div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          <h1 className="text-xl sm:text-2xl font-semibold text-[#1a2e22] ">
             {isInvoice ? 'Nouvelle facture' : 'Nouveau devis'}
           </h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 animate-slide-up">
           {/* Client selection */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Client</h2>
+          <div className="card rounded-2xl p-6">
+            <h2 className="text-sm font-semibold text-[#1a2e22]  mb-4">Client</h2>
             <select
               value={clientId}
               onChange={(e) => setClientId(e.target.value)}
@@ -125,12 +125,12 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
               ))}
             </select>
             {clients.length === 0 && (
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+              <p className="text-xs text-[#5A6B61]  mt-2">
                 Aucun client actif.{' '}
                 <button
                   type="button"
                   onClick={() => router.push('/freelance/clients')}
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="text-[#235037] hover:underline"
                 >
                   Creer un client
                 </button>
@@ -139,32 +139,32 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
           </div>
 
           {/* Dates & TVA */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Informations</h2>
+          <div className="card rounded-2xl p-6">
+            <h2 className="text-sm font-semibold text-[#1a2e22]  mb-4">Informations</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
+                <label className="block text-xs font-medium text-[#5A6B61]  mb-1.5">
                   {isInvoice ? 'Date de facture' : 'Date du devis'}
                 </label>
                 <input type="date" value={docDate} onChange={(e) => setDocDate(e.target.value)} className={inputClass} required />
               </div>
               {isInvoice ? (
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
+                  <label className="block text-xs font-medium text-[#5A6B61]  mb-1.5">
                     Date d&apos;echeance
                   </label>
                   <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className={inputClass} required />
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
+                  <label className="block text-xs font-medium text-[#5A6B61]  mb-1.5">
                     Date d&apos;expiration
                   </label>
                   <input type="date" value={expiryDate} onChange={(e) => setExpiryDate(e.target.value)} className={inputClass} />
                 </div>
               )}
               <div>
-                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
+                <label className="block text-xs font-medium text-[#5A6B61]  mb-1.5">
                   Taux TVA (%)
                 </label>
                 <select value={tvaRate} onChange={(e) => setTvaRate(Number(e.target.value))} className={inputClass}>
@@ -174,7 +174,7 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
                   <option value={20}>20%</option>
                 </select>
                 {profile?.is_micro_entrepreneur && tvaRate === 0 && (
-                  <p className="text-[10px] text-zinc-500 dark:text-zinc-400 mt-1">
+                  <p className="text-[10px] text-[#5A6B61]  mt-1">
                     TVA non applicable, art. 293 B du CGI
                   </p>
                 )}
@@ -183,14 +183,14 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
           </div>
 
           {/* Line items */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Prestations</h2>
+          <div className="card rounded-2xl p-6">
+            <h2 className="text-sm font-semibold text-[#1a2e22]  mb-4">Prestations</h2>
             <LineItemsEditor items={items} onChange={setItems} globalTvaRate={tvaRate} />
           </div>
 
           {/* Notes */}
-          <div className="glass-card rounded-2xl p-6">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-4">Notes</h2>
+          <div className="card rounded-2xl p-6">
+            <h2 className="text-sm font-semibold text-[#1a2e22]  mb-4">Notes</h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -202,21 +202,21 @@ export default function InvoiceForm({ clients, profile, type }: InvoiceFormProps
 
           {/* Error & submit */}
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600">{error}</p>
           )}
 
           <div className="flex justify-end gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="px-5 py-2.5 rounded-xl text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]  transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium text-sm hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md shadow-indigo-500/30 disabled:opacity-50"
+              className="px-6 py-2.5 bg-[#235037] text-white rounded-xl font-medium text-sm  transition-all shadow-md  disabled:opacity-50"
             >
               {isPending ? 'Creation...' : isInvoice ? 'Creer la facture' : 'Creer le devis'}
             </button>

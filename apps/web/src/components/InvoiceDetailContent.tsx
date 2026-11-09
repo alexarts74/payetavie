@@ -16,17 +16,17 @@ interface InvoiceDetailContentProps {
 
 const statusActions: Record<InvoiceStatus, { label: string; next: InvoiceStatus; icon: typeof Send; color: string }[]> = {
   brouillon: [
-    { label: 'Marquer envoyee', next: 'envoyee', icon: Send, color: 'from-blue-600 to-indigo-600' },
-    { label: 'Annuler', next: 'annulee', icon: XCircle, color: 'from-zinc-600 to-zinc-700' },
+    { label: 'Marquer envoyee', next: 'envoyee', icon: Send, color: 'bg-[#235037]' },
+    { label: 'Annuler', next: 'annulee', icon: XCircle, color: '[#5A6B61] to-[#5A6B61]' },
   ],
   envoyee: [
     { label: 'Marquer payee', next: 'payee', icon: CheckCircle, color: 'from-green-600 to-emerald-600' },
     { label: 'Marquer en retard', next: 'en_retard', icon: AlertCircle, color: 'from-red-600 to-orange-600' },
-    { label: 'Annuler', next: 'annulee', icon: XCircle, color: 'from-zinc-600 to-zinc-700' },
+    { label: 'Annuler', next: 'annulee', icon: XCircle, color: '[#5A6B61] to-[#5A6B61]' },
   ],
   en_retard: [
     { label: 'Marquer payee', next: 'payee', icon: CheckCircle, color: 'from-green-600 to-emerald-600' },
-    { label: 'Annuler', next: 'annulee', icon: XCircle, color: 'from-zinc-600 to-zinc-700' },
+    { label: 'Annuler', next: 'annulee', icon: XCircle, color: '[#5A6B61] to-[#5A6B61]' },
   ],
   payee: [],
   annulee: [],
@@ -73,7 +73,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
         {/* Back */}
         <button
           onClick={() => router.push('/freelance/facturation/factures')}
-          className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors mb-6"
+          className="flex items-center gap-2 text-sm text-[#5A6B61]  hover:text-[#5A6B61] transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour aux factures
@@ -82,7 +82,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 animate-fade-in">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+            <h1 className="text-xl sm:text-2xl font-semibold text-[#1a2e22] ">
               {invoice.document_number}
             </h1>
             <InvoiceStatusBadge status={invoice.status as InvoiceStatus} />
@@ -92,7 +92,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
               <button
                 onClick={handleDelete}
                 disabled={isPending}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 dark:border-red-500/30 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-red-200 text-sm font-medium text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               >
                 <Trash2 className="w-4 h-4" />
                 Supprimer
@@ -101,7 +101,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
             <button
               onClick={handleDuplicate}
               disabled={isPending}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/40 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E8]  text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]/50  transition-all disabled:opacity-50"
             >
               <Copy className="w-4 h-4" />
               Dupliquer
@@ -109,7 +109,7 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
             <Link
               href={`/api/freelance/invoices/${invoice.id}/pdf`}
               target="_blank"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700/40 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#E8E8E8]  text-sm font-medium text-[#5A6B61]  hover:bg-[#EEF7F1]/50  transition-all"
             >
               <Download className="w-4 h-4" />
               PDF
@@ -133,9 +133,9 @@ export default function InvoiceDetailContent({ invoice: initial, profile }: Invo
 
         {/* Quotation link */}
         {invoice.source_document_id && (
-          <div className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="mb-6 text-sm text-[#5A6B61] ">
             Issue du devis{' '}
-            <Link href={`/freelance/facturation/devis/${invoice.source_document_id}`} className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link href={`/freelance/facturation/devis/${invoice.source_document_id}`} className="text-[#235037] hover:underline">
               voir le devis
             </Link>
           </div>

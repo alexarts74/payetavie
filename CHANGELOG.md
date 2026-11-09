@@ -4,6 +4,16 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-09 — Redesign web — identité visuelle nature (parité mobile)
+
+Refonte visuelle complète du web pour adopter exactement la même identité que l'app mobile. Suppression totale du glass morphism, du dark mode et de la palette indigo/violet/purple. ~40 fichiers modifiés en 8 phases.
+
+**Design system** : fond `#F5E9AF` (jaune), primary `#235037` (vert), accent `#EBA7CB` (rose), cartes blanches plates. Typographie Caprasimo (titres) + Jost (corps). Zéro glass morphism, zéro dark mode.
+
+**Phases** : globals.css + layout.tsx → TopicsShell + NavLinks → auth x4 → composants partagés x11 → pages protégées → module freelance x17 → landing + légales + error/404 + PDFs → cleanup final (0 occurrences de `glass-`/`dark:`/`indigo`/`violet`/`purple` dans les .tsx).
+
+---
+
 ## 2026-11-08 — Onboarding mobile (wizard 4 étapes)
 
 ### Mobile — Wizard d'onboarding (`app/onboarding.tsx`)

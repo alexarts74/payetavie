@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { Caprasimo, Jost } from "next/font/google";
 
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  weight: ["400", "500", "600", "700"],
+const caprasimo = Caprasimo({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-caprasimo",
+});
+
+const jost = Jost({
+  weight: ["300", "500"],
   subsets: ["latin", "latin-ext"],
-  variable: "--font-jakarta",
+  variable: "--font-jost",
 });
 
 export const metadata: Metadata = {
@@ -15,34 +20,17 @@ export const metadata: Metadata = {
   description: "Votre assistant pour comprendre et gérer tous les aspects de la vie adulte : impôts, URSSAF, mutuelle, fiches de paie, aides, logement, assurances",
 };
 
-// Script inline pour éviter le flash au chargement
-const themeScript = `
-  (function() {
-    try {
-      var theme = localStorage.getItem('payetavie-theme');
-      var systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var isDark = theme === 'dark' || (theme === 'system' && systemDark) || (!theme && systemDark);
-      document.documentElement.classList.add(isDark ? 'dark' : 'light');
-    } catch (e) {}
-  })();
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
+    <html lang="fr">
       <body
-        className={`${jakarta.variable} font-sans antialiased min-h-screen`}
+        className={`${caprasimo.variable} ${jost.variable} font-sans antialiased min-h-screen`}
       >
-        <ThemeProvider defaultTheme="system" storageKey="payetavie-theme">
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

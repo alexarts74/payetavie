@@ -26,13 +26,10 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
   const [newRecurrence, setNewRecurrence] = useState<'annuel' | 'mensuel' | ''>('')
   const [addingReminder, setAddingReminder] = useState(false)
 
-  // Identifier quels rappels predefinis sont deja actives
-  // On compare par titre et date pour matcher
   const activatedPredefinedIds = useMemo(() => {
     return new Set(
       reminders
         .filter(r => {
-          // Verifier si ce rappel correspond a un rappel predefini
           return predefinedReminders.some(pr =>
             pr.title === r.title &&
             pr.dueDate === r.due_date
@@ -49,7 +46,6 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
     )
   }, [reminders, predefinedReminders])
 
-  // Separer les rappels predefinis en actives et non actives
   const availablePredefined = useMemo(() => {
     return predefinedReminders.filter(pr => !activatedPredefinedIds.has(pr.id))
   }, [predefinedReminders, activatedPredefinedIds])
@@ -105,7 +101,6 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
     const result = await updateReminder(reminderId, { completed })
     if (result.data) {
       const updated = reminders.map(r => r.id === reminderId ? result.data : r)
-      // Si rappel récurrent complété, la Server Action crée le suivant → revalidatePath rafraîchira
       setReminders(updated)
     }
   }
@@ -141,31 +136,31 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
   const reminderLimitReached = plan === 'free' && remindersCount !== undefined && remindersLimit !== undefined && remindersCount >= remindersLimit
 
   return (
-    <div className="glass-card rounded-[2rem] p-6">
+    <div className="card rounded-[2rem] p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center">
-            <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+          <div className="w-12 h-12 rounded-full bg-[#EEF7F1] flex items-center justify-center">
+            <Clock className="w-5 h-5 text-[#235037]" />
           </div>
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Rappels</h2>
+          <h2 className="text-lg font-semibold text-[#235037]">Rappels</h2>
         </div>
         <div className="flex items-center gap-1">
           {reminders.length > 0 && plan !== 'free' && (
             <button
               onClick={handleExportIcs}
-              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#EEF7F1] transition-colors"
               title="Exporter les rappels (.ics)"
             >
-              <Download className="w-4 h-4 text-zinc-700 dark:text-zinc-400" />
+              <Download className="w-4 h-4 text-[#5A6B61]" />
             </button>
           )}
           {!reminderLimitReached && (
             <button
               onClick={() => setShowAddForm(v => !v)}
-              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-[#EEF7F1] transition-colors"
               title="Ajouter un rappel"
             >
-              <Plus className="w-4 h-4 text-zinc-700 dark:text-zinc-400" />
+              <Plus className="w-4 h-4 text-[#5A6B61]" />
             </button>
           )}
         </div>
@@ -173,25 +168,25 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
 
       {/* Formulaire d'ajout rapide */}
       {showAddForm && !reminderLimitReached && (
-        <div className="mb-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700/50 bg-zinc-50 dark:bg-zinc-800/30 space-y-3">
+        <div className="mb-4 p-4 rounded-xl border border-[#E8E8E8] bg-[#EEF7F1]/40 space-y-3">
           <input
             type="text"
             placeholder="Titre du rappel"
             value={newTitle}
             onChange={e => setNewTitle(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full px-3 py-2 rounded-lg border border-[#E8E8E8] bg-white text-sm text-[#1a2e22] placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40"
           />
           <div className="flex gap-2">
             <input
               type="date"
               value={newDueDate}
               onChange={e => setNewDueDate(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="flex-1 px-3 py-2 rounded-lg border border-[#E8E8E8] bg-white text-sm text-[#1a2e22] focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40"
             />
             <select
               value={newRecurrence}
               onChange={e => setNewRecurrence(e.target.value as 'annuel' | 'mensuel' | '')}
-              className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="flex-1 px-3 py-2 rounded-lg border border-[#E8E8E8] bg-white text-sm text-[#1a2e22] focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40"
             >
               <option value="">Aucune récurrence</option>
               <option value="mensuel">Mensuelle</option>
@@ -201,14 +196,14 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => { setShowAddForm(false); setNewTitle(''); setNewDueDate(''); setNewRecurrence('') }}
-              className="px-3 py-1.5 rounded-lg text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              className="px-3 py-1.5 rounded-lg text-xs text-[#5A6B61] hover:text-[#1a2e22] transition-colors"
             >
               Annuler
             </button>
             <button
               onClick={handleAddCustomReminder}
               disabled={!newTitle.trim() || addingReminder}
-              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-colors disabled:opacity-50"
+              className="px-4 py-1.5 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-xs font-medium transition-colors disabled:opacity-50"
             >
               {addingReminder ? 'Ajout...' : 'Ajouter'}
             </button>
@@ -231,46 +226,44 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
       {availablePredefined.length > 0 && !reminderLimitReached && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Rappels proposes</h3>
+            <Sparkles className="w-4 h-4 text-[#235037]" />
+            <h3 className="text-sm font-semibold text-[#5A6B61]">Rappels proposés</h3>
           </div>
           <div className="space-y-2">
-            {availablePredefined.map((predefined) => {
-              return (
-                <div
-                  key={predefined.id}
-                  className="group relative p-3 rounded-xl border border-indigo-200 dark:border-indigo-800/50 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-indigo-400 dark:border-indigo-500 flex items-center justify-center">
-                      <Plus className="w-2.5 h-2.5 text-indigo-600 dark:text-indigo-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mb-0.5 leading-tight">
-                        {predefined.title}
-                      </h3>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Calendar className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
-                        <span className="text-xs text-indigo-700 dark:text-indigo-300 font-medium">
-                          {new Date(predefined.dueDate).toLocaleDateString('fr-FR', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleActivatePredefined(predefined)}
-                      className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium transition-all flex items-center gap-1 flex-shrink-0"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Activer
-                    </button>
+            {availablePredefined.map((predefined) => (
+              <div
+                key={predefined.id}
+                className="group relative p-3 rounded-xl border border-[#235037]/20 bg-[#EEF7F1]/50 hover:bg-[#EEF7F1] transition-all duration-300"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full border-2 border-[#235037]/40 flex items-center justify-center">
+                    <Plus className="w-2.5 h-2.5 text-[#235037]" />
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xs font-semibold text-[#1a2e22] mb-0.5 leading-tight">
+                      {predefined.title}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <Calendar className="w-3 h-3 text-[#235037]" />
+                      <span className="text-xs text-[#235037] font-medium">
+                        {new Date(predefined.dueDate).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleActivatePredefined(predefined)}
+                    className="px-2.5 py-1 rounded-lg bg-[#235037] hover:bg-[#1a3d2a] text-white text-xs font-medium transition-all flex items-center gap-1 flex-shrink-0"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Activer
+                  </button>
                 </div>
-              )
-            })}
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -280,8 +273,8 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
         <div>
           {availablePredefined.length > 0 && (
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Mes rappels</h3>
+              <Clock className="w-4 h-4 text-[#235037]" />
+              <h3 className="text-sm font-semibold text-[#5A6B61]">Mes rappels</h3>
             </div>
           )}
           <div className="space-y-2">
@@ -296,10 +289,10 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                   key={reminder.id}
                   className={`group relative p-4 rounded-[1.25rem] border transition-all duration-300 ${
                     reminder.completed
-                      ? 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 opacity-60'
+                      ? 'border-[#E8E8E8] bg-[#EEF7F1]/30 opacity-60'
                       : overdue
-                      ? 'border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-900/30'
-                      : 'border-zinc-200 dark:border-zinc-700/50 hover:border-zinc-300 dark:hover:border-zinc-600/50 bg-white dark:bg-zinc-800/30 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                      ? 'border-red-200 bg-red-50'
+                      : 'border-[#E8E8E8] hover:border-[#235037]/20 bg-white hover:bg-[#EEF7F1]/30'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -307,8 +300,8 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                       onClick={() => handleToggleComplete(reminder.id, !reminder.completed)}
                       className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
                         reminder.completed
-                          ? 'bg-indigo-600 border-indigo-600'
-                          : 'border-zinc-300 dark:border-zinc-600 hover:border-indigo-500 dark:hover:border-indigo-500'
+                          ? 'bg-[#235037] border-[#235037]'
+                          : 'border-[#E8E8E8] hover:border-[#235037]'
                       }`}
                     >
                       {reminder.completed && (
@@ -318,17 +311,17 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3 className={`text-sm font-semibold ${
-                          reminder.completed ? 'text-zinc-600 dark:text-zinc-500 line-through' : 'text-zinc-900 dark:text-zinc-100'
+                          reminder.completed ? 'text-[#5A6B61] line-through' : 'text-[#1a2e22]'
                         }`}>
                           {reminder.title}
                         </h3>
                         {isPredefined && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-[#EEF7F1] text-[#235037]">
                             Automatique
                           </span>
                         )}
                         {reminder.recurrence && (
-                          <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300">
+                          <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-[#EBA7CB]/20 text-[#235037]">
                             <RefreshCw className="w-2.5 h-2.5" />
                             {reminder.recurrence === 'annuel' ? 'Annuel' : 'Mensuel'}
                           </span>
@@ -336,16 +329,16 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                       </div>
                       {reminder.description && (
                         <p className={`text-xs mb-2 ${
-                          reminder.completed ? 'text-zinc-500 dark:text-zinc-500' : 'text-zinc-700 dark:text-zinc-400'
+                          reminder.completed ? 'text-[#5A6B61]' : 'text-[#5A6B61]'
                         }`}>
                           {reminder.description}
                         </p>
                       )}
                       {reminder.due_date && (
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-3 h-3 text-zinc-500 dark:text-zinc-500" />
+                          <Calendar className="w-3 h-3 text-[#5A6B61]" />
                           <span className={`text-xs ${
-                            overdue && !reminder.completed ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-zinc-600 dark:text-zinc-400'
+                            overdue && !reminder.completed ? 'text-red-600 font-semibold' : 'text-[#5A6B61]'
                           }`}>
                             {new Date(reminder.due_date).toLocaleDateString('fr-FR', {
                               day: 'numeric',
@@ -354,15 +347,15 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
                             })}
                           </span>
                           {overdue && !reminder.completed && (
-                            <span className="text-xs text-red-600 dark:text-red-400 font-semibold">(En retard)</span>
+                            <span className="text-xs text-red-600 font-semibold">(En retard)</span>
                           )}
                         </div>
                       )}
                     </div>
                     <button
                       onClick={() => isPredefined ? handleDeactivateReminder(reminder.id) : handleDeleteReminder(reminder.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400"
-                      title={isPredefined ? 'Desactiver ce rappel' : 'Supprimer ce rappel'}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-red-50 text-red-500"
+                      title={isPredefined ? 'Désactiver ce rappel' : 'Supprimer ce rappel'}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -376,7 +369,7 @@ export default function RemindersSection({ topicSlug, initialReminders, predefin
 
       {/* Message si aucun rappel */}
       {reminders.length === 0 && availablePredefined.length === 0 && (
-        <p className="text-zinc-600 dark:text-zinc-400 text-sm text-center py-8">
+        <p className="text-[#5A6B61] text-sm text-center py-8">
           Aucun rappel disponible pour ce sujet.
         </p>
       )}

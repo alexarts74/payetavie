@@ -27,39 +27,23 @@ export default async function PricingPage({
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden relative">
-      {/* Ambient background — tinted base */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-indigo-50/60 to-violet-50/40 dark:from-[#0c0c18] dark:via-[#0e0f1e] dark:to-[#110c1c]" />
-      <div className="absolute top-[-30%] left-[-15%] w-[65%] h-[90%] rounded-full bg-indigo-300/20 dark:bg-indigo-600/15 blur-[120px]" />
-      <div className="absolute bottom-[-25%] right-[-10%] w-[55%] h-[75%] rounded-full bg-purple-300/20 dark:bg-purple-600/12 blur-[120px]" />
-      <div className="absolute top-[10%] right-[20%] w-[30%] h-[40%] rounded-full bg-violet-200/15 dark:bg-violet-500/10 blur-[100px]" />
-      <div className="absolute bottom-[15%] left-[10%] w-[20%] h-[25%] rounded-full bg-blue-200/10 dark:bg-blue-600/8 blur-[80px]" />
-
-      {/* Grid pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06]"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
-          backgroundSize: '28px 28px',
-        }}
-      />
-
-      <div className="relative flex-1 flex flex-col justify-center max-w-6xl w-full mx-auto px-4 py-6">
-        <div className="mb-4">
+    <div className="min-h-screen bg-[#F5E9AF] flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-6xl w-full mx-auto px-4 py-10">
+        <div className="mb-6">
           <Link
             href={currentPlan !== 'free' ? '/dashboard' : '/'}
-            className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-[#5A6B61] hover:text-[#235037] transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             Retour
           </Link>
         </div>
 
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-            <span className="gradient-text">Choisissez votre plan</span>
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#235037] mb-2">
+            Choisissez votre plan
           </h1>
-          <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto">
+          <p className="text-sm sm:text-base text-[#5A6B61] max-w-xl mx-auto">
             {requiredPlan
               ? `La fonctionnalité que vous souhaitez utiliser nécessite le plan ${requiredPlan === 'essentiel' ? 'Essentiel' : 'Pro'}.`
               : 'Des plans simples et transparents pour vous accompagner dans votre vie administrative.'}
@@ -68,7 +52,7 @@ export default async function PricingPage({
 
         <PricingCards currentPlan={currentPlan} highlightPlan={requiredPlan || null} />
 
-        <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+        <p className="mt-6 text-center text-xs text-[#5A6B61]">
           Tous les prix sont en euros, TTC. Annulation possible à tout moment.
         </p>
       </div>

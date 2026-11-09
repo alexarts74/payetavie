@@ -29,6 +29,8 @@ export default function AddExpenseModal({
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const inputClass = 'w-full px-4 py-2.5 rounded-xl border border-[#E8E8E8] bg-[#FAFAFA] text-[#1a2e22] placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all'
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -81,26 +83,26 @@ export default function AddExpenseModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 glass-overlay"
+        className="absolute inset-0 bg-black/35"
         onClick={onClose}
         aria-label="Fermer"
       />
-      <div className="relative glass-card rounded-2xl p-6 w-full max-w-md animate-scale-in">
+      <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-md animate-scale-in">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-lg font-semibold text-[#1a2e22]">
             {isEditing ? 'Modifier la depense' : 'Ajouter une depense'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-2 rounded-xl hover:bg-[#EEF7F1] transition-colors"
           >
-            <X className="w-5 h-5 text-zinc-500" />
+            <X className="w-5 h-5 text-[#5A6B61]" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61] mb-1.5">
               Titre *
             </label>
             <input
@@ -108,12 +110,12 @@ export default function AddExpenseModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex: Courses Carrefour"
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61] mb-1.5">
               Montant (EUR) *
             </label>
             <input
@@ -123,30 +125,30 @@ export default function AddExpenseModal({
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61] mb-1.5">
               Date
             </label>
             <input
               type="date"
               value={expenseDate}
               onChange={(e) => setExpenseDate(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61] mb-1.5">
               Categorie
             </label>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all"
+              className={inputClass}
             >
               <option value="">Sans categorie</option>
               {categories.map((cat) => (
@@ -158,7 +160,7 @@ export default function AddExpenseModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+            <label className="block text-sm font-medium text-[#5A6B61] mb-1.5">
               Notes
             </label>
             <textarea
@@ -166,26 +168,26 @@ export default function AddExpenseModal({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Notes optionnelles..."
               rows={2}
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-all resize-none"
+              className={`${inputClass} resize-none`}
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+            <p className="text-sm text-red-600">{error}</p>
           )}
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-medium text-[#5A6B61] hover:bg-[#EEF7F1] transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 shadow-md shadow-indigo-500/30 transition-all disabled:opacity-50"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#235037] hover:bg-[#1a3d2a] text-white text-sm font-medium transition-all disabled:opacity-50"
             >
               {loading ? 'Enregistrement...' : isEditing ? 'Modifier' : 'Ajouter'}
             </button>

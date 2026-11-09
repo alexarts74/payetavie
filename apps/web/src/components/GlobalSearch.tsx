@@ -130,7 +130,7 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
   return (
     <span>
       {text.slice(0, index)}
-      <mark className="bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 rounded px-0.5 not-italic font-semibold">
+      <mark className="bg-[#EEF7F1] text-[#235037] rounded px-0.5 not-italic font-semibold">
         {text.slice(index, index + query.length)}
       </mark>
       {text.slice(index + query.length)}
@@ -329,7 +329,7 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
   return (
     <div ref={containerRef} className={`relative ${className ?? ''}`}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-400 pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#5A6B61] pointer-events-none" />
         <input
           ref={inputRef}
           type="text"
@@ -341,18 +341,18 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Rechercher un module..."
-          className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-xl bg-zinc-100/80 dark:bg-zinc-800/80 border border-zinc-200/60 dark:border-zinc-700/60 text-zinc-700 dark:text-zinc-300 placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400 dark:focus:border-indigo-500 transition-all duration-200"
+          className="w-full pl-8 pr-3 py-1.5 text-[13px] rounded-xl bg-[#F5E9AF]/60 border border-[#E8E8E8] text-[#1a2e22] placeholder:text-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all duration-200"
         />
       </div>
 
       {isOpen && filteredItems.length > 0 && (
-        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 shadow-xl shadow-zinc-900/10 dark:shadow-zinc-950/40 overflow-hidden">
+        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 rounded-xl border border-[#E8E8E8] bg-white shadow-lg shadow-black/8 overflow-hidden">
           <div className="py-1.5">
             {Object.entries(groupedItems).map(([section, items]) => (
               <div key={section}>
                 {showSectionLabels && (
                   <div className="px-3 pt-2 pb-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-[#5A6B61]/60">
                       {section}
                     </span>
                   </div>
@@ -369,17 +369,17 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
                       onClick={() => navigate(item.href)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 transition-colors duration-100 ${
                         isActive
-                          ? 'bg-indigo-50 dark:bg-indigo-950/50'
-                          : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                          ? 'bg-[#EEF7F1]'
+                          : 'hover:bg-[#EEF7F1]/50'
                       }`}
                     >
-                      <Icon className="w-4 h-4 text-zinc-400 flex-shrink-0" />
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-[#235037]' : 'text-[#5A6B61]'}`} />
                       <div className="flex-1 min-w-0 text-left">
-                        <div className="text-[13px] font-medium text-zinc-800 dark:text-zinc-200 leading-tight">
+                        <div className="text-[13px] font-medium text-[#1a2e22] leading-tight">
                           <HighlightedText text={item.title} query={query} />
                         </div>
                         {showSectionLabels ? null : (
-                          <div className="text-[11px] text-zinc-400 leading-tight">{item.subtitle}</div>
+                          <div className="text-[11px] text-[#5A6B61] leading-tight">{item.subtitle}</div>
                         )}
                       </div>
                     </button>
@@ -392,8 +392,8 @@ export default function GlobalSearch({ selectedTopics, plan, className }: Global
       )}
 
       {isOpen && query.trim() && filteredItems.length === 0 && (
-        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60 bg-white dark:bg-zinc-900 shadow-xl shadow-zinc-900/10 dark:shadow-zinc-950/40 overflow-hidden">
-          <div className="py-4 px-3 text-center text-[13px] text-zinc-400">
+        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 rounded-xl border border-[#E8E8E8] bg-white shadow-lg shadow-black/8 overflow-hidden">
+          <div className="py-4 px-3 text-center text-[13px] text-[#5A6B61]">
             Aucun résultat pour &quot;{query}&quot;
           </div>
         </div>

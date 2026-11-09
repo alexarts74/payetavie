@@ -19,9 +19,9 @@ export default function LogoutPage() {
   }, [router])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-[#F5E9AF]">
       <div className="text-center">
-        <p className="text-zinc-600 dark:text-zinc-400">Déconnexion en cours...</p>
+        <p className="text-[#5A6B61]">Déconnexion en cours...</p>
       </div>
     </div>
   )

@@ -31,7 +31,7 @@ export function generateInvoiceHtml(invoice: BillingDocumentWithItems, profile: 
 <body class="bg-white text-zinc-900 font-sans text-sm">
   <!-- Print button -->
   <div class="no-print fixed top-4 right-4 z-50">
-    <button onclick="window.print()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium text-sm hover:bg-indigo-700 transition-all shadow-lg">
+    <button onclick="window.print()" class="px-6 py-2.5 bg-[#235037] text-white rounded-xl font-medium text-sm hover:bg-[#1a3d2a] transition-all shadow-lg">
       Imprimer / Sauvegarder en PDF
     </button>
   </div>
@@ -40,7 +40,7 @@ export function generateInvoiceHtml(invoice: BillingDocumentWithItems, profile: 
     <!-- Header -->
     <div class="flex justify-between items-start mb-10">
       <div>
-        <h1 class="text-3xl font-bold text-indigo-600">FACTURE</h1>
+        <h1 class="text-3xl font-bold text-[#235037]">FACTURE</h1>
         <p class="text-base text-zinc-500 mt-1">${invoice.document_number}</p>
       </div>
       <div class="text-right text-sm">
@@ -101,7 +101,7 @@ export function generateInvoiceHtml(invoice: BillingDocumentWithItems, profile: 
         </div>
         <div class="flex justify-between py-2 border-t-2 border-zinc-200 mt-2">
           <span class="text-lg font-bold">Total TTC</span>
-          <span class="text-lg font-bold text-indigo-600">${Number(invoice.total_ttc).toFixed(2)} &euro;</span>
+          <span class="text-lg font-bold text-[#235037]">${Number(invoice.total_ttc).toFixed(2)} &euro;</span>
         </div>
       </div>
     </div>

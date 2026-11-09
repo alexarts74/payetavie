@@ -64,77 +64,77 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
     <div className="p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-[#1a2e22]  mb-2">
             Profil professionnel
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+          <p className="text-[#5A6B61]  text-sm">
             Ces informations apparaissent sur vos factures et devis générés en PDF.
           </p>
         </div>
 
         <div className="space-y-6">
           {/* Section — Informations générales */}
-          <section className="glass-card rounded-2xl p-6 animate-slide-up">
+          <section className="card rounded-2xl p-6 animate-slide-up">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-md shadow-purple-500/30">
+              <div className="w-10 h-10 rounded-xl bg-[#235037] flex items-center justify-center shadow-md ">
                 <Building2 className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-[#1a2e22] ">
                 Informations générales
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Nom commercial
                 </label>
                 <input
                   type="text"
                   value={form.business_name}
                   onChange={e => set('business_name', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="Mon Entreprise"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   SIRET
                 </label>
                 <input
                   type="text"
                   value={form.siret}
                   onChange={e => set('siret', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="123 456 789 00012"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   N° TVA intracommunautaire
                 </label>
                 <input
                   type="text"
                   value={form.tva_number}
                   onChange={e => set('tva_number', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="FR 00 123456789"
                 />
               </div>
 
-              <div className="sm:col-span-2 flex items-center gap-3 p-4 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200/60 dark:border-orange-800/30">
+              <div className="sm:col-span-2 flex items-center gap-3 p-4 rounded-xl bg-orange-50 border border-orange-200/60">
                 <input
                   id="micro"
                   type="checkbox"
                   checked={form.is_micro_entrepreneur}
                   onChange={e => set('is_micro_entrepreneur', e.target.checked)}
-                  className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500"
+                  className="w-4 h-4 rounded text-[#235037] focus:ring-[#235037]/20"
                 />
-                <label htmlFor="micro" className="text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
+                <label htmlFor="micro" className="text-sm text-[#5A6B61]  cursor-pointer select-none">
                   <span className="font-medium">Micro-entrepreneur</span>
-                  <span className="text-zinc-500 dark:text-zinc-400 ml-2">
+                  <span className="text-[#5A6B61]  ml-2">
                     — TVA non applicable, mention légale ajoutée automatiquement
                   </span>
                 </label>
@@ -143,65 +143,65 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
           </section>
 
           {/* Section — Adresse */}
-          <section className="glass-card rounded-2xl p-6 animate-slide-up">
+          <section className="card rounded-2xl p-6 animate-slide-up">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/30">
                 <MapPin className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-[#1a2e22] ">
                 Adresse
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Adresse ligne 1
                 </label>
                 <input
                   type="text"
                   value={form.address_line1}
                   onChange={e => set('address_line1', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="12 rue de la Paix"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
-                  Adresse ligne 2 <span className="text-zinc-400 dark:text-zinc-500 font-normal">(optionnel)</span>
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
+                  Adresse ligne 2 <span className="text-[#5A6B61]/60  font-normal">(optionnel)</span>
                 </label>
                 <input
                   type="text"
                   value={form.address_line2}
                   onChange={e => set('address_line2', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="Bâtiment B"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Code postal
                 </label>
                 <input
                   type="text"
                   value={form.postal_code}
                   onChange={e => set('postal_code', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="75001"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Ville
                 </label>
                 <input
                   type="text"
                   value={form.city}
                   onChange={e => set('city', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="Paris"
                 />
               </div>
@@ -209,45 +209,45 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
           </section>
 
           {/* Section — Paiement */}
-          <section className="glass-card rounded-2xl p-6 animate-slide-up">
+          <section className="card rounded-2xl p-6 animate-slide-up">
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md shadow-blue-500/30">
+              <div className="w-10 h-10 rounded-xl bg-[#235037] flex items-center justify-center shadow-md ">
                 <CreditCard className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-[#1a2e22] ">
                 Coordonnées bancaires
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   IBAN
                 </label>
                 <input
                   type="text"
                   value={form.iban}
                   onChange={e => set('iban', e.target.value.toUpperCase())}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm font-mono"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm font-mono"
                   placeholder="FR76 3000 1007 9412 3456 7890 185"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   BIC / SWIFT
                 </label>
                 <input
                   type="text"
                   value={form.bic}
                   onChange={e => set('bic', e.target.value.toUpperCase())}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm font-mono"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm font-mono"
                   placeholder="BNPAFRPP"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Délai de paiement (jours)
                 </label>
                 <input
@@ -256,52 +256,52 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
                   max="365"
                   value={form.default_payment_terms_days}
                   onChange={e => set('default_payment_terms_days', parseInt(e.target.value) || 30)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                 />
               </div>
             </div>
           </section>
 
           {/* Section — Facturation */}
-          <section className="glass-card rounded-2xl p-6 animate-slide-up">
+          <section className="card rounded-2xl p-6 animate-slide-up">
             <div className="flex items-center gap-3 mb-5">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md shadow-amber-500/30">
                 <FileText className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+              <h2 className="text-base font-semibold text-[#1a2e22] ">
                 Paramètres de facturation
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Préfixe factures
                 </label>
                 <input
                   type="text"
                   value={form.invoice_prefix}
                   onChange={e => set('invoice_prefix', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="FAC-"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Préfixe devis
                 </label>
                 <input
                   type="text"
                   value={form.quotation_prefix}
                   onChange={e => set('quotation_prefix', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="DEV-"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5">
+                <label className="block text-sm font-medium text-[#5A6B61]  mb-1.5">
                   Taux horaire (€)
                 </label>
                 <input
@@ -310,7 +310,7 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
                   step="0.5"
                   value={form.hourly_rate}
                   onChange={e => set('hourly_rate', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E8E8]  text-[#1a2e22]  placeholder-[#5A6B61]/60 focus:outline-none focus:ring-2 focus:ring-[#235037]/20 focus:border-[#235037]/40 transition-all text-sm"
                   placeholder="0"
                 />
               </div>
@@ -322,8 +322,8 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
             <div
               className={`p-4 rounded-xl text-sm font-medium flex items-center gap-2 animate-scale-in ${
                 message.type === 'success'
-                  ? 'bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-300'
-                  : 'bg-red-50 dark:bg-red-950/30 border border-red-200/60 dark:border-red-800/30 text-red-700 dark:text-red-300'
+                  ? 'bg-emerald-50 border border-emerald-200/60 text-emerald-700'
+                  : 'bg-red-50 border border-red-200/60 text-red-700'
               }`}
             >
               {message.type === 'success' ? (
@@ -339,7 +339,7 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
           <button
             onClick={handleSave}
             disabled={isPending}
-            className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-semibold text-sm shadow-md shadow-purple-500/25 hover:shadow-lg hover:shadow-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+            className="w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#235037] hover:bg-[#1a3d2a] text-white font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
           >
             {isPending ? (
               <>

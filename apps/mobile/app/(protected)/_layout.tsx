@@ -65,8 +65,8 @@ function TabBar({ state, navigation }: { state: any; navigation: any }) {
         shadowOpacity: 0.10,
         shadowRadius: 16,
         elevation: 10,
-        paddingTop: 10,
-        paddingBottom: 8,
+        paddingTop: 6,
+        paddingBottom: 4,
       }}
     >
       <View
@@ -92,7 +92,7 @@ function TabBar({ state, navigation }: { state: any; navigation: any }) {
               key={tab.name}
               onPress={onPress}
               activeOpacity={0.7}
-              style={{ flex: 1, alignItems: 'center', paddingVertical: 8, gap: 5 }}
+              style={{ flex: 1, alignItems: 'center', paddingVertical: 4, gap: 3 }}
             >
               <Ionicons
                 name={isFocused ? tab.iconActive : tab.icon}

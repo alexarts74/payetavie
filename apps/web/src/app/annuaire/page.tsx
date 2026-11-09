@@ -8,7 +8,7 @@ export default async function AnnuairePage() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold gradient-text mb-1">Annuaire des administrations</h1>
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+        <p className="text-[#5A6B61]  text-sm">
           Trouvez vos administrations proches par code postal
         </p>
       </div>
