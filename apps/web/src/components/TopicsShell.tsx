@@ -146,7 +146,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                 href="/dashboard"
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${pathname === '/dashboard' ? 'bg-white/15' : 'hover:bg-white/10'}`}
               >
-                {pathname === '/dashboard' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />}
+                {pathname === '/dashboard' && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#EBA7CB]" />}
                 <LayoutDashboard className="w-[18px] h-[18px] text-white/80 transition-colors group-hover:text-white" />
                 <span className="text-[12px] font-semibold tracking-wide transition-colors text-white/80 group-hover:text-white">Tableau de bord</span>
               </Link>
@@ -163,7 +163,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   href="/depenses"
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative ${pathname.startsWith('/depenses') ? 'bg-white/15' : 'hover:bg-white/10'}`}
                 >
-                  {pathname.startsWith('/depenses') && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />}
+                  {pathname.startsWith('/depenses') && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#EBA7CB]" />}
                   <Wallet className="w-[18px] h-[18px] text-white/80 transition-colors group-hover:text-white" />
                   <span className="text-[12px] font-semibold tracking-wide transition-colors text-white/80 group-hover:text-white">Dépenses</span>
                 </Link>
@@ -209,7 +209,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               {plan !== 'pro' && (
                 <div className="rounded-xl bg-white/10 border border-white/15 p-3 mb-3">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Crown className="w-4 h-4 text-white/80" />
+                    <Crown className="w-4 h-4 text-[#EBA7CB]" />
                     <span className="text-[12px] font-semibold text-white">
                       {plan === 'essentiel' ? 'Passer au Pro' : 'Débloquer plus'}
                     </span>
@@ -328,7 +328,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                   }`}
                 >
                   {pathname === '/dashboard' && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#EBA7CB]" />
                   )}
                   <LayoutDashboard className="w-[18px] h-[18px] text-white/80 group-hover:text-white transition-colors" />
                   <span className="text-[12px] font-semibold tracking-wide text-white/80 group-hover:text-white transition-colors">
@@ -346,7 +346,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
                     }`}
                   >
                     {pathname.startsWith('/depenses') && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-white" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#EBA7CB]" />
                     )}
                     <Wallet className="w-[18px] h-[18px] text-white/80 group-hover:text-white transition-colors" />
                     <span className="text-[12px] font-semibold tracking-wide text-white/80 group-hover:text-white transition-colors">
@@ -370,7 +370,7 @@ export default function TopicsShell({ userEmail, selectedTopics, plan, children 
               {plan !== 'pro' && (
                 <div className="rounded-xl bg-white/10 border border-white/15 p-3 mb-3">
                   <div className="flex items-center gap-2 mb-1.5">
-                    <Crown className="w-4 h-4 text-white/80" />
+                    <Crown className="w-4 h-4 text-[#EBA7CB]" />
                     <span className="text-[12px] font-semibold text-white">
                       {plan === 'essentiel' ? 'Passer au Pro' : 'Débloquer plus'}
                     </span>

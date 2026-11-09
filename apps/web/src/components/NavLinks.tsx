@@ -314,7 +314,7 @@ export default function NavLinks({ onNavigate, selectedTopics, plan, isCollapsed
                         }`}
                       >
                         {isActive && (
-                          <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-white" />
+                          <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full bg-[#EBA7CB]" />
                         )}
                         <TopicIcon className={`w-4 h-4 flex-shrink-0 transition-colors duration-200 ${
                           isActive ? 'text-white' : 'text-white/60 group-hover:text-white'
