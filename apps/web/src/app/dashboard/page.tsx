@@ -94,7 +94,7 @@ export default async function DashboardPage() {
             Tableau de bord
           </h1>
           <p className="text-[#5A6B61] text-sm">
-            Votre vie administrative en un coup d&apos;<span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#EBA7CB] text-[#235037] font-semibold">œil</span>
+            Votre vie administrative en un coup d&apos;<span className="bg-[#EBA7CB] rounded-lg px-1.5 py-0.5">œil</span>
           </p>
         </div>
 
