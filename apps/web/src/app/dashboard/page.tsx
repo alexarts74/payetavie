@@ -94,7 +94,7 @@ export default async function DashboardPage() {
             Tableau de bord
           </h1>
           <p className="text-[#5A6B61] text-sm">
-            Votre vie administrative en un coup d&apos;<span className="relative inline-block"><span className="relative z-10">œil</span><span className="absolute inset-x-0 bottom-0 h-[110%] -mx-1 rounded-md bg-[#EBA7CB]/40 -z-0" /></span>
+            Votre vie administrative en un coup d&apos;<span className="relative inline-block"><span className="relative z-10">œil</span><span className="absolute inset-x-0 bottom-0 h-[110%] -mx-1 rounded-md bg-[#EBA7CB] -z-0" /></span>
           </p>
         </div>
 
