@@ -21,8 +21,8 @@ type BottomTab = {
 
 const BOTTOM_TABS: BottomTab[] = [
   { name: 'dashboard',      icon: 'home-outline',     iconActive: 'home',     label: 'Accueil' },
-  { name: 'topics/index',   icon: 'grid-outline',     iconActive: 'grid',     label: 'Topics'  },
-  { name: 'calendar',       icon: 'calendar-outline', iconActive: 'calendar', label: 'Agenda'  },
+  { name: 'topics/index',   icon: 'layers-outline',   iconActive: 'layers',   label: 'Démarches' },
+  { name: 'reminders',      icon: 'alarm-outline',    iconActive: 'alarm',    label: 'Rappels'   },
   { name: 'depenses/index', icon: 'wallet-outline',   iconActive: 'wallet',   label: 'Budget'  },
   { name: 'profile',        icon: 'person-outline',   iconActive: 'person',   label: 'Profil'  },
 ]
@@ -192,11 +192,12 @@ export default function ProtectedLayout() {
         {/* Main tabs */}
         <Tabs.Screen name="dashboard" />
         <Tabs.Screen name="topics/index" />
-        <Tabs.Screen name="calendar" />
+        <Tabs.Screen name="reminders" />
         <Tabs.Screen name="depenses/index" />
         <Tabs.Screen name="profile" />
 
         {/* Sub-screens — not in tab bar, keep native back button */}
+        <Tabs.Screen name="calendar"                                 options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Calendrier' }} />
         <Tabs.Screen name="topics/[slug]"                            options={{ href: null, ...SUB_SCREEN_HEADER }} />
         <Tabs.Screen name="annuaire"                                 options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Annuaire' }} />
         <Tabs.Screen name="pricing"                                  options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Abonnement' }} />
