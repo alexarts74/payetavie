@@ -8,12 +8,9 @@ import {
   Briefcase,
   Heart,
   DollarSign,
-  HandHeart,
   Home,
   Shield,
   Stethoscope,
-  Pill,
-  TestTube,
   Users,
   Receipt,
   Rocket,
@@ -32,7 +29,6 @@ const categories: Category[] = [
     icon: Briefcase,
     topics: [
       { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
-      { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
     ],
   },
   {
@@ -40,7 +36,6 @@ const categories: Category[] = [
     icon: FileText,
     topics: [
       { slug: 'impots', title: 'Impots', icon: FileText },
-      { slug: 'urssaf', title: 'URSSAF / Cotisations sociales', icon: Briefcase },
       { slug: 'assurances', title: 'Assurances', icon: Shield },
     ],
   },
@@ -49,9 +44,7 @@ const categories: Category[] = [
     icon: Stethoscope,
     topics: [
       { slug: 'mutuelle', title: 'Mutuelle', icon: Heart },
-      { slug: 'medecin-generaliste', title: 'Medecin generaliste', icon: Stethoscope },
-      { slug: 'pharmacie', title: 'Pharmacie', icon: Pill },
-      { slug: 'analyses-medicales', title: 'Analyses medicales', icon: TestTube },
+      { slug: 'sante', title: 'Sante', icon: Stethoscope },
     ],
   },
   {
@@ -270,13 +263,53 @@ export default function ManageTopicsModal({ isOpen, onClose, currentTopics, maxT
               )
             })}
 
-            {/* Module Freelance Pro */}
+            {/* Section Independant */}
             <div className="border-t border-[#E8E8E8] pt-6">
               <div className="flex items-center gap-2 mb-3">
                 <Briefcase className="w-4 h-4 text-[#235037]" />
                 <span className="text-xs font-semibold uppercase tracking-wide text-[#235037]">
-                  Module Freelance
+                  Independant
                 </span>
+              </div>
+              {/* URSSAF — disponible pour tous */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
+                {(() => {
+                  const slug = 'urssaf'
+                  const isSelected = selected.has(slug)
+                  const isDisabled = !isSelected && isAtLimit
+                  return (
+                    <button
+                      key={slug}
+                      onClick={() => {
+                        if (isDisabled) {
+                          setLimitBump(slug)
+                          setTimeout(() => setLimitBump(null), 500)
+                        } else {
+                          toggleSlug(slug)
+                        }
+                      }}
+                      title={isDisabled ? 'Limite atteinte — passez au plan Essentiel' : undefined}
+                      className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+                        isSelected
+                          ? 'border-[#235037]/30 bg-[#EEF7F1]'
+                          : isDisabled
+                            ? `border-[#E8E8E8] opacity-55 ${limitBump === slug ? 'animate-shake' : ''}`
+                            : 'border-[#E8E8E8] opacity-50 hover:opacity-80 hover:bg-[#EEF7F1]/50'
+                      }`}
+                    >
+                      <Briefcase className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-[#235037]' : 'text-[#5A6B61]'}`} />
+                      <span className={`text-sm font-medium flex-1 text-left ${isSelected ? 'text-[#1a2e22]' : 'text-[#5A6B61]'}`}>
+                        URSSAF / Cotisations
+                      </span>
+                      {isSelected && <Check className="w-4 h-4 text-[#235037] flex-shrink-0" />}
+                      {isDisabled && <Crown className="w-3.5 h-3.5 text-[#EBA7CB] ml-auto flex-shrink-0" />}
+                    </button>
+                  )
+                })()}
+              </div>
+              {/* Module Freelance Pro */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-semibold text-[#5A6B61]">Module Facturation</span>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EBA7CB]/30 text-[10px] font-bold text-[#235037] uppercase tracking-wider">
                   <Lock className="w-3 h-3" /> Pro
                 </span>

@@ -2,23 +2,20 @@ import type { ProfileType } from '@/types'
 
 const profileTopicsMap: Record<ProfileType, string[]> = {
   etudiant: [
-    'impots', 'caf', 'mutuelle', 'medecin-generaliste', 'pharmacie',
-    'analyses-medicales',
+    'impots', 'mutuelle', 'sante',
   ],
   salarie: [
-    'impots', 'fiches-de-paie', 'assurances', 'mutuelle', 'medecin-generaliste',
-    'pharmacie', 'analyses-medicales',
+    'impots', 'fiches-de-paie', 'assurances', 'mutuelle', 'sante',
   ],
   independant: [
-    'impots', 'urssaf', 'assurances', 'mutuelle', 'medecin-generaliste',
-    'pharmacie', 'analyses-medicales', 'freelance-clients', 'freelance-facturation',
+    'impots', 'urssaf', 'assurances', 'mutuelle', 'sante',
+    'freelance-clients', 'freelance-facturation',
   ],
   recherche_emploi: [
-    'impots', 'caf', 'mutuelle', 'medecin-generaliste', 'pharmacie',
-    'analyses-medicales',
+    'impots', 'mutuelle', 'sante',
   ],
   autre: [
-    'impots', 'mutuelle', 'medecin-generaliste', 'pharmacie', 'assurances',
+    'impots', 'mutuelle', 'sante', 'assurances',
   ],
 }
 
@@ -32,8 +29,8 @@ export const OPTIONAL_TOPIC_GROUPS = [
 ] as const
 
 export const ALL_TOPIC_SLUGS = [
-  'fiches-de-paie', 'caf',
-  'mutuelle', 'medecin-generaliste', 'pharmacie', 'analyses-medicales',
+  'fiches-de-paie',
+  'mutuelle', 'sante',
   'logement',
   'freelance-clients', 'freelance-facturation', 'impots', 'urssaf', 'assurances',
 ]

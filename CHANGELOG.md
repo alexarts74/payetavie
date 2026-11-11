@@ -4,6 +4,50 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-11 — Navigation mobile : Démarches + Rappels
+
+### A — Refonte bottom bar mobile
+- Tab "Topics" renommé en "Démarches" (icône `layers-outline`)
+- Tab "Agenda" remplacé par "Rappels" (icône `alarm-outline`)
+- L'écran Calendrier devient un sous-écran accessible depuis Rappels (bouton calendrier en haut à droite)
+
+### B — Écran Démarches (`topics/index.tsx`)
+- Topics regroupés par catégorie : Finances, Santé, Logement & Assurances, Freelance
+- Header de section uppercase avec couleur `#235037`
+- Card blanche par catégorie avec dividers entre les items
+- Chaque topic affiche l'emoji via `getTopicIcon()` dans un cercle `#F5E9AF`
+- État vide avec lien vers le profil
+
+### C — Nouvel écran Rappels (`reminders.tsx`)
+- Bouton calendrier en haut à droite avec badge rouge si rappels en retard
+- Groupes chronologiques : En retard, Aujourd'hui, Cette semaine, Plus tard, Sans date, Complétés (pliables, 5 max)
+- Tap sur un item → navigate vers la page du topic correspondant
+- État vide avec CTA "Voir mes démarches"
+- Bouton "Ajouter depuis une démarche" en bas de liste
+
+---
+
+## 2026-11-11 — Simplification de la navigation (fusion santé, suppression CAF, URSSAF → Indépendant)
+
+### A — Fusion 3 topics Santé → `sante`
+- `medecin-generaliste` + `pharmacie` + `analyses-medicales` → nouveau slug unifié `sante`
+- Migration SQL `016_topic_slug_rename.sql` : remappage des 3 anciens slugs dans `documents`, `reminders`, `checklist_progress`
+- Nouvelle page `/topics/sante` (checklist 12 items, 3 rappels prédéfinis, FAQ 5 questions)
+- `topicMap` et `checklistMap` mis à jour dans `packages/shared/src/topic-utils.ts`
+- Les anciens slugs conservés en backward compat (pages `/topics/medecin-generaliste` etc. toujours accessibles)
+
+### B — Suppression de CAF du nav/onboarding
+- `profile-topics.ts` (shared + web) : `caf` retiré de tous les profils et de `ALL_TOPIC_SLUGS`
+- `fiscal-calendar.ts` : événement CROUS étudiant déplacé de `topicSlug: 'caf'` → `'impots'`
+- La page `/topics/caf` reste accessible via URL directe (données préservées)
+
+### C — URSSAF déplacé dans la section "Indépendant" (tous plans)
+- `NavLinks.tsx` : section renommée "Indépendant" — URSSAF visible pour tous, Clients/Facturation/Profil pro pour Pro uniquement
+- `ManageTopicsModal.tsx` : section "Indépendant" avec URSSAF togglable + module facturation Pro
+- `apps/mobile/app/onboarding.tsx` : catégories mises à jour (`sante` unifié, `caf` supprimé, URSSAF dans "Indépendant")
+
+---
+
 ## 2026-11-11 — UX navigation mobile — Hub profil + actions rapides dynamiques
 
 ### A — Écran Profil restructuré en hub de navigation

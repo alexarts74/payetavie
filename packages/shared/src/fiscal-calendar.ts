@@ -105,7 +105,7 @@ export function generateFiscalEvents(
       `fiscal-crous-${year}`,
       `${year}-09-15`,
       'Renouvellement aides CROUS / bourse',
-      'caf',
+      'impots',
       'Renouvellement sur messervices.etudiant.gouv.fr avant la date limite'
     )
   }

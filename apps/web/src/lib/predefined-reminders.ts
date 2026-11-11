@@ -158,6 +158,39 @@ export function getPredefinedReminders(topicSlug: string): PredefinedReminder[] 
       month: 10,
       day: 1
     })
+  } else if (topicSlug === 'sante') {
+    const medecinDate = new Date(currentYear, 0, 15)
+    if (medecinDate < currentDate) medecinDate.setFullYear(currentYear + 1)
+    reminders.push({
+      id: 'sante-bilan-annuel',
+      title: 'Bilan de santé annuel',
+      description: 'Prenez rendez-vous avec votre médecin traitant pour votre bilan annuel.',
+      dueDate: formatDate(medecinDate),
+      month: 1,
+      day: 15,
+    })
+
+    const ordoDate = new Date(currentYear, 2, 1)
+    if (ordoDate < currentDate) ordoDate.setFullYear(currentYear + 1)
+    reminders.push({
+      id: 'sante-renouvellement-ordo',
+      title: 'Renouveler vos ordonnances',
+      description: 'Vérifiez les ordonnances arrivant à expiration (validité 3 mois).',
+      dueDate: formatDate(ordoDate),
+      month: 3,
+      day: 1,
+    })
+
+    const ameliDate = new Date(currentYear, 5, 1)
+    if (ameliDate < currentDate) ameliDate.setFullYear(currentYear + 1)
+    reminders.push({
+      id: 'sante-verifier-ameli',
+      title: 'Vérifier vos remboursements Ameli',
+      description: 'Consultez votre espace Ameli pour vérifier vos remboursements et votre dossier médical.',
+      dueDate: formatDate(ameliDate),
+      month: 6,
+      day: 1,
+    })
   } else if (topicSlug === 'mutuelle') {
     // Rappels Mutuelle / Santé
 

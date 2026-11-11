@@ -28,10 +28,10 @@ const PROFILE_OPTIONS: { type: ProfileType; label: string; description: string; 
 ]
 
 const TOPIC_CATEGORIES = [
-  { label: 'Administratif & Travail', slugs: ['impots', 'urssaf', 'fiches-de-paie', 'caf', 'assurances'] },
-  { label: 'Santé', slugs: ['mutuelle', 'medecin-generaliste', 'pharmacie', 'analyses-medicales'] },
+  { label: 'Administratif & Travail', slugs: ['impots', 'fiches-de-paie', 'assurances'] },
+  { label: 'Santé', slugs: ['mutuelle', 'sante'] },
   { label: 'Logement', slugs: ['logement'] },
-  { label: 'Freelance', slugs: ['freelance-clients', 'freelance-facturation'] },
+  { label: 'Independant', slugs: ['urssaf', 'freelance-clients', 'freelance-facturation'] },
 ]
 
 function ProgressDots({ step }: { step: Step }) {

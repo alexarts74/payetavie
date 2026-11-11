@@ -8,12 +8,9 @@ import {
   Briefcase,
   Heart,
   DollarSign,
-  HandHeart,
   Home,
   Shield,
   Stethoscope,
-  Pill,
-  TestTube,
   Users,
   Receipt,
   ChevronDown,
@@ -52,7 +49,6 @@ const categories: Category[] = [
     icon: Briefcase,
     topics: [
       { slug: 'fiches-de-paie', title: 'Fiches de paie', icon: DollarSign },
-      { slug: 'caf', title: 'CAF / Aides', icon: HandHeart },
     ],
   },
   {
@@ -60,7 +56,6 @@ const categories: Category[] = [
     icon: FileText,
     topics: [
       { slug: 'impots', title: 'Impots', icon: FileText },
-      { slug: 'urssaf', title: 'URSSAF / Cotisations', icon: Briefcase },
       { slug: 'assurances', title: 'Assurances', icon: Shield },
     ],
   },
@@ -69,9 +64,7 @@ const categories: Category[] = [
     icon: Stethoscope,
     topics: [
       { slug: 'mutuelle', title: 'Mutuelle', icon: Heart },
-      { slug: 'medecin-generaliste', title: 'Medecin generaliste', icon: Stethoscope },
-      { slug: 'pharmacie', title: 'Pharmacie', icon: Pill },
-      { slug: 'analyses-medicales', title: 'Analyses medicales', icon: TestTube },
+      { slug: 'sante', title: 'Sante', icon: Stethoscope },
     ],
   },
   {
@@ -82,6 +75,8 @@ const categories: Category[] = [
     ],
   },
 ]
+
+const urssafLink = { slug: 'urssaf', title: 'URSSAF / Cotisations', icon: Briefcase, href: '/topics/urssaf' }
 
 const freelanceLinks = [
   { slug: 'freelance-clients', title: 'Clients', icon: Users, href: '/freelance/clients' },
@@ -187,24 +182,32 @@ export default function NavLinks({ onNavigate, selectedTopics, plan, isCollapsed
           </Link>
         </>
 
-        {canAccessPro && (
-          <>
-            <div className="my-2 mx-3 border-t border-white/10" />
-            {freelanceLinks.map(({ slug, title, icon: Icon, href }) => (
-              <Link
-                key={slug}
-                href={href}
-                onClick={onNavigate}
-                title={title}
-                className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
-                  pathname.startsWith(href) ? 'bg-white/20' : 'hover:bg-white/10'
-                }`}
-              >
-                <Icon className="w-[18px] h-[18px] text-white" />
-              </Link>
-            ))}
-          </>
-        )}
+        <>
+          <div className="my-2 mx-3 border-t border-white/10" />
+          <Link
+            href={urssafLink.href}
+            onClick={onNavigate}
+            title={urssafLink.title}
+            className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
+              pathname === urssafLink.href ? 'bg-white/20' : 'hover:bg-white/10'
+            }`}
+          >
+            <urssafLink.icon className="w-[18px] h-[18px] text-white" />
+          </Link>
+          {canAccessPro && freelanceLinks.map(({ slug, title, icon: Icon, href }) => (
+            <Link
+              key={slug}
+              href={href}
+              onClick={onNavigate}
+              title={title}
+              className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
+                pathname.startsWith(href) ? 'bg-white/20' : 'hover:bg-white/10'
+              }`}
+            >
+              <Icon className="w-[18px] h-[18px] text-white" />
+            </Link>
+          ))}
+        </>
 
         {selectedTopics && (
           <div className="pt-2">
@@ -385,46 +388,73 @@ export default function NavLinks({ onNavigate, selectedTopics, plan, isCollapsed
         </Link>
       </>
 
-      {canAccessPro && (
-        <>
-          <div className="my-3 border-t border-white/10" />
-          <div className="px-3 pb-1">
-            <div className="flex items-center gap-2 mb-1.5">
-              <Briefcase className="w-3.5 h-3.5 text-white/60" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Freelance</span>
+      <>
+        <div className="my-3 border-t border-white/10" />
+        <div className="px-3 pb-1">
+          <div className="flex items-center gap-2 mb-1.5">
+            <Briefcase className="w-3.5 h-3.5 text-white/60" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/50">Independant</span>
+            {canAccessPro && (
               <span className="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-md bg-[#EBA7CB] text-[9px] font-bold text-[#235037] uppercase tracking-wider">Pro</span>
-            </div>
-            <div className="space-y-0.5">
-              {freelanceLinks.map(({ slug, title, icon: Icon, href }) => {
-                const isActive = pathname.startsWith(href)
-                return (
-                  <Link
-                    key={slug}
-                    href={href}
-                    onClick={onNavigate}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group ${
-                      isActive
-                        ? 'bg-white/15 border border-white/10'
-                        : 'hover:bg-white/10 border border-transparent'
-                    }`}
-                  >
-                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
-                      isActive ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
-                    }`}>
-                      <Icon className="w-3.5 h-3.5 text-white transition-colors duration-200" />
-                    </div>
-                    <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
-                      isActive ? 'text-white' : 'text-white/70 group-hover:text-white'
-                    }`}>
-                      {title}
-                    </span>
-                  </Link>
-                )
-              })}
-            </div>
+            )}
           </div>
-        </>
-      )}
+          <div className="space-y-0.5">
+            {/* URSSAF — visible pour tous les plans */}
+            {(() => {
+              const isActive = pathname === urssafLink.href
+              return (
+                <Link
+                  href={urssafLink.href}
+                  onClick={onNavigate}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group ${
+                    isActive
+                      ? 'bg-white/15 border border-white/10'
+                      : 'hover:bg-white/10 border border-transparent'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    isActive ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
+                  }`}>
+                    <urssafLink.icon className="w-3.5 h-3.5 text-white transition-colors duration-200" />
+                  </div>
+                  <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
+                    isActive ? 'text-white' : 'text-white/70 group-hover:text-white'
+                  }`}>
+                    {urssafLink.title}
+                  </span>
+                </Link>
+              )
+            })()}
+            {/* Liens Pro uniquement */}
+            {canAccessPro && freelanceLinks.map(({ slug, title, icon: Icon, href }) => {
+              const isActive = pathname.startsWith(href)
+              return (
+                <Link
+                  key={slug}
+                  href={href}
+                  onClick={onNavigate}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group ${
+                    isActive
+                      ? 'bg-white/15 border border-white/10'
+                      : 'hover:bg-white/10 border border-transparent'
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
+                    isActive ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
+                  }`}>
+                    <Icon className="w-3.5 h-3.5 text-white transition-colors duration-200" />
+                  </div>
+                  <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
+                    isActive ? 'text-white' : 'text-white/70 group-hover:text-white'
+                  }`}>
+                    {title}
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      </>
 
       {selectedTopics && (
         <div className="pt-2">
