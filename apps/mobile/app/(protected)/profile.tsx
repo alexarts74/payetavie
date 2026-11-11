@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useFocusEffect } from 'expo-router'
 import {
   View, Text, ScrollView, TouchableOpacity, Alert, Modal, TextInput,
-  KeyboardAvoidingView, Platform, ActivityIndicator,
+  ActivityIndicator,
 } from 'react-native'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -122,6 +122,8 @@ export default function ProfileScreen() {
   }
 
   const topicsForModal = canAccess(plan, 'pro') ? Object.keys(topicMap) : NON_FREELANCE_SLUGS
+  const canAccessEssentiel = canAccess(plan, 'essentiel')
+  const canAccessPro = canAccess(plan, 'pro')
 
   return (
     <>
@@ -138,7 +140,7 @@ export default function ProfileScreen() {
         <View className="px-4 pb-28 gap-5">
           {/* Avatar */}
           <View className="items-center py-4">
-            <View className="w-20 h-20 rounded-full bg-violet-100 items-center justify-center mb-3">
+            <View className="w-20 h-20 rounded-full bg-[#FDEEF6] items-center justify-center mb-3">
               <Ionicons name="person" size={38} color="#235037" />
             </View>
             <Text className="text-xl font-semibold text-gray-900">
@@ -150,9 +152,76 @@ export default function ProfileScreen() {
             {profileType && <Text className="text-gray-500 mt-1">{PROFILE_LABELS[profileType]}</Text>}
           </View>
 
-          {/* Nom d'affichage */}
+          {/* Accès rapide */}
+          <View className="bg-white rounded-2xl p-4 shadow-sm">
+            <Text className="font-semibold text-gray-900 mb-3" style={{ fontFamily: 'Jost_500Medium' }}>Accès rapide</Text>
+
+            {/* Annuaire */}
+            <TouchableOpacity
+              className={`flex-row items-center gap-3 py-2.5 ${!canAccessEssentiel ? 'opacity-60' : ''}`}
+              onPress={() => canAccessEssentiel ? router.push('/(protected)/annuaire') : router.push('/(protected)/pricing')}
+              activeOpacity={0.7}
+            >
+              <View className="w-9 h-9 bg-[#FDEEF6] rounded-[9px] items-center justify-center">
+                <Ionicons name="map-outline" size={18} color="#235037" />
+              </View>
+              <Text className="flex-1 text-gray-900" style={{ fontFamily: 'Jost_500Medium' }}>Annuaire des administrations</Text>
+              {!canAccessEssentiel ? (
+                <View className="bg-[#EBA7CB] rounded-full px-2 py-0.5">
+                  <Text className="text-[10px] text-[#235037]" style={{ fontFamily: 'Jost_500Medium' }}>Essentiel</Text>
+                </View>
+              ) : (
+                <Text className="text-gray-400 text-base">›</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Freelance section */}
+            {canAccessPro ? (
+              <>
+                <View className="border-t border-gray-100 my-1" />
+                <TouchableOpacity className="flex-row items-center gap-3 py-2.5" onPress={() => router.push('/(protected)/freelance/clients')} activeOpacity={0.7}>
+                  <View className="w-9 h-9 bg-[#FDEEF6] rounded-[9px] items-center justify-center">
+                    <Ionicons name="people-outline" size={18} color="#235037" />
+                  </View>
+                  <Text className="flex-1 text-gray-900" style={{ fontFamily: 'Jost_500Medium' }}>Mes clients</Text>
+                  <Text className="text-gray-400 text-base">›</Text>
+                </TouchableOpacity>
+                <View className="border-t border-gray-100 my-1" />
+                <TouchableOpacity className="flex-row items-center gap-3 py-2.5" onPress={() => router.push('/(protected)/freelance/facturation')} activeOpacity={0.7}>
+                  <View className="w-9 h-9 bg-[#FDEEF6] rounded-[9px] items-center justify-center">
+                    <Ionicons name="receipt-outline" size={18} color="#235037" />
+                  </View>
+                  <Text className="flex-1 text-gray-900" style={{ fontFamily: 'Jost_500Medium' }}>Facturation</Text>
+                  <Text className="text-gray-400 text-base">›</Text>
+                </TouchableOpacity>
+                <View className="border-t border-gray-100 my-1" />
+                <TouchableOpacity className="flex-row items-center gap-3 py-2.5" onPress={() => router.push('/(protected)/freelance/profil')} activeOpacity={0.7}>
+                  <View className="w-9 h-9 bg-[#FDEEF6] rounded-[9px] items-center justify-center">
+                    <Ionicons name="briefcase-outline" size={18} color="#235037" />
+                  </View>
+                  <Text className="flex-1 text-gray-900" style={{ fontFamily: 'Jost_500Medium' }}>Profil professionnel</Text>
+                  <Text className="text-gray-400 text-base">›</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <View className="bg-[#F5E9AF] rounded-xl p-3 mt-2 flex-row items-center gap-3">
+                <Ionicons name="lock-closed-outline" size={18} color="#235037" />
+                <View className="flex-1">
+                  <Text className="text-sm text-[#235037]" style={{ fontFamily: 'Jost_500Medium' }}>Espace Freelance</Text>
+                  <Text className="text-xs text-[#235037]/70 mt-0.5" style={{ fontFamily: 'Jost_300Light' }}>Clients, facturation, profil pro</Text>
+                </View>
+                <TouchableOpacity className="bg-[#235037] rounded-lg px-3 py-1.5" onPress={() => router.push('/(protected)/pricing')}>
+                  <Text className="text-white text-xs" style={{ fontFamily: 'Jost_500Medium' }}>Passer Pro</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          {/* Mon compte */}
           <View className="bg-white rounded-2xl p-4 shadow-sm gap-3">
-            <Text className="font-semibold text-gray-900">Nom d'affichage</Text>
+            <Text className="font-semibold text-gray-900" style={{ fontFamily: 'Jost_500Medium' }}>Mon compte</Text>
+
+            {/* Nom d'affichage */}
             {editingName ? (
               <View className="gap-2">
                 <TextInput
@@ -167,7 +236,7 @@ export default function ProfileScreen() {
                     <Text className="text-gray-700 font-medium">Annuler</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className={`flex-1 py-2.5 rounded-xl items-center ${savingName ? 'bg-violet-400' : 'bg-violet-600'}`}
+                    className={`flex-1 py-2.5 rounded-xl items-center ${savingName ? 'bg-[#235037]/70' : 'bg-[#235037]'}`}
                     onPress={saveDisplayName}
                     disabled={savingName}
                   >
@@ -177,20 +246,22 @@ export default function ProfileScreen() {
               </View>
             ) : (
               <TouchableOpacity className="flex-row items-center justify-between py-1" onPress={() => setEditingName(true)}>
-                <Text className="text-gray-600">{displayName || "Ajouter un nom d'affichage"}</Text>
-                <Text className="text-violet-600 text-sm font-medium">Modifier</Text>
+                <Text className="text-gray-500 text-sm" style={{ fontFamily: 'Jost_300Light' }}>
+                  {displayName || "Ajouter un nom d'affichage"}
+                </Text>
+                <Text className="text-[#235037] text-sm font-medium">Nom › </Text>
               </TouchableOpacity>
             )}
-          </View>
 
-          {/* Mot de passe */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm gap-3">
+            <View className="border-t border-gray-100" />
+
+            {/* Mot de passe */}
             <TouchableOpacity
-              className="flex-row items-center justify-between"
+              className="flex-row items-center justify-between py-1"
               onPress={() => setShowPasswordSection((v) => !v)}
             >
-              <Text className="font-semibold text-gray-900">Mot de passe</Text>
-              <Text className="text-violet-600 text-sm font-medium">{showPasswordSection ? 'Annuler' : 'Modifier'}</Text>
+              <Text className="text-gray-500 text-sm" style={{ fontFamily: 'Jost_300Light' }}>••••••••</Text>
+              <Text className="text-[#235037] text-sm font-medium">Mot de passe › </Text>
             </TouchableOpacity>
             {showPasswordSection && (
               <View className="gap-3">
@@ -209,7 +280,7 @@ export default function ProfileScreen() {
                   secureTextEntry
                 />
                 <TouchableOpacity
-                  className={`rounded-xl py-3 items-center ${savingPassword ? 'bg-violet-400' : 'bg-violet-600'}`}
+                  className={`rounded-xl py-3 items-center ${savingPassword ? 'bg-[#235037]/70' : 'bg-[#235037]'}`}
                   onPress={savePassword}
                   disabled={savingPassword}
                 >
@@ -226,7 +297,7 @@ export default function ProfileScreen() {
               {(Object.keys(PROFILE_LABELS) as ProfileType[]).map((type) => (
                 <TouchableOpacity
                   key={type}
-                  className={`px-3 py-2 rounded-xl border ${profileType === type ? 'bg-violet-600 border-violet-600' : 'bg-gray-50 border-gray-200'}`}
+                  className={`px-3 py-2 rounded-xl border ${profileType === type ? 'bg-[#235037] border-[#235037]' : 'bg-gray-50 border-gray-200'}`}
                   onPress={() => saveProfileType(type)}
                 >
                   <Text className={`text-sm font-medium ${profileType === type ? 'text-white' : 'text-gray-700'}`}>{PROFILE_LABELS[type]}</Text>
@@ -240,7 +311,7 @@ export default function ProfileScreen() {
             <View className="flex-row items-center justify-between">
               <Text className="font-semibold text-gray-900">Topics sélectionnés</Text>
               <TouchableOpacity onPress={openTopicsModal}>
-                <Text className="text-violet-600 text-sm font-medium">Gérer</Text>
+                <Text className="text-[#235037] text-sm font-medium">Gérer</Text>
               </TouchableOpacity>
             </View>
             {selectedTopics.length === 0 ? (
@@ -248,13 +319,13 @@ export default function ProfileScreen() {
             ) : (
               <View className="flex-row flex-wrap gap-2">
                 {selectedTopics.filter((s) => !s.startsWith('freelance-')).map((slug) => (
-                  <View key={slug} className="bg-violet-50 rounded-lg px-3 py-1.5">
-                    <Text className="text-violet-700 text-sm font-medium">{topicMap[slug]?.title ?? slug}</Text>
+                  <View key={slug} className="bg-[#FDEEF6] rounded-lg px-3 py-1.5">
+                    <Text className="text-[#235037] text-sm font-medium">{topicMap[slug]?.title ?? slug}</Text>
                   </View>
                 ))}
               </View>
             )}
-            {!canAccess(plan, 'essentiel') && (
+            {!canAccessEssentiel && (
               <Text className="text-xs text-gray-400">{selectedTopics.filter((s) => !s.startsWith('freelance-')).length}/{FREE_TOPIC_LIMIT} topics (plan gratuit)</Text>
             )}
           </View>
@@ -264,7 +335,7 @@ export default function ProfileScreen() {
             className="bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm"
             onPress={() => router.push('/(protected)/pricing')}
           >
-            <View className="w-9 h-9 bg-violet-50 rounded-[9px] items-center justify-center">
+            <View className="w-9 h-9 bg-[#FDEEF6] rounded-[9px] items-center justify-center">
               <Ionicons name="star-outline" size={18} color="#235037" />
             </View>
             <Text className="font-medium text-gray-900">Mon abonnement</Text>
@@ -288,7 +359,7 @@ export default function ProfileScreen() {
                 <Text className="text-gray-500 text-base">Annuler</Text>
               </TouchableOpacity>
             </View>
-            {!canAccess(plan, 'essentiel') && (
+            {!canAccessEssentiel && (
               <View className="bg-orange-50 rounded-xl p-3">
                 <Text className="text-orange-700 text-sm">Plan gratuit : maximum {FREE_TOPIC_LIMIT} topics</Text>
               </View>
@@ -303,14 +374,14 @@ export default function ProfileScreen() {
                 return (
                   <TouchableOpacity
                     key={slug}
-                    className={`bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm border ${isSelected ? 'border-violet-500' : 'border-transparent'}`}
+                    className={`bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm border ${isSelected ? 'border-[#235037]' : 'border-transparent'}`}
                     onPress={() => toggleDraftTopic(slug)}
                   >
-                    <View className="w-8 h-8 bg-violet-50 rounded-lg items-center justify-center flex-shrink-0">
+                    <View className="w-8 h-8 bg-[#FDEEF6] rounded-lg items-center justify-center flex-shrink-0">
                       <Ionicons name="folder-outline" size={16} color="#235037" />
                     </View>
                     <Text className="flex-1 font-medium text-gray-900">{topic?.title ?? slug}</Text>
-                    <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${isSelected ? 'border-violet-500 bg-violet-500' : 'border-gray-300'}`}>
+                    <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${isSelected ? 'border-[#235037] bg-[#235037]' : 'border-gray-300'}`}>
                       {isSelected && <Ionicons name="checkmark" size={14} color="white" />}
                     </View>
                   </TouchableOpacity>
@@ -321,7 +392,7 @@ export default function ProfileScreen() {
 
           <View className="px-4 pb-8 pt-2">
             <TouchableOpacity
-              className={`rounded-xl py-3.5 items-center ${savingTopics ? 'bg-violet-400' : 'bg-violet-600'}`}
+              className={`rounded-xl py-3.5 items-center ${savingTopics ? 'bg-[#235037]/70' : 'bg-[#235037]'}`}
               onPress={saveTopics}
               disabled={savingTopics}
             >

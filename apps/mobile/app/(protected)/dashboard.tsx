@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { router } from 'expo-router'
+import { router, useFocusEffect } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { getUserSubscription, canAccess } from '@/lib/subscription'
+import type { PlanName } from '@/lib/subscription'
 
 interface DashboardStats {
   remindersCount: number
@@ -25,6 +27,11 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [plan, setPlan] = useState<PlanName>('free')
+
+  useFocusEffect(useCallback(() => {
+    getUserSubscription().then(({ plan: p }) => setPlan(p))
+  }, []))
 
   async function loadStats() {
     if (!user) return
@@ -167,10 +174,12 @@ export default function DashboardScreen() {
       ]
     : []
 
-  const QUICK_ACTIONS = [
+  const quickActions = [
     { label: 'Topics', icon: 'grid-outline' as const, route: '/(protected)/topics' as const },
-    { label: 'Documents', icon: 'cloud-upload-outline' as const, route: '/(protected)/topics' as const },
     { label: 'Calendrier', icon: 'calendar-outline' as const, route: '/(protected)/calendar' as const },
+    { label: 'Budget', icon: 'wallet-outline' as const, route: '/(protected)/depenses' as const },
+    ...(canAccess(plan, 'essentiel') ? [{ label: 'Annuaire', icon: 'map-outline' as const, route: '/(protected)/annuaire' as const }] : []),
+    ...(canAccess(plan, 'pro') ? [{ label: 'Facturation', icon: 'receipt-outline' as const, route: '/(protected)/freelance/facturation' as const }] : []),
   ]
 
   return (
@@ -225,7 +234,7 @@ export default function DashboardScreen() {
         {/* ── Dépenses du mois (full-width card) ── */}
         {stats && (
           <TouchableOpacity
-            onPress={() => router.push('/(protected)/depenses/index')}
+            onPress={() => router.push('/(protected)/depenses')}
             activeOpacity={0.85}
             style={styles.expenseCard}
           >
@@ -437,7 +446,7 @@ export default function DashboardScreen() {
             <Text style={styles.sectionTitle}>Actions rapides</Text>
           </View>
           <View style={styles.actionsRow}>
-            {QUICK_ACTIONS.map((action) => (
+            {quickActions.map((action) => (
               <TouchableOpacity
                 key={action.label}
                 onPress={() => router.push(action.route)}

@@ -140,6 +140,11 @@ const SUB_SCREEN_HEADER = {
   headerTitleStyle: { color: '#0D0D0D', fontFamily: 'Caprasimo_400Regular' },
   headerShadowVisible: false,
   headerBackTitle: '',
+  headerLeft: () => (
+    <TouchableOpacity onPress={() => router.back()} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+      <Ionicons name="chevron-back" size={26} color="#235037" />
+    </TouchableOpacity>
+  ),
 }
 
 export default function ProtectedLayout() {
@@ -207,6 +212,7 @@ export default function ProtectedLayout() {
         <Tabs.Screen name="freelance/facturation/devis/nouveau"      options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Nouveau devis' }} />
         <Tabs.Screen name="freelance/facturation/devis/[id]"         options={{ href: null, ...SUB_SCREEN_HEADER }} />
         <Tabs.Screen name="freelance/profil"                         options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Profil pro' }} />
+        <Tabs.Screen name="aides"                                    options={{ href: null, ...SUB_SCREEN_HEADER, title: 'Aides' }} />
       </Tabs>
     </GestureHandlerRootView>
   )
