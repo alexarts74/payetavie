@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import TopicsShell from '@/components/TopicsShell'
 import { getUserPreferences } from '@/app/actions/preferences'
-import { getUserSubscription, canAccess } from '@/lib/subscription'
+import { getUserSubscription } from '@/lib/subscription'
 
 export default async function AnnuaireLayout({
   children,
@@ -27,10 +27,6 @@ export default async function AnnuaireLayout({
 
   if (!preferences || !preferences.onboarding_completed) {
     redirect('/auth/register')
-  }
-
-  if (!canAccess(plan, 'essentiel')) {
-    redirect('/pricing?required=essentiel')
   }
 
   return (

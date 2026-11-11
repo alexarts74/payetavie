@@ -14,7 +14,6 @@ import {
   ArrowRight,
   Bell,
   FolderOpen,
-  Bookmark,
   Wallet,
 } from 'lucide-react'
 import CalendarView from '@/components/CalendarView'
@@ -99,7 +98,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Stat Cards */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${canAccessEssentiel ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-4 mb-8`}>
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${canAccessEssentiel ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4 mb-8`}>
           {/* Rappels actifs */}
           <div className="card rounded-2xl p-5 animate-slide-up stagger-1 overflow-hidden" style={{ opacity: 0 }}>
             <div className="flex items-center justify-between mb-4">
@@ -136,19 +135,8 @@ export default async function DashboardPage() {
             <div className="text-xs font-medium text-[#5A6B61]">Documents stockés</div>
           </div>
 
-          {/* Favoris */}
-          <div className="card rounded-2xl p-5 animate-slide-up stagger-3 overflow-hidden" style={{ opacity: 0 }}>
-            <div className="w-11 h-11 rounded-xl bg-[#FDEEF6] flex items-center justify-center mb-4">
-              <Bookmark className="w-5 h-5 text-[#235037]" />
-            </div>
-            <div className="text-3xl font-bold text-[#235037] mb-0.5" style={{ fontFamily: 'var(--font-caprasimo)' }}>
-              {stats.totalBookmarks}
-            </div>
-            <div className="text-xs font-medium text-[#5A6B61]">Ressources favorites</div>
-          </div>
-
           {/* Completion */}
-          <div className="card rounded-2xl p-5 animate-slide-up stagger-4 overflow-hidden" style={{ opacity: 0 }}>
+          <div className="card rounded-2xl p-5 animate-slide-up stagger-3 overflow-hidden" style={{ opacity: 0 }}>
             <div className="w-11 h-11 rounded-xl bg-[#EEF7F1] flex items-center justify-center mb-4">
               <CheckCircle2 className="w-5 h-5 text-[#235037]" />
             </div>
@@ -393,12 +381,10 @@ export default async function DashboardPage() {
           </div>
         </AnimateOnScroll>
 
-        {/* Annuaire des administrations - Essentiel+ only */}
-        {canAccessEssentiel && (
-          <AnimateOnScroll className="mt-6">
-            <AnnuaireGlobal initialPostalCode={preferences?.postal_code ?? null} />
-          </AnimateOnScroll>
-        )}
+        {/* Annuaire des administrations */}
+        <AnimateOnScroll className="mt-6">
+          <AnnuaireGlobal initialPostalCode={preferences?.postal_code ?? null} />
+        </AnimateOnScroll>
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import type { BillingDocument, BillingDocumentWithItems, InvoicingStats, InvoiceStatus, MonthlyRevenueStat, ClientRevenueStat } from '@/types'
+import type { BillingDocument, BillingDocumentWithItems, InvoicingStats, InvoiceStatus, MonthlyRevenueStat, ClientRevenueStat, MicroEntrepreneurPlafondStats } from '@/types'
 import { requirePlan } from '@/lib/subscription'
 
 interface LineItem {
@@ -650,4 +650,170 @@ export async function duplicateInvoice(id: string) {
     tvaRate: Number(original.tva_rate),
     notes: original.notes,
   })
+}
+
+const ME_THRESHOLDS_WEB = { services: 77700, commerce: 188700, mixte: 77700 } as const
+
+// Taux de cotisations URSSAF par type d'activité
+const URSSAF_RATES = {
+  services: 0.221,   // 22.1% prestations de services
+  commerce: 0.128,   // 12.8% ventes de marchandises
+  mixte: 0.221,
+} as const
+
+function getUrssafDueDate(year: number, quarter: number): string {
+  // Date limite : dernier jour du mois suivant la fin du trimestre
+  const endMonth = quarter * 3 // mois de fin du trimestre (1-based)
+  const dueMonth = endMonth + 1
+  if (dueMonth > 12) {
+    return `${year + 1}-01-31`
+  }
+  const lastDay = new Date(year, dueMonth, 0).getDate()
+  return `${year}-${String(dueMonth).padStart(2, '0')}-${lastDay}`
+}
+
+export async function getUrssafDeclaration(year: number, quarter?: number): Promise<{
+  data: {
+    totalHT: number
+    period: string
+    dueDate: string
+    cotisationsEstimees: number
+    taux: number
+    activityType: 'services' | 'commerce' | 'mixte'
+    isMicroEntrepreneur: boolean
+  } | null
+  error: string | null
+}> {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { data: null, error: planCheck.error ?? null }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: null, error: null }
+
+  const { data: profile } = await supabase
+    .from('professional_profiles')
+    .select('is_micro_entrepreneur, activity_type, urssaf_frequency')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!profile?.is_micro_entrepreneur) {
+    return { data: null, error: null }
+  }
+
+  const activityType = (profile.activity_type as 'services' | 'commerce' | 'mixte') || 'services'
+  const urssafFrequency = profile.urssaf_frequency || 'trimestriel'
+  const taux = URSSAF_RATES[activityType]
+
+  const now = new Date()
+  const currentQuarter = quarter ?? Math.ceil((now.getMonth() + 1) / 3)
+  const startMonth = (currentQuarter - 1) * 3 + 1
+  const endMonth = currentQuarter * 3
+
+  const startDate = `${year}-${String(startMonth).padStart(2, '0')}-01`
+  const nextMonthAfterEnd = endMonth === 12 ? `${year + 1}-01-01` : `${year}-${String(endMonth + 1).padStart(2, '0')}-01`
+
+  const { data: invoices } = await supabase
+    .from('billing_documents')
+    .select('total_ht, status')
+    .eq('user_id', user.id)
+    .eq('type', 'invoice')
+    .in('status', ['payee', 'envoyee'])
+    .gte('document_date', startDate)
+    .lt('document_date', nextMonthAfterEnd)
+
+  const totalHT = (invoices ?? []).reduce((sum, i) => sum + Number(i.total_ht || 0), 0)
+  const cotisationsEstimees = Math.round(totalHT * taux * 100) / 100
+
+  const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+  const period = urssafFrequency === 'mensuel'
+    ? `${monthNames[endMonth - 1]} ${year}`
+    : `T${currentQuarter} ${year} (${monthNames[startMonth - 1]}–${monthNames[endMonth - 1]})`
+
+  const dueDate = getUrssafDueDate(year, currentQuarter)
+
+  return {
+    data: {
+      totalHT: Math.round(totalHT * 100) / 100,
+      period,
+      dueDate,
+      cotisationsEstimees,
+      taux,
+      activityType,
+      isMicroEntrepreneur: true,
+    },
+    error: null,
+  }
+}
+
+export async function getMicroEntrepreneurPlafondStats(year: number): Promise<{
+  data: MicroEntrepreneurPlafondStats | null
+  error: string | null
+}> {
+  const planCheck = await requirePlan('pro')
+  if (!planCheck.allowed) {
+    return { data: null, error: planCheck.error ?? null }
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { data: null, error: null }
+  }
+
+  const [profileResult, invoicesResult] = await Promise.all([
+    supabase
+      .from('professional_profiles')
+      .select('is_micro_entrepreneur, activity_type')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('billing_documents')
+      .select('status, total_ht')
+      .eq('user_id', user.id)
+      .eq('type', 'invoice')
+      .gte('document_date', `${year}-01-01`)
+      .lt('document_date', `${year + 1}-01-01`),
+  ])
+
+  const profile = profileResult.data
+  if (!profile?.is_micro_entrepreneur) {
+    return { data: null, error: null }
+  }
+
+  const activityType = (profile.activity_type as 'services' | 'commerce' | 'mixte') || 'services'
+  const threshold = ME_THRESHOLDS_WEB[activityType]
+
+  const invoices = invoicesResult.data ?? []
+  const caEncaisse = invoices
+    .filter(i => i.status === 'payee')
+    .reduce((sum, i) => sum + Number(i.total_ht || 0), 0)
+  const caAttente = invoices
+    .filter(i => i.status === 'envoyee' || i.status === 'en_retard')
+    .reduce((sum, i) => sum + Number(i.total_ht || 0), 0)
+
+  const today = new Date()
+  const currentYear = today.getFullYear()
+  const monthsElapsed = year === currentYear ? today.getMonth() + 1 : 12
+  const projectedYearEnd =
+    year === currentYear && monthsElapsed > 0 && caEncaisse > 0
+      ? Math.round((caEncaisse / monthsElapsed) * 12)
+      : null
+
+  return {
+    data: {
+      caEncaisse: Math.round(caEncaisse * 100) / 100,
+      caAttente: Math.round(caAttente * 100) / 100,
+      threshold,
+      projectedYearEnd,
+      activityType,
+      monthsElapsed,
+    },
+    error: null,
+  }
 }

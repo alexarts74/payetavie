@@ -20,6 +20,7 @@ import {
   Settings,
   MapPin,
   UserCog,
+  Gift,
   type LucideIcon,
 } from 'lucide-react'
 import ManageTopicsModal from '@/components/ManageTopicsModal'
@@ -162,21 +163,29 @@ export default function NavLinks({ onNavigate, selectedTopics, plan, isCollapsed
           )
         })}
 
-        {canAccessEssentiel && (
-          <>
-            <div className="my-2 mx-3 border-t border-white/10" />
-            <Link
-              href="/annuaire"
-              onClick={onNavigate}
-              title="Annuaire"
-              className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
-                pathname === '/annuaire' ? 'bg-white/20' : 'hover:bg-white/10'
-              }`}
-            >
-              <MapPin className="w-[18px] h-[18px] text-white" />
-            </Link>
-          </>
-        )}
+        <>
+          <div className="my-2 mx-3 border-t border-white/10" />
+          <Link
+            href="/annuaire"
+            onClick={onNavigate}
+            title="Annuaire"
+            className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
+              pathname === '/annuaire' ? 'bg-white/20' : 'hover:bg-white/10'
+            }`}
+          >
+            <MapPin className="w-[18px] h-[18px] text-white" />
+          </Link>
+          <Link
+            href="/aides"
+            onClick={onNavigate}
+            title="Aides & droits"
+            className={`flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all duration-200 ${
+              pathname === '/aides' ? 'bg-white/20' : 'hover:bg-white/10'
+            }`}
+          >
+            <Gift className="w-[18px] h-[18px] text-white" />
+          </Link>
+        </>
 
         {canAccessPro && (
           <>
@@ -336,29 +345,45 @@ export default function NavLinks({ onNavigate, selectedTopics, plan, isCollapsed
         )
       })}
 
-      {canAccessEssentiel && (
-        <>
-          <div className="my-3 border-t border-white/10" />
-          <Link
-            href="/annuaire"
-            onClick={onNavigate}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
-              pathname === '/annuaire' ? 'bg-white/15' : 'hover:bg-white/10'
-            }`}
-          >
-            <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
-              pathname === '/annuaire' ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
-            }`}>
-              <MapPin className="w-3.5 h-3.5 text-white transition-colors duration-200" />
-            </div>
-            <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
-              pathname === '/annuaire' ? 'text-white' : 'text-white/70 group-hover:text-white'
-            }`}>
-              Annuaire
-            </span>
-          </Link>
-        </>
-      )}
+      <>
+        <div className="my-3 border-t border-white/10" />
+        <Link
+          href="/annuaire"
+          onClick={onNavigate}
+          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
+            pathname === '/annuaire' ? 'bg-white/15' : 'hover:bg-white/10'
+          }`}
+        >
+          <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
+            pathname === '/annuaire' ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <MapPin className="w-3.5 h-3.5 text-white transition-colors duration-200" />
+          </div>
+          <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
+            pathname === '/annuaire' ? 'text-white' : 'text-white/70 group-hover:text-white'
+          }`}>
+            Annuaire
+          </span>
+        </Link>
+        <Link
+          href="/aides"
+          onClick={onNavigate}
+          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 group relative ${
+            pathname === '/aides' ? 'bg-white/15' : 'hover:bg-white/10'
+          }`}
+        >
+          <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all duration-200 ${
+            pathname === '/aides' ? 'bg-white/20' : 'bg-white/10 group-hover:bg-white/15'
+          }`}>
+            <Gift className="w-3.5 h-3.5 text-white transition-colors duration-200" />
+          </div>
+          <span className={`text-[12px] font-semibold tracking-wide transition-colors duration-200 ${
+            pathname === '/aides' ? 'text-white' : 'text-white/70 group-hover:text-white'
+          }`}>
+            Aides & droits
+          </span>
+        </Link>
+      </>
 
       {canAccessPro && (
         <>

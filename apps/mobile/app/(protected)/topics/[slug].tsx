@@ -7,9 +7,10 @@ import { useLocalSearchParams, useNavigation } from 'expo-router'
 import * as DocumentPicker from 'expo-document-picker'
 import { Ionicons } from '@expo/vector-icons'
 import { supabase } from '@/lib/supabase'
+import { analyzeDocument } from '@/lib/documents'
 import { useAuth } from '@/contexts/AuthContext'
 import { getTopicTitle, getTopicIcon, getTopicChecklist } from '@payetavie/shared'
-import type { Reminder, Bookmark, Document } from '@payetavie/shared'
+import type { Reminder, Document } from '@payetavie/shared'
 
 type RecurrenceOption = 'annuel' | 'mensuel' | null
 
@@ -18,11 +19,6 @@ interface ReminderForm {
   description: string
   due_date: string
   recurrence: RecurrenceOption
-}
-
-interface BookmarkForm {
-  resource_name: string
-  resource_url: string
 }
 
 interface DocumentUploadForm {
@@ -45,7 +41,6 @@ export default function TopicDetailScreen() {
 
   const [reminders, setReminders] = useState<Reminder[]>([])
   const [documents, setDocuments] = useState<Document[]>([])
-  const [bookmarks, setBookmarks] = useState<Bookmark[]>([])
   const [completedItems, setCompletedItems] = useState<Set<number>>(new Set())
   const [refreshing, setRefreshing] = useState(false)
 
@@ -55,10 +50,24 @@ export default function TopicDetailScreen() {
   const [reminderForm, setReminderForm] = useState<ReminderForm>({ title: '', description: '', due_date: '', recurrence: null })
   const [savingReminder, setSavingReminder] = useState(false)
 
-  // Bookmark modal
-  const [showBookmarkModal, setShowBookmarkModal] = useState(false)
-  const [bookmarkForm, setBookmarkForm] = useState<BookmarkForm>({ resource_name: '', resource_url: '' })
-  const [savingBookmark, setSavingBookmark] = useState(false)
+  // Document analysis modal
+  const [analysisDocId, setAnalysisDocId] = useState<string | null>(null)
+  const [analysisDocName, setAnalysisDocName] = useState('')
+  const [analysisLoading, setAnalysisLoading] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null)
+  const [analysisError, setAnalysisError] = useState<string | null>(null)
+
+  async function handleAnalyzeDocument(doc: Document) {
+    setAnalysisDocId(doc.id)
+    setAnalysisDocName(doc.name)
+    setAnalysisResult(null)
+    setAnalysisError(null)
+    setAnalysisLoading(true)
+    const { analysis, error } = await analyzeDocument(doc.id)
+    setAnalysisLoading(false)
+    if (error) setAnalysisError(error)
+    else setAnalysisResult(analysis)
+  }
 
   // Document upload modal
   const [showDocModal, setShowDocModal] = useState(false)
@@ -74,15 +83,13 @@ export default function TopicDetailScreen() {
 
   async function loadData() {
     if (!user || !slug) return
-    const [rem, docs, bkm, check] = await Promise.all([
+    const [rem, docs, check] = await Promise.all([
       supabase.from('reminders').select('*').eq('user_id', user.id).eq('topic_slug', slug).order('due_date', { ascending: true, nullsFirst: false }),
       supabase.from('documents').select('*').eq('user_id', user.id).eq('topic_slug', slug).order('created_at', { ascending: false }),
-      supabase.from('bookmarks').select('*').eq('user_id', user.id).eq('topic_slug', slug).order('created_at', { ascending: false }),
       supabase.from('checklist_progress').select('item_index').eq('user_id', user.id).eq('topic_slug', slug).eq('completed', true),
     ])
     setReminders(rem.data ?? [])
     setDocuments(docs.data ?? [])
-    setBookmarks(bkm.data ?? [])
     setCompletedItems(new Set((check.data ?? []).map((r) => r.item_index)))
   }
 
@@ -162,43 +169,6 @@ export default function TopicDetailScreen() {
     if (!user) return
     await supabase.from('reminders').delete().eq('id', id).eq('user_id', user.id)
     setReminders((prev) => prev.filter((r) => r.id !== id))
-  }
-
-  // ── Bookmarks ──────────────────────────────────────────────────────────────
-
-  function openCreateBookmark() {
-    setBookmarkForm({ resource_name: '', resource_url: '' })
-    setShowBookmarkModal(true)
-  }
-
-  async function saveBookmark() {
-    if (!user || !slug) return
-    if (!bookmarkForm.resource_name.trim() || !bookmarkForm.resource_url.trim()) {
-      Alert.alert('Erreur', "Le nom et l'URL sont requis")
-      return
-    }
-    setSavingBookmark(true)
-    const { data, error } = await supabase
-      .from('bookmarks')
-      .insert({ user_id: user.id, topic_slug: slug, resource_name: bookmarkForm.resource_name.trim(), resource_url: bookmarkForm.resource_url.trim() })
-      .select().single()
-    if (error) { Alert.alert('Erreur', error.message); setSavingBookmark(false); return }
-    setBookmarks((prev) => [data as Bookmark, ...prev])
-    setSavingBookmark(false)
-    setShowBookmarkModal(false)
-  }
-
-  function confirmDeleteBookmark(id: string) {
-    Alert.alert('Supprimer ce favori ?', 'Cette action est irréversible.', [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Supprimer', style: 'destructive', onPress: () => deleteBookmark(id) },
-    ])
-  }
-
-  async function deleteBookmark(id: string) {
-    if (!user) return
-    await supabase.from('bookmarks').delete().eq('id', id).eq('user_id', user.id)
-    setBookmarks((prev) => prev.filter((b) => b.id !== id))
   }
 
   // ── Documents ──────────────────────────────────────────────────────────────
@@ -359,38 +329,6 @@ export default function TopicDetailScreen() {
             )}
           </View>
 
-          {/* Favoris */}
-          <View>
-            <View className="flex-row items-center justify-between mb-3">
-              <Text className="text-lg font-semibold text-gray-900">Favoris</Text>
-              <TouchableOpacity className="w-8 h-8 bg-violet-600 rounded-full items-center justify-center" onPress={openCreateBookmark}>
-                <Text className="text-white text-xl font-bold leading-none">+</Text>
-              </TouchableOpacity>
-            </View>
-            {bookmarks.length === 0 ? (
-              <View className="bg-white rounded-2xl p-6 items-center">
-                <Text className="text-gray-500">Aucun favori pour ce topic</Text>
-              </View>
-            ) : (
-              <View className="gap-2">
-                {bookmarks.map((bookmark) => (
-                  <View key={bookmark.id} className="bg-white rounded-2xl p-4 flex-row items-center gap-3 shadow-sm">
-                    <View className="w-8 h-8 bg-violet-100 rounded-lg items-center justify-center flex-shrink-0">
-                      <Ionicons name="link-outline" size={15} color="#235037" />
-                    </View>
-                    <View className="flex-1">
-                      <Text className="font-medium text-gray-900">{bookmark.resource_name}</Text>
-                      <Text className="text-sm text-violet-600" numberOfLines={1}>{bookmark.resource_url}</Text>
-                    </View>
-                    <TouchableOpacity onPress={() => confirmDeleteBookmark(bookmark.id)} className="p-1">
-                      <Ionicons name="close" size={18} color="#9CA3AF" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-
           {/* Documents */}
           <View>
             <View className="flex-row items-center justify-between mb-3">
@@ -421,6 +359,9 @@ export default function TopicDetailScreen() {
                         <Text className="text-sm text-gray-500 mt-0.5">{doc.employer_name}</Text>
                       )}
                     </View>
+                    <TouchableOpacity onPress={() => handleAnalyzeDocument(doc)} className="p-1 mr-1">
+                      <Ionicons name="sparkles-outline" size={18} color="#235037" />
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => confirmDeleteDocument(doc)} className="p-1">
                       <Ionicons name="close" size={18} color="#9CA3AF" />
                     </TouchableOpacity>
@@ -512,58 +453,6 @@ export default function TopicDetailScreen() {
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Modal — Favori */}
-      <Modal visible={showBookmarkModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowBookmarkModal(false)}>
-        <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <ScrollView className="flex-1 bg-white" keyboardShouldPersistTaps="handled">
-            <View className="px-4 py-6">
-              <View className="flex-row items-center justify-between mb-6">
-                <Text className="text-xl font-bold text-gray-900">Nouveau favori</Text>
-                <TouchableOpacity onPress={() => setShowBookmarkModal(false)}>
-                  <Text className="text-gray-500 text-base">Annuler</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View className="gap-4">
-                <View>
-                  <Text className="text-sm font-medium text-gray-700 mb-1">Nom *</Text>
-                  <TextInput
-                    className="border border-gray-300 rounded-xl px-4 py-3 text-base text-gray-900 bg-gray-50"
-                    placeholder="Ex : Site officiel des impôts"
-                    value={bookmarkForm.resource_name}
-                    onChangeText={(v) => setBookmarkForm((f) => ({ ...f, resource_name: v }))}
-                  />
-                </View>
-
-                <View>
-                  <Text className="text-sm font-medium text-gray-700 mb-1">URL *</Text>
-                  <TextInput
-                    className="border border-gray-300 rounded-xl px-4 py-3 text-base text-gray-900 bg-gray-50"
-                    placeholder="https://..."
-                    value={bookmarkForm.resource_url}
-                    onChangeText={(v) => setBookmarkForm((f) => ({ ...f, resource_url: v }))}
-                    keyboardType="url"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  className={`rounded-xl py-3.5 items-center mt-2 ${savingBookmark ? 'bg-violet-400' : 'bg-violet-600'}`}
-                  onPress={saveBookmark}
-                  disabled={savingBookmark}
-                >
-                  {savingBookmark
-                    ? <ActivityIndicator color="white" />
-                    : <Text className="text-white font-semibold text-base">Ajouter le favori</Text>
-                  }
-                </TouchableOpacity>
-              </View>
-            </View>
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </Modal>
-
       {/* Modal — Upload document */}
       <Modal visible={showDocModal} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowDocModal(false)}>
         <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -630,6 +519,62 @@ export default function TopicDetailScreen() {
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Modal — Analyse IA */}
+      <Modal visible={!!analysisDocId} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAnalysisDocId(null)}>
+        <View className="flex-1 bg-white">
+          <View className="flex-row items-center justify-between px-4 py-5 border-b border-gray-100">
+            <View className="flex-row items-center gap-3">
+              <View className="w-9 h-9 bg-[#EEF7F1] rounded-full items-center justify-center">
+                <Ionicons name="sparkles-outline" size={18} color="#235037" />
+              </View>
+              <View>
+                <Text className="text-base font-semibold text-gray-900">Analyse IA</Text>
+                <Text className="text-xs text-gray-500 max-w-[220px]" numberOfLines={1}>{analysisDocName}</Text>
+              </View>
+            </View>
+            <TouchableOpacity onPress={() => { setAnalysisDocId(null); setAnalysisResult(null); setAnalysisError(null) }}>
+              <Ionicons name="close" size={22} color="#6B7280" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView className="flex-1 px-4 py-5">
+            {analysisLoading ? (
+              <View className="items-center py-16">
+                <ActivityIndicator size="large" color="#235037" />
+                <Text className="text-sm text-gray-500 mt-4">Analyse en cours…</Text>
+                <Text className="text-xs text-gray-400 mt-1">Cela peut prendre quelques secondes.</Text>
+              </View>
+            ) : analysisError ? (
+              <View className="bg-red-50 rounded-2xl p-4 flex-row items-start gap-3">
+                <Ionicons name="alert-circle-outline" size={20} color="#EF4444" />
+                <View className="flex-1">
+                  <Text className="text-sm font-semibold text-red-700">Erreur</Text>
+                  <Text className="text-xs text-red-600 mt-1">{analysisError}</Text>
+                </View>
+              </View>
+            ) : analysisResult ? (
+              <View className="gap-5">
+                {analysisResult.split('\n## ').filter(Boolean).map((section, i) => {
+                  const lines = (i === 0 ? section.replace(/^## /, '') : section).split('\n')
+                  const title = lines[0].trim()
+                  const body = lines.slice(1).join('\n').trim()
+                  return (
+                    <View key={i}>
+                      <Text style={{ fontFamily: 'Jost_500Medium', fontSize: 11, color: '#235037', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
+                        {title}
+                      </Text>
+                      <Text style={{ fontFamily: 'Jost_300Light', fontSize: 14, color: '#5A6B61', lineHeight: 22 }}>
+                        {body}
+                      </Text>
+                    </View>
+                  )
+                })}
+              </View>
+            ) : null}
+          </ScrollView>
+        </View>
       </Modal>
     </>
   )

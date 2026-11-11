@@ -1,9 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { Receipt, FileText, TrendingUp, AlertCircle, Clock, Plus, ArrowRight, AlertTriangle } from 'lucide-react'
-import type { InvoicingStats, BillingDocument, Client, InvoiceStatus, QuotationStatus, MonthlyRevenueStat, ClientRevenueStat } from '@/types'
+import { Receipt, FileText, TrendingUp, AlertCircle, Clock, Plus, ArrowRight, AlertTriangle, Calculator, CalendarCheck } from 'lucide-react'
+import type { InvoicingStats, BillingDocument, Client, InvoiceStatus, QuotationStatus, MonthlyRevenueStat, ClientRevenueStat, MicroEntrepreneurPlafondStats } from '@/types'
 import { InvoiceStatusBadge, QuotationStatusBadge } from '@/components/InvoiceStatusBadge'
+import MicroEntrepreneurGauge from '@/components/MicroEntrepreneurGauge'
+
+interface UrssafData {
+  totalHT: number
+  period: string
+  dueDate: string
+  cotisationsEstimees: number
+  taux: number
+  activityType: 'services' | 'commerce' | 'mixte'
+  isMicroEntrepreneur: boolean
+}
 
 interface FacturationDashboardProps {
   stats: InvoicingStats
@@ -13,9 +24,11 @@ interface FacturationDashboardProps {
   year: number
   monthlyStats: MonthlyRevenueStat[]
   clientStats: ClientRevenueStat[]
+  meStats?: MicroEntrepreneurPlafondStats | null
+  urssafData?: UrssafData | null
 }
 
-export default function FacturationDashboard({ stats, recentInvoices, recentQuotations, hasProfile, year, monthlyStats, clientStats }: FacturationDashboardProps) {
+export default function FacturationDashboard({ stats, recentInvoices, recentQuotations, hasProfile, year, monthlyStats, clientStats, meStats, urssafData }: FacturationDashboardProps) {
   return (
     <div className="p-4 sm:p-8">
       <div className="max-w-6xl mx-auto">
@@ -47,6 +60,12 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
           </div>
         </div>
 
+        {/* Jauge plafond micro-entrepreneur */}
+        {meStats && <MicroEntrepreneurGauge stats={meStats} year={year} />}
+
+        {/* Widget URSSAF */}
+        {urssafData && <UrssafWidget data={urssafData} />}
+
         {/* Profile warning */}
         {!hasProfile && (
           <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 animate-fade-in">
@@ -75,7 +94,7 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
           <div className="card rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
-                <TrendingUp className="w-4.5 h-4.5 text-green-600" />
+                <TrendingUp className="w-[18px] h-[18px] text-green-600" />
               </div>
             </div>
             <span className="text-xs font-medium text-[#5A6B61]  uppercase tracking-wide">CA encaisse</span>
@@ -84,7 +103,7 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
           <div className="card rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Clock className="w-4.5 h-4.5 text-blue-600" />
+                <Clock className="w-[18px] h-[18px] text-blue-600" />
               </div>
             </div>
             <span className="text-xs font-medium text-[#5A6B61]  uppercase tracking-wide">En attente</span>
@@ -93,7 +112,7 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
           <div className="card rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center">
-                <AlertCircle className="w-4.5 h-4.5 text-red-600" />
+                <AlertCircle className="w-[18px] h-[18px] text-red-600" />
               </div>
             </div>
             <span className="text-xs font-medium text-[#5A6B61]  uppercase tracking-wide">Impayes</span>
@@ -102,7 +121,7 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
           <div className="card rounded-xl p-5">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-9 h-9 rounded-lg bg-[#EEF7F1] flex items-center justify-center">
-                <FileText className="w-4.5 h-4.5 text-[#235037]" />
+                <FileText className="w-[18px] h-[18px] text-[#235037]" />
               </div>
             </div>
             <span className="text-xs font-medium text-[#5A6B61]  uppercase tracking-wide">Documents</span>
@@ -223,6 +242,52 @@ export default function FacturationDashboard({ stats, recentInvoices, recentQuot
   )
 }
 
+function UrssafWidget({ data }: { data: UrssafData }) {
+  const { totalHT, period, dueDate, cotisationsEstimees, taux, activityType } = data
+  const dueDateFormatted = new Date(dueDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  const activityLabel = activityType === 'services' ? 'Prestations de services' : activityType === 'commerce' ? 'Ventes' : 'Mixte'
+  const isUrgent = new Date(dueDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+  return (
+    <div className="card rounded-2xl p-5 mb-6 animate-fade-in">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+          <Calculator className="w-4 h-4 text-blue-600" />
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold text-[#1a2e22]">Déclaration URSSAF</h2>
+          <p className="text-xs text-[#5A6B61]">{period} · {activityLabel}</p>
+        </div>
+        {isUrgent && (
+          <span className="ml-auto px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded-full">Bientôt</span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="bg-[#EEF7F1] rounded-xl p-3">
+          <div className="text-[10px] font-medium text-[#5A6B61] uppercase tracking-wide mb-1">CA HT déclaré</div>
+          <div className="text-base font-bold text-[#1a2e22]">{totalHT.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</div>
+        </div>
+        <div className="bg-blue-50 rounded-xl p-3">
+          <div className="text-[10px] font-medium text-[#5A6B61] uppercase tracking-wide mb-1">Cotisations ({(taux * 100).toFixed(1)}%)</div>
+          <div className="text-base font-bold text-blue-700">{cotisationsEstimees.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</div>
+        </div>
+        <div className={`rounded-xl p-3 ${isUrgent ? 'bg-amber-50' : 'bg-gray-50'}`}>
+          <div className="text-[10px] font-medium text-[#5A6B61] uppercase tracking-wide mb-1">Date limite</div>
+          <div className={`text-sm font-bold ${isUrgent ? 'text-amber-700' : 'text-[#1a2e22]'} flex items-center gap-1`}>
+            <CalendarCheck className="w-3.5 h-3.5" />
+            {dueDateFormatted}
+          </div>
+        </div>
+      </div>
+
+      <p className="text-xs text-[#5A6B61]">
+        Estimation basée sur vos factures payées et envoyées. Déclarez sur <a href="https://www.autoentrepreneur.urssaf.fr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">autoentrepreneur.urssaf.fr</a>.
+      </p>
+    </div>
+  )
+}
+
 function TopClientsChart({ clients }: { clients: ClientRevenueStat[] }) {
   const maxRevenue = Math.max(...clients.map((c) => c.totalRevenue), 1)
 
@@ -306,7 +371,7 @@ function MonthlyRevenueChart({ stats }: { stats: MonthlyRevenueStat[] }) {
               {m.revenue > 0 && (
                 <div
                   title={`Encaissé : ${m.revenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`}
-                  className="w-full rounded-t bg-[#EEF7F1]0 transition-all"
+                  className="w-full rounded-t bg-[#235037] transition-all"
                   style={{ height: `${revenueHeight}px` }}
                 />
               )}

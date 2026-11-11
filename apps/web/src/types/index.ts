@@ -125,12 +125,23 @@ export interface ProfessionalProfile {
   bic: string | null
   hourly_rate: number | null
   is_micro_entrepreneur: boolean
+  activity_type: 'services' | 'commerce' | 'mixte'
+  urssaf_frequency: 'mensuel' | 'trimestriel'
   logo_path: string | null
   invoice_prefix: string
   quotation_prefix: string
   default_payment_terms_days: number
   created_at: string
   updated_at: string
+}
+
+export interface MicroEntrepreneurPlafondStats {
+  caEncaisse: number
+  caAttente: number
+  threshold: number
+  projectedYearEnd: number | null
+  activityType: 'services' | 'commerce' | 'mixte'
+  monthsElapsed: number
 }
 
 export interface Client {

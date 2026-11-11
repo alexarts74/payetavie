@@ -15,6 +15,8 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
     siret: initialProfile?.siret ?? '',
     tva_number: initialProfile?.tva_number ?? '',
     is_micro_entrepreneur: initialProfile?.is_micro_entrepreneur ?? false,
+    activity_type: initialProfile?.activity_type ?? 'services' as 'services' | 'commerce' | 'mixte',
+    urssaf_frequency: initialProfile?.urssaf_frequency ?? 'trimestriel' as 'mensuel' | 'trimestriel',
     address_line1: initialProfile?.address_line1 ?? '',
     address_line2: initialProfile?.address_line2 ?? '',
     postal_code: initialProfile?.postal_code ?? '',
@@ -41,6 +43,8 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
         siret: form.siret.trim() || null,
         tva_number: form.tva_number.trim() || null,
         is_micro_entrepreneur: form.is_micro_entrepreneur,
+        activity_type: form.activity_type,
+        urssaf_frequency: form.urssaf_frequency,
         address_line1: form.address_line1.trim() || null,
         address_line2: form.address_line2.trim() || null,
         postal_code: form.postal_code.trim() || null,
@@ -139,6 +143,53 @@ export default function ProfilProfessionnelContent({ initialProfile }: ProfilPro
                   </span>
                 </label>
               </div>
+
+              {form.is_micro_entrepreneur && (
+                <>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-[#5A6B61] mb-2">
+                      Type d&apos;activité
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {(['services', 'commerce', 'mixte'] as const).map(type => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => set('activity_type', type)}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                            form.activity_type === type
+                              ? 'bg-[#235037] text-white'
+                              : 'bg-white border border-[#E8E8E8] text-[#5A6B61] hover:bg-[#EEF7F1]'
+                          }`}
+                        >
+                          {type === 'services' ? 'Services (77 700 €)' : type === 'commerce' ? 'Commerce (188 700 €)' : 'Mixte'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-[#5A6B61] mb-2">
+                      Fréquence déclarations URSSAF
+                    </label>
+                    <div className="flex gap-2">
+                      {(['trimestriel', 'mensuel'] as const).map(freq => (
+                        <button
+                          key={freq}
+                          type="button"
+                          onClick={() => set('urssaf_frequency', freq)}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                            form.urssaf_frequency === freq
+                              ? 'bg-[#235037] text-white'
+                              : 'bg-white border border-[#E8E8E8] text-[#5A6B61] hover:bg-[#EEF7F1]'
+                          }`}
+                        >
+                          {freq === 'trimestriel' ? 'Trimestriel' : 'Mensuel'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </section>
 

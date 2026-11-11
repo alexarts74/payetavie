@@ -3,12 +3,15 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { generateFiscalEvents } from '@payetavie/shared'
+import type { ProfileType, UrssafFrequency } from '@payetavie/shared'
 
 interface CalEvent {
   id: string
   title: string
   date: string
-  type: 'reminder' | 'document' | 'overdue'
+  type: 'reminder' | 'document' | 'overdue' | 'fiscal'
+  description?: string
 }
 
 const MONTH_NAMES = [
@@ -52,8 +55,10 @@ export default function CalendarScreen() {
     const startStr = isoDate(start)
     const endStr = isoDate(end)
     const todayStr = isoDate(today)
+    const calYear = year
+    const calMonth = month + 1 // generateFiscalEvents uses 1-indexed months
 
-    const [reminders, documents] = await Promise.all([
+    const [reminders, documents, prefs, profile] = await Promise.all([
       supabase
         .from('reminders')
         .select('id, title, due_date, topic_slug')
@@ -68,6 +73,16 @@ export default function CalendarScreen() {
         .not('expires_at', 'is', null)
         .gte('expires_at', startStr)
         .lte('expires_at', endStr),
+      supabase
+        .from('user_preferences')
+        .select('profile_type')
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('professional_profiles')
+        .select('is_micro_entrepreneur, urssaf_frequency')
+        .eq('user_id', user.id)
+        .maybeSingle(),
     ])
 
     const all: CalEvent[] = []
@@ -86,6 +101,21 @@ export default function CalendarScreen() {
         title: d.name,
         date: d.expires_at.split('T')[0],
         type: 'document',
+      })
+    }
+
+    // Événements fiscaux selon le profil
+    const profileType = (prefs.data?.profile_type as ProfileType) || 'autre'
+    const isMicroEntrepreneur = profile.data?.is_micro_entrepreneur ?? false
+    const urssafFrequency = (profile.data?.urssaf_frequency as UrssafFrequency) || 'trimestriel'
+
+    for (const fe of generateFiscalEvents(calYear, calMonth, profileType, isMicroEntrepreneur, urssafFrequency)) {
+      all.push({
+        id: fe.id,
+        title: fe.title,
+        date: fe.date,
+        type: 'fiscal',
+        description: fe.description,
       })
     }
 
@@ -128,6 +158,7 @@ export default function CalendarScreen() {
     reminder: '#f97316',
     document: '#a855f7',
     overdue: '#ef4444',
+    fiscal: '#3b82f6',
   }
 
   return (
@@ -216,6 +247,10 @@ export default function CalendarScreen() {
             <View className="w-3 h-3 rounded-full bg-red-500" />
             <Text className="text-xs text-gray-500">En retard</Text>
           </View>
+          <View className="flex-row items-center gap-1.5">
+            <View className="w-3 h-3 rounded-full bg-blue-500" />
+            <Text className="text-xs text-gray-500">Fiscal</Text>
+          </View>
         </View>
 
         {/* Selected day events */}
@@ -236,9 +271,13 @@ export default function CalendarScreen() {
                   <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: DOT_COLORS[e.type] }} />
                   <View className="flex-1">
                     <Text className="text-gray-900 text-sm">{e.title}</Text>
-                    <Text className="text-xs text-gray-400 mt-0.5">
-                      {e.type === 'document' ? 'Document expirant' : e.type === 'overdue' ? 'Rappel en retard' : 'Rappel'}
-                    </Text>
+                    {e.description ? (
+                      <Text className="text-xs text-gray-400 mt-0.5">{e.description}</Text>
+                    ) : (
+                      <Text className="text-xs text-gray-400 mt-0.5">
+                        {e.type === 'document' ? 'Document expirant' : e.type === 'overdue' ? 'Rappel en retard' : e.type === 'fiscal' ? 'Échéance fiscale' : 'Rappel'}
+                      </Text>
+                    )}
                   </View>
                 </View>
               ))

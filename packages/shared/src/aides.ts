@@ -1,0 +1,245 @@
+import type { ProfileType } from './types'
+
+export interface Aide {
+  id: string
+  titre: string
+  description: string
+  montantMax?: string
+  organisme: string
+  url?: string
+  eligibleProfiles: ProfileType[]
+  conditions: string[]
+  categorie: 'logement' | 'emploi' | 'sante' | 'famille' | 'formation' | 'independant'
+}
+
+export const AIDES: Aide[] = [
+  {
+    id: 'apl',
+    titre: 'APL — Aide Personnalisée au Logement',
+    description: 'Aide mensuelle versée directement au bailleur pour réduire votre loyer. Calculée selon vos revenus, la zone géographique et la composition de votre foyer.',
+    montantMax: 'Jusqu\'à 400 €/mois',
+    organisme: 'CAF',
+    url: 'https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/logement/les-aides-au-logement',
+    eligibleProfiles: ['etudiant', 'salarie', 'recherche_emploi', 'autre'],
+    conditions: ['Locataire ou colocataire', 'Logement conventionné', 'Ressources sous plafond'],
+    categorie: 'logement',
+  },
+  {
+    id: 'rsa',
+    titre: 'RSA — Revenu de Solidarité Active',
+    description: 'Minimum social pour les personnes sans ressources ou avec de très faibles revenus. Garantit un niveau de vie minimum et favorise l\'insertion professionnelle.',
+    montantMax: '635 €/mois (personne seule)',
+    organisme: 'CAF',
+    url: 'https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/emploi-et-formation/le-revenu-de-solidarite-active-rsa',
+    eligibleProfiles: ['recherche_emploi', 'autre'],
+    conditions: ['25 ans ou plus (ou parent isolé)', 'Ressources inférieures au seuil', 'Résidence en France'],
+    categorie: 'emploi',
+  },
+  {
+    id: 'prime-activite',
+    titre: 'Prime d\'activité',
+    description: 'Complément de revenu pour les travailleurs à faibles revenus — salariés, indépendants ou apprentis. Versée mensuellement par la CAF.',
+    montantMax: 'Jusqu\'à 300 €/mois',
+    organisme: 'CAF',
+    url: 'https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/emploi-et-formation/la-prime-d-activite',
+    eligibleProfiles: ['salarie', 'independant', 'etudiant'],
+    conditions: ['Travailler en France', 'Avoir 18 ans ou plus', 'Ressources sous plafond'],
+    categorie: 'emploi',
+  },
+  {
+    id: 'are',
+    titre: 'ARE — Allocation de Retour à l\'Emploi',
+    description: 'Indemnité chômage versée par France Travail aux demandeurs d\'emploi ayant cotisé suffisamment. Remplace une partie de votre ancien salaire.',
+    montantMax: '75% du salaire journalier de référence',
+    organisme: 'France Travail',
+    url: 'https://www.francetravail.fr/candidat/vos-recherches/les-aides-a-la-formation-et-a-la-/les-aides-financieres/lallocation-daide-au-retour-a-lem.html',
+    eligibleProfiles: ['recherche_emploi'],
+    conditions: ['Involontairement privé d\'emploi', 'Avoir travaillé 6 mois sur les 24 derniers mois', 'Être inscrit à France Travail'],
+    categorie: 'emploi',
+  },
+  {
+    id: 'acre',
+    titre: 'ACRE — Aide à la Création ou Reprise d\'Entreprise',
+    description: 'Exonération partielle de cotisations sociales pendant la première année d\'activité pour les créateurs ou repreneurs d\'entreprise.',
+    montantMax: 'Exonération jusqu\'à 100% la 1ère année',
+    organisme: 'URSSAF',
+    url: 'https://www.service-public.fr/professionnels-entreprises/vosdroits/F23547',
+    eligibleProfiles: ['independant'],
+    conditions: ['Créer ou reprendre une entreprise', 'Ne pas avoir bénéficié de l\'ACRE dans les 3 dernières années', 'Répondre à l\'un des critères d\'éligibilité'],
+    categorie: 'independant',
+  },
+  {
+    id: 'arce',
+    titre: 'ARCE — Aide à la Reprise ou Création d\'Entreprise',
+    description: 'Versement en capital de 60% de vos droits ARE restants au lieu de les percevoir mensuellement, pour financer votre projet entrepreneurial.',
+    montantMax: '60% des droits ARE restants',
+    organisme: 'France Travail',
+    url: 'https://www.francetravail.fr/candidat/vos-recherches/les-aides-a-la-formation-et-a-la-/les-aides-financieres/lare-aide-a-la-reprise-ou-creatio.html',
+    eligibleProfiles: ['recherche_emploi', 'independant'],
+    conditions: ['Bénéficiaire de l\'ARE', 'Créer ou reprendre une entreprise', 'Avoir obtenu l\'ACRE'],
+    categorie: 'independant',
+  },
+  {
+    id: 'exo-me',
+    titre: 'Exonération micro-entrepreneur',
+    description: 'Régime fiscal simplifié avec cotisations calculées sur le CA réel. Pas de CA = pas de charges. Idéal pour démarrer une activité avec peu de risque financier.',
+    organisme: 'URSSAF',
+    url: 'https://www.autoentrepreneur.urssaf.fr',
+    eligibleProfiles: ['independant'],
+    conditions: ['CA inférieur aux plafonds (77 700 € services, 188 700 € commerce)', 'Régime micro-fiscal'],
+    categorie: 'independant',
+  },
+  {
+    id: 'css',
+    titre: 'CSS — Complémentaire Santé Solidaire',
+    description: 'Mutuelle gratuite ou quasi gratuite pour les personnes à faibles revenus. Couvre les soins non remboursés par l\'Assurance Maladie.',
+    montantMax: 'Gratuite ou max 1 €/jour',
+    organisme: 'Assurance Maladie',
+    url: 'https://www.ameli.fr/assure/droits-demarches/difficultes-acces-soins-situation-handicap/complementaire-sante-solidaire',
+    eligibleProfiles: ['recherche_emploi', 'etudiant', 'autre'],
+    conditions: ['Ressources sous plafond', 'Résider en France depuis plus de 3 mois'],
+    categorie: 'sante',
+  },
+  {
+    id: 'cej',
+    titre: 'CEJ — Contrat d\'Engagement Jeune',
+    description: 'Accompagnement intensif et allocation mensuelle pour les jeunes éloignés de l\'emploi. Jusqu\'à 500 €/mois pour faciliter l\'insertion professionnelle.',
+    montantMax: 'Jusqu\'à 528 €/mois',
+    organisme: 'France Travail',
+    url: 'https://www.francetravail.fr/candidat/vos-recherches/le-contrat-dengagement-jeune.html',
+    eligibleProfiles: ['etudiant', 'recherche_emploi'],
+    conditions: ['16 à 25 ans (29 ans si handicap)', 'Sans emploi ni formation', 'Prêt à s\'engager dans le dispositif'],
+    categorie: 'emploi',
+  },
+  {
+    id: 'cpf',
+    titre: 'CPF — Compte Personnel de Formation',
+    description: 'Crédit en euros utilisable pour financer une formation professionnelle. Se cumule chaque année et ne se perd pas si vous changez d\'emploi.',
+    montantMax: '500 €/an (800 € pour non-qualifiés)',
+    organisme: 'Caisse des Dépôts',
+    url: 'https://www.moncompteformation.gouv.fr',
+    eligibleProfiles: ['salarie', 'recherche_emploi', 'independant'],
+    conditions: ['Travailler ou chercher un emploi en France', 'Formation éligible CPF'],
+    categorie: 'formation',
+  },
+  {
+    id: 'bourse-enseignement-sup',
+    titre: 'Bourse d\'enseignement supérieur',
+    description: 'Aide financière de l\'État pour les étudiants dont les parents ont des ressources modestes. Couvre une partie des frais de vie et de scolarité.',
+    montantMax: "Jusqu'à 7 300 €/an",
+    organisme: 'CROUS',
+    url: 'https://www.etudiant.gouv.fr/fr/bourse-sur-criteres-sociaux-531',
+    eligibleProfiles: ['etudiant'],
+    conditions: ['Inscrit dans un établissement d\'enseignement supérieur', 'Revenus des parents sous plafond', 'Âge inférieur à 28 ans'],
+    categorie: 'formation',
+  },
+  {
+    id: 'mobili-jeune',
+    titre: 'Mobili-Jeune',
+    description: 'Aide au logement pour les jeunes de moins de 30 ans en alternance, pour financer leur hébergement pendant leur contrat.',
+    montantMax: '100 €/mois',
+    organisme: 'Action Logement',
+    url: 'https://www.actionlogement.fr/l-aide-mobili-jeune',
+    eligibleProfiles: ['etudiant'],
+    conditions: ['Moins de 30 ans', 'En alternance (apprentissage ou contrat pro)', 'Locataire'],
+    categorie: 'logement',
+  },
+  {
+    id: 'pass-navigo-reduit',
+    titre: 'Pass Navigo réduit',
+    description: 'Réduction sur le Pass Navigo en Île-de-France pour les demandeurs d\'emploi, les étudiants boursiers et les personnes à faibles revenus.',
+    montantMax: '50% de réduction',
+    organisme: 'RATP / Île-de-France Mobilités',
+    url: 'https://www.iledefrance-mobilites.fr/titres-et-tarifs/detail/pass-navigo-annuel',
+    eligibleProfiles: ['recherche_emploi', 'etudiant'],
+    conditions: ['Résider en Île-de-France', 'Bénéficier d\'une des tarifications sociales'],
+    categorie: 'emploi',
+  },
+  {
+    id: 'aide-permis',
+    titre: 'Aide au permis de conduire',
+    description: 'Prêt à taux zéro ou financement partiel du permis B pour les jeunes de 15 à 25 ans via l\'apprentissage de la conduite accompagnée.',
+    montantMax: '1 200 €',
+    organisme: 'État / Région',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F21089',
+    eligibleProfiles: ['etudiant', 'recherche_emploi'],
+    conditions: ['15 à 25 ans (selon dispositif)', 'Sous conditions de ressources'],
+    categorie: 'formation',
+  },
+  {
+    id: 'allocation-retraite',
+    titre: 'ASPA — Allocation de Solidarité aux Personnes Âgées',
+    description: 'Minimum vieillesse pour les retraités dont la pension est inférieure à un seuil minimum. Garantit un revenu minimum à la retraite.',
+    montantMax: '1 012 €/mois (personne seule)',
+    organisme: 'Caisse de retraite',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F16871',
+    eligibleProfiles: ['autre'],
+    conditions: ['Avoir l\'âge légal de départ à la retraite', 'Ressources inférieures au plafond', 'Résider en France'],
+    categorie: 'famille',
+  },
+  {
+    id: 'aah',
+    titre: 'AAH — Allocation aux Adultes Handicapés',
+    description: 'Aide financière pour compenser la perte de revenus liée à un handicap, garantissant un revenu minimum aux personnes en situation de handicap.',
+    montantMax: '1 016 €/mois',
+    organisme: 'CAF / MSA',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F12242',
+    eligibleProfiles: ['recherche_emploi', 'salarie', 'autre'],
+    conditions: ['Taux d\'incapacité ≥ 80% (ou 50 à 79% avec restriction emploi)', 'Âge entre 20 et 60 ans', 'Ressources sous plafond'],
+    categorie: 'sante',
+  },
+  {
+    id: 'fsl',
+    titre: 'FSL — Fonds de Solidarité pour le Logement',
+    description: 'Aide du département pour les ménages en difficulté à payer leur loyer, charges, factures d\'énergie ou caution lors d\'une entrée dans un logement.',
+    organisme: 'Département / CAF',
+    url: 'https://www.service-public.fr/particuliers/vosdroits/F1334',
+    eligibleProfiles: ['recherche_emploi', 'salarie', 'autre'],
+    conditions: ['Difficultés financières avérées', 'Résider dans le département', 'Faire la demande auprès du CCAS ou de la CAF'],
+    categorie: 'logement',
+  },
+  {
+    id: 'aide-creation-auto',
+    titre: 'NACRE — Nouvel Accompagnement pour la Création d\'Entreprise',
+    description: 'Accompagnement gratuit sur 3 ans pour la création ou reprise d\'entreprise : aide au montage du dossier, financement et développement.',
+    organisme: 'BpiFrance / État',
+    url: 'https://bpifrance-creation.fr/encyclopedie/financements-aides/aides-publiques/nacre',
+    eligibleProfiles: ['recherche_emploi', 'independant'],
+    conditions: ['Bénéficiaire de certaines allocations (ARE, RSA, etc.)', 'Projet de création ou reprise viable'],
+    categorie: 'independant',
+  },
+  {
+    id: 'aide-renov',
+    titre: 'MaPrimeRénov\'',
+    description: 'Aide pour financer des travaux de rénovation énergétique dans votre logement : isolation, chauffage, ventilation… Montant variable selon revenus et travaux.',
+    montantMax: 'Jusqu\'à 70% du montant des travaux',
+    organisme: 'ANAH',
+    url: 'https://www.maprimerenov.gouv.fr',
+    eligibleProfiles: ['salarie', 'recherche_emploi', 'autre'],
+    conditions: ['Propriétaire occupant ou bailleur', 'Logement de plus de 15 ans', 'Travaux réalisés par un artisan RGE'],
+    categorie: 'logement',
+  },
+  {
+    id: 'caf-garde-enfant',
+    titre: 'CMGE — Complément Mode de Garde',
+    description: 'Aide pour financer la garde de vos enfants de moins de 6 ans : assistante maternelle, garde à domicile ou crèche. Réduction significative du coût de garde.',
+    montantMax: 'Jusqu\'à 85% des dépenses',
+    organisme: 'CAF',
+    url: 'https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/petite-enfance/les-modes-de-garde',
+    eligibleProfiles: ['salarie', 'independant', 'recherche_emploi', 'etudiant', 'autre'],
+    conditions: ['Enfant de moins de 6 ans', 'Mode de garde déclaré', 'Revenus sous plafond'],
+    categorie: 'famille',
+  },
+]
+
+export function getAidesForProfile(profileType: ProfileType): Aide[] {
+  return AIDES.filter(aide => aide.eligibleProfiles.includes(profileType))
+}
+
+export function getAidesParCategorie(aides: Aide[]): Record<string, Aide[]> {
+  return aides.reduce((acc, aide) => {
+    if (!acc[aide.categorie]) acc[aide.categorie] = []
+    acc[aide.categorie].push(aide)
+    return acc
+  }, {} as Record<string, Aide[]>)
+}

@@ -37,6 +37,8 @@ export interface Bookmark {
 }
 
 export type ProfileType = 'etudiant' | 'salarie' | 'independant' | 'recherche_emploi' | 'autre'
+export type ActivityType = 'services' | 'commerce' | 'mixte'
+export type UrssafFrequency = 'mensuel' | 'trimestriel'
 
 export type HousingSituation = 'locataire' | 'proprietaire' | 'parents' | 'residence_etudiante' | 'heberge'
 
@@ -125,6 +127,8 @@ export interface ProfessionalProfile {
   bic: string | null
   hourly_rate: number | null
   is_micro_entrepreneur: boolean
+  activity_type: ActivityType
+  urssaf_frequency: UrssafFrequency
   logo_path: string | null
   invoice_prefix: string
   quotation_prefix: string

@@ -23,6 +23,8 @@ interface ProfessionalProfile {
   quotation_prefix: string | null
   hourly_rate: number | null
   is_micro_entrepreneur: boolean
+  activity_type: 'services' | 'commerce' | 'mixte'
+  urssaf_frequency: 'mensuel' | 'trimestriel'
 }
 
 const EMPTY_PROFILE: Omit<ProfessionalProfile, 'user_id'> = {
@@ -40,6 +42,8 @@ const EMPTY_PROFILE: Omit<ProfessionalProfile, 'user_id'> = {
   quotation_prefix: null,
   hourly_rate: null,
   is_micro_entrepreneur: false,
+  activity_type: 'services',
+  urssaf_frequency: 'trimestriel',
 }
 
 export default function ProfilProfessionnelScreen() {
@@ -94,6 +98,8 @@ export default function ProfilProfessionnelScreen() {
       quotation_prefix: form.quotation_prefix || null,
       hourly_rate: form.hourly_rate,
       is_micro_entrepreneur: form.is_micro_entrepreneur,
+      activity_type: form.activity_type,
+      urssaf_frequency: form.urssaf_frequency,
     }
     const { data, error } = await supabase
       .from('professional_profiles')
@@ -223,6 +229,42 @@ export default function ProfilProfessionnelScreen() {
                     trackColor={{ true: '#2563eb' }}
                   />
                 </View>
+                {form.is_micro_entrepreneur && (
+                  <>
+                    <View className="gap-1.5">
+                      <Text className="text-xs text-gray-500">Type d'activité</Text>
+                      <View className="flex-row gap-2 flex-wrap">
+                        {(['services', 'commerce', 'mixte'] as const).map(type => (
+                          <TouchableOpacity
+                            key={type}
+                            onPress={() => set('activity_type', type)}
+                            className={`px-3 py-1.5 rounded-lg ${form.activity_type === type ? 'bg-violet-600' : 'bg-gray-100'}`}
+                          >
+                            <Text className={`text-xs font-medium ${form.activity_type === type ? 'text-white' : 'text-gray-600'}`}>
+                              {type === 'services' ? 'Services (77 700 €)' : type === 'commerce' ? 'Commerce (188 700 €)' : 'Mixte'}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                    <View className="gap-1.5">
+                      <Text className="text-xs text-gray-500">Fréquence URSSAF</Text>
+                      <View className="flex-row gap-2">
+                        {(['trimestriel', 'mensuel'] as const).map(freq => (
+                          <TouchableOpacity
+                            key={freq}
+                            onPress={() => set('urssaf_frequency', freq)}
+                            className={`px-3 py-1.5 rounded-lg ${form.urssaf_frequency === freq ? 'bg-violet-600' : 'bg-gray-100'}`}
+                          >
+                            <Text className={`text-xs font-medium ${form.urssaf_frequency === freq ? 'text-white' : 'text-gray-600'}`}>
+                              {freq === 'trimestriel' ? 'Trimestriel' : 'Mensuel'}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </>
+                )}
               </FormSection>
 
               <FormSection title="Adresse">

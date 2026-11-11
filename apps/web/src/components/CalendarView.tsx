@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { ChevronLeft, ChevronRight, Calendar, Clock, FileText, X, Download, Link2, Copy, Check, RefreshCw } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, Clock, FileText, X, Download, Link2, Copy, Check, RefreshCw } from 'lucide-react'
 import { getCalendarEvents, CalendarEvent } from '@/app/actions/calendar'
 import { exportAllRemindersToIcs } from '@/app/actions/calendar-export'
 import { getOrCreateCalendarToken, regenerateCalendarToken } from '@/app/actions/calendar-tokens'
@@ -240,6 +240,7 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
             const dayEvents = day ? eventsByDay[day] || [] : []
             const hasReminder = dayEvents.some(e => e.type === 'reminder')
             const hasDocument = dayEvents.some(e => e.type === 'document')
+            const hasFiscal = dayEvents.some(e => e.type === 'fiscal')
             const hasOverdue = dayEvents.some(e => e.isOverdue)
 
             return (
@@ -276,6 +277,9 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
                     {hasDocument && (
                       <div className="w-1 h-1 rounded-full bg-[#D97706]" />
                     )}
+                    {hasFiscal && (
+                      <div className="w-1 h-1 rounded-full bg-blue-500" />
+                    )}
                   </div>
                 )}
               </button>
@@ -297,6 +301,10 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
         <div className="flex items-center gap-1 text-[10px] text-[#5A6B61]">
           <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
           <span>En retard</span>
+        </div>
+        <div className="flex items-center gap-1 text-[10px] text-[#5A6B61]">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          <span>Fiscal</span>
         </div>
       </div>
 
@@ -333,12 +341,16 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
                     }`}
                   >
                     <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
-                      event.isOverdue
-                        ? 'bg-red-100'
-                        : 'bg-[#EEF7F1]'
+                      event.type === 'fiscal'
+                        ? 'bg-blue-50'
+                        : event.isOverdue
+                          ? 'bg-red-100'
+                          : 'bg-[#EEF7F1]'
                     }`}>
                       {event.type === 'reminder' ? (
                         <Clock className={`w-4 h-4 ${event.isOverdue ? 'text-red-600' : 'text-[#235037]'}`} />
+                      ) : event.type === 'fiscal' ? (
+                        <CalendarDays className="w-4 h-4 text-blue-600" />
                       ) : (
                         <FileText className="w-4 h-4 text-[#D97706]" />
                       )}
@@ -348,12 +360,19 @@ export default function CalendarView({ initialYear, initialMonth }: CalendarView
                         <span className="text-sm font-medium text-[#1a2e22] truncate">
                           {event.title}
                         </span>
-                        {event.isOverdue && (
-                          <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-medium rounded">
+                        {event.type === 'fiscal' ? (
+                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded flex-shrink-0">
+                            Fiscal
+                          </span>
+                        ) : event.isOverdue && (
+                          <span className="px-1.5 py-0.5 bg-red-500 text-white text-xs font-medium rounded flex-shrink-0">
                             En retard
                           </span>
                         )}
                       </div>
+                      {event.description && (
+                        <p className="text-xs text-[#5A6B61] mb-0.5">{event.description}</p>
+                      )}
                       <div className="flex items-center gap-2 text-xs text-[#5A6B61]">
                         <span>{getTopicIcon(event.topicSlug)}</span>
                         <span>{getTopicTitle(event.topicSlug)}</span>

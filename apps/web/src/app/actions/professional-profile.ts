@@ -46,6 +46,8 @@ export async function upsertProfessionalProfile(profileData: {
   bic?: string | null
   hourly_rate?: number | null
   is_micro_entrepreneur?: boolean
+  activity_type?: 'services' | 'commerce' | 'mixte'
+  urssaf_frequency?: 'mensuel' | 'trimestriel'
   logo_path?: string | null
   invoice_prefix?: string
   quotation_prefix?: string

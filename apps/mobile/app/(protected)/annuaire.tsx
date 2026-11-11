@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { View, Text, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { router } from 'expo-router'
-import { requirePlan } from '@/lib/subscription'
 
 interface AnnuaireRecord {
   id: string
@@ -42,42 +40,11 @@ function parseJsonField(raw: string | null): string | null {
 }
 
 export default function AnnuaireScreen() {
-  const [allowed, setAllowed] = useState<boolean | null>(null)
   const [codePostal, setCodePostal] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [results, setResults] = useState<AnnuaireRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
-
-  useEffect(() => {
-    requirePlan('essentiel').then(r => setAllowed(r.allowed))
-  }, [])
-
-  if (allowed === null) {
-    return (
-      <View className="flex-1 bg-[#F5E9AF] items-center justify-center">
-        <ActivityIndicator size="large" color="#235037" />
-      </View>
-    )
-  }
-
-  if (!allowed) {
-    return (
-      <View className="flex-1 bg-[#F5E9AF] items-center justify-center px-6">
-        <View className="w-20 h-20 bg-violet-50 rounded-full items-center justify-center mb-4">
-          <Ionicons name="lock-closed-outline" size={36} color="#235037" />
-        </View>
-        <Text className="text-xl font-semibold text-gray-900 text-center">Fonctionnalité Essentiel</Text>
-        <Text className="text-gray-500 text-center mt-2">L'annuaire des administrations est disponible à partir du plan Essentiel.</Text>
-        <TouchableOpacity
-          className="bg-violet-600 rounded-2xl px-6 py-3 mt-6"
-          onPress={() => router.push('/(protected)/pricing')}
-        >
-          <Text className="text-white font-semibold">Voir les plans</Text>
-        </TouchableOpacity>
-      </View>
-    )
-  }
 
   async function search() {
     if (!codePostal || codePostal.length !== 5 || selectedCategory === null) return

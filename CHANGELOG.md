@@ -4,6 +4,103 @@ Historique des features implémentées, par ordre antichronologique.
 
 ---
 
+## 2026-11-11 — UX navigation mobile — Hub profil + actions rapides dynamiques
+
+### A — Écran Profil restructuré en hub de navigation
+- Nouvelle section "Accès rapide" après l'avatar : Annuaire, Clients, Facturation, Profil pro
+- Annuaire : visible pour tous, badge "Essentiel" + redirection pricing si plan free
+- Freelance (Clients, Facturation, Profil pro) : visible si plan pro, sinon bloc "Espace Freelance" avec lock + bouton "Passer Pro"
+- Fix couleurs : toutes les occurrences `violet-*` remplacées par le design system (`#235037` / `#EBA7CB` / `#FDEEF6`)
+
+### B — Dashboard quick actions dynamiques selon plan
+- Base : Topics, Calendrier, Budget (3 actions pour tous)
+- Essentiel+ : ajout Annuaire
+- Pro : ajout Facturation
+- Suppression du doublon "Documents → Topics" (même route que "Topics")
+
+### C — Enregistrement screen `aides` dans le layout protégé
+- `_layout.tsx` : ajout `<Tabs.Screen name="aides" />` avec `href: null`
+
+---
+
+## 2026-11-11 — Phase 2 : SaaS — Bookmarks, Annuaire libre, URSSAF, Aides & IA documents
+
+### A — Suppression des Bookmarks
+- Supprimés de toutes les pages topics web (×10), du dashboard (stat card Favoris), et du mobile `[slug].tsx`
+- `getDashboardStats` : champ `totalBookmarks` retiré
+
+### B — Annuaire accessible à tous les plans
+- Lien Annuaire visible pour tous (free, essentiel, pro) dans la sidebar web et sur mobile
+- Suppression du gate `canAccessEssentiel` dans `NavLinks.tsx` et `annuaire/layout.tsx`
+- Mobile : suppression du check `requirePlan` dans `annuaire.tsx`
+
+### C — Widget URSSAF (Micro-entrepreneurs)
+- Nouveau widget "Déclaration URSSAF" sur le dashboard Facturation (web + mobile)
+- Calcule automatiquement le CA HT de la période (mensuel ou trimestriel selon fréquence)
+- Affiche le taux de cotisations estimé (22,1% services / 12,8% commerce) et le montant à déclarer
+- Affiche la date limite de déclaration
+- Visible uniquement si `is_micro_entrepreneur = true`
+
+### D — Assistant IA documents (plan Pro)
+- Bouton "Analyser" (icône Sparkles) sur chaque document dans la section Documents (web + mobile)
+- API route `POST /api/documents/analyze` : auth pro, fetch fichier depuis Supabase Storage, analyse via **Groq** (gratuit)
+  - Images (JPG/PNG) : `llama-3.2-11b-vision-preview` avec base64
+  - PDFs : extraction texte via `pdf-parse` + `llama-3.1-8b-instant`
+- Synthèse structurée : Type de document, Points clés, Alertes, Actions recommandées
+- **Quota mensuel : 10 analyses/mois** par utilisateur Pro, remis à zéro le 1er du mois
+- Compteur affiché dans la modal ("X analyses restantes ce mois")
+- Plan free/essentiel : UpgradePrompt affiché à la place
+- Modal `DocumentAnalysisModal` (web) + bottom sheet natif (mobile)
+- Migrations `013_documents_last_analyzed_at.sql` + `014_ai_quota.sql`
+- Variable d'env requise : `GROQ_API_KEY` (clé gratuite sur console.groq.com)
+
+### E — Moteur d'aides & droits (tous plans)
+- 20 aides publiques françaises dans `packages/shared/src/aides.ts` : APL, RSA, Prime d'activité, ARE, ACRE, ARCE, CPF, CSS, CEJ, CMGE, Bourse sup, Mobili-Jeune, Pass Navigo, Aide permis, ASPA, AAH, FSL, NACRE, MaPrimeRénov', Exo ME
+- Filtrage automatique par `profile_type` (étudiant, salarié, indépendant, recherche d'emploi, autre)
+- Filtres par catégorie (logement, emploi, santé, famille, formation, indépendant)
+- Toggle "Voir toutes les aides" / "Mon profil uniquement"
+- Cards expandables avec description, conditions et lien vers le site officiel
+- Lien "Aides & droits" dans la sidebar (web) pour tous les plans
+- Route `/aides` (web) + écran `aides.tsx` (mobile)
+
+---
+
+## 2026-11-11 — Calendrier fiscal automatique + Jauge plafond micro-entrepreneur
+
+### Calendrier fiscal automatique
+- Nouveau type d'événement `fiscal` (point bleu) dans le calendrier web et mobile
+- Génération automatique des échéances selon le profil utilisateur, sans aucune configuration :
+  - **Tous profils** : Déclaration d'impôts (20 mai, date indicative)
+  - **Salarié** : Vérification acompte PAS (15 janvier)
+  - **Micro-entrepreneur trimestriel** : Déclarations URSSAF T1–T4 + CFE (15 déc)
+  - **Micro-entrepreneur mensuel** : Déclaration URSSAF chaque fin de mois
+  - **Chercheur d'emploi** : Actualisation France Travail chaque fin de mois
+  - **Étudiant** : Renouvellement aides CROUS (15 septembre)
+- Modal : description de l'échéance + badge bleu "Fiscal"
+- Parité web ↔ mobile complète
+
+### Jauge plafond micro-entrepreneur
+- Widget sur le dashboard Facturation (visible uniquement si `is_micro_entrepreneur = true`)
+- Barre de progression CA encaissé / CA total facturé / seuil annuel
+- Codes couleur : vert < 70%, orange 70–90%, rouge ≥ 90%
+- Projection CA fin d'année basée sur le rythme mensuel en cours
+- Alertes contextuelles selon le niveau d'approche du plafond
+- Parité web ↔ mobile complète
+
+### Profil professionnel — nouveaux champs ME
+- **Type d'activité** : services (77 700 €) / commerce (188 700 €) / mixte — calibre le bon seuil de la jauge
+- **Fréquence URSSAF** : trimestriel / mensuel — détermine les échéances dans le calendrier
+- Champs affichés uniquement quand "Micro-entrepreneur" est activé
+- Migration DB : `professional_profiles.activity_type`, `professional_profiles.urssaf_frequency`
+- Parité web ↔ mobile complète
+
+### Technique
+- Nouveau `packages/shared/src/fiscal-calendar.ts` : `generateFiscalEvents()` + `ME_THRESHOLDS` partagés web/mobile
+- Nouveaux types `@payetavie/shared` : `ActivityType`, `UrssafFrequency`, `FiscalEventData`
+- Nouveau type web : `MicroEntrepreneurPlafondStats`
+
+---
+
 ## 2026-11-09 — Stripe mobile : refresh + portail client
 
 - `apps/web/src/app/api/stripe/portal/route.ts` (nouveau) : endpoint GET `GET /api/stripe/portal?token=<access_token>` — valide le JWT Supabase, récupère le `stripe_customer_id` via service role, crée une session portail Stripe et redirige

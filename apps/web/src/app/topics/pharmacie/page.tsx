@@ -1,11 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getReminders } from '@/app/actions/reminders'
-import { getBookmarks } from '@/app/actions/bookmarks'
 import { getDocuments } from '@/app/actions/documents'
 import { getChecklistProgress } from '@/app/actions/checklists'
 import RemindersSection from '@/components/RemindersSection'
-import BookmarksSection from '@/components/BookmarksSection'
 import DocumentsSection from '@/components/DocumentsSection'
 import FAQModal from '@/components/FAQModal'
 import { getPredefinedReminders } from '@/lib/predefined-reminders'
@@ -25,7 +23,6 @@ export default async function PharmaciePage() {
 
   const topicSlug = 'pharmacie'
   const { data: reminders } = await getReminders(topicSlug)
-  const { data: bookmarks } = await getBookmarks(topicSlug)
   const { data: documents } = await getDocuments(topicSlug)
   const { data: checklistProgress } = await getChecklistProgress(topicSlug)
   const predefinedReminders = getPredefinedReminders(topicSlug)
@@ -131,15 +128,6 @@ export default async function PharmaciePage() {
         </div>
 
 
-        {/* Resources */}
-        <BookmarksSection
-          topicSlug={topicSlug}
-          initialBookmarks={bookmarks || []}
-          resources={topic.resources}
-          plan={plan}
-          bookmarksCount={(bookmarks ?? []).length}
-          bookmarksLimit={limits.bookmarksPerTopic}
-        />
       </div>
 
       {/* Modal FAQ */}

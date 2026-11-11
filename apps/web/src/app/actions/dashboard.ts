@@ -79,7 +79,6 @@ export async function getDashboardStats() {
       overdueReminders: 0,
       totalDocuments: 0,
       expiringDocuments: 0,
-      totalBookmarks: 0,
     }
   }
 
@@ -123,19 +122,12 @@ export async function getDashboardStats() {
     .gte('expires_at', today)
     .lte('expires_at', thirtyDaysFromNowStr)
 
-  // Compter les favoris
-  const { count: totalBookmarks } = await supabase
-    .from('bookmarks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-
   return {
     totalReminders: totalReminders || 0,
     activeReminders: activeReminders || 0,
     overdueReminders: overdueReminders || 0,
     totalDocuments: totalDocuments || 0,
     expiringDocuments: expiringDocuments || 0,
-    totalBookmarks: totalBookmarks || 0,
   }
 }
 

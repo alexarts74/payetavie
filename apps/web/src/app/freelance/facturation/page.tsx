@@ -1,4 +1,4 @@
-import { getInvoicingStats, getInvoices, getMonthlyRevenueStats, getClientRevenueStats } from '@/app/actions/invoices'
+import { getInvoicingStats, getInvoices, getMonthlyRevenueStats, getClientRevenueStats, getMicroEntrepreneurPlafondStats, getUrssafDeclaration } from '@/app/actions/invoices'
 import { getQuotations } from '@/app/actions/quotations'
 import { getProfessionalProfile } from '@/app/actions/professional-profile'
 import FacturationDashboard from '@/components/FacturationDashboard'
@@ -34,7 +34,8 @@ const faq = [
 export default async function FacturationPage() {
   const currentYear = new Date().getFullYear()
 
-  const [{ data: stats }, { data: recentInvoices }, { data: recentQuotations }, { data: profile }, { data: monthlyStats }, { data: clientStats }] =
+  const currentQuarter = Math.ceil((new Date().getMonth() + 1) / 3)
+  const [{ data: stats }, { data: recentInvoices }, { data: recentQuotations }, { data: profile }, { data: monthlyStats }, { data: clientStats }, { data: meStats }, { data: urssafData }] =
     await Promise.all([
       getInvoicingStats(currentYear),
       getInvoices({ year: currentYear }),
@@ -42,6 +43,8 @@ export default async function FacturationPage() {
       getProfessionalProfile(),
       getMonthlyRevenueStats(currentYear),
       getClientRevenueStats(currentYear),
+      getMicroEntrepreneurPlafondStats(currentYear),
+      getUrssafDeclaration(currentYear, currentQuarter),
     ])
 
   return (
@@ -54,6 +57,8 @@ export default async function FacturationPage() {
         year={currentYear}
         monthlyStats={monthlyStats}
         clientStats={clientStats}
+        meStats={meStats}
+        urssafData={urssafData}
       />
       <FAQModal faq={faq} />
     </>

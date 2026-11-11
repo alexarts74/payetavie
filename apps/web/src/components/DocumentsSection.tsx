@@ -3,9 +3,10 @@
 import { useState, useRef } from 'react'
 import { uploadDocument, deleteDocument, updateDocument } from '@/app/actions/documents'
 import type { Document } from '@/types'
-import { FileText, Upload, X, Download, Calendar, Edit2, Trash2, Check, X as XIcon } from 'lucide-react'
+import { FileText, Upload, X, Download, Calendar, Edit2, Trash2, Check, X as XIcon, Sparkles } from 'lucide-react'
 import type { PlanName } from '@/types'
 import UpgradePrompt from '@/components/UpgradePrompt'
+import DocumentAnalysisModal from '@/components/DocumentAnalysisModal'
 
 // Extended document type with optional employer_name and document_type fields
 type ExtendedDocument = Document & {
@@ -229,6 +230,7 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
   const needsCategory = isPayslipTopic || isLogementTopic || isAssurancesTopic
   const [selectedCategory, setSelectedCategory] = useState<string | 'all'>('all')
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [analysisModal, setAnalysisModal] = useState<{ id: string; name: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -638,6 +640,13 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
                         </div>
                       </div>
                       <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => setAnalysisModal({ id: doc.id, name: doc.name })}
+                          className="p-2 rounded-lg hover:bg-[#EEF7F1] text-[#5A6B61] hover:text-[#235037] transition-all"
+                          title="Analyser avec l'IA"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                        </button>
                         <a
                           href={doc.public_url}
                           download
@@ -677,6 +686,16 @@ export default function DocumentsSection({ topicSlug, initialDocuments, plan, do
           onUpload={handleUploadFromModal}
           isUploading={isUploading}
           {...getModalConfig()}
+        />
+      )}
+
+      {analysisModal && (
+        <DocumentAnalysisModal
+          isOpen={true}
+          onClose={() => setAnalysisModal(null)}
+          documentId={analysisModal.id}
+          documentName={analysisModal.name}
+          plan={plan}
         />
       )}
     </div>

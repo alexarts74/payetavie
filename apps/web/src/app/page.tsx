@@ -182,19 +182,19 @@ export default async function Home() {
   ]
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#F5F5F0]">
       <ForceLightMode />
       <LandingNavbar />
 
       {/* ── Hero ── */}
-      <section id="hero" className="relative overflow-hidden pt-16">
+      <section id="hero" className="relative overflow-hidden pt-16" style={{ background: 'linear-gradient(135deg, #FDEEF6 0%, #F5E9AF 40%, #EEF7F1 100%)' }}>
         {/* Dot grid background */}
-        <div className="absolute inset-0 landing-dot-grid opacity-60" />
+        <div className="absolute inset-0 landing-dot-grid opacity-40" />
         {/* Background orbs */}
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
-        {/* Fade-out bottom edge */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+        {/* Fade-out bottom edge vers la section stats jaune */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#F5E9AF]/30 to-transparent pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-40 text-center">
           <div className="animate-fade-in">
@@ -251,7 +251,7 @@ export default async function Home() {
       </section>
 
       {/* ── Chiffres ── */}
-      <section id="chiffres" className="[scroll-margin-top:4rem] border-y border-zinc-100">
+      <section id="chiffres" className="[scroll-margin-top:4rem] bg-white border-y border-[#E8E8E8]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-[#E8E8E8]">
             {[
@@ -279,7 +279,7 @@ export default async function Home() {
       </section>
 
       {/* ── Fonctionnalités ── */}
-      <section id="fonctionnalites" className="py-20 sm:py-28 [scroll-margin-top:4rem]">
+      <section id="fonctionnalites" className="py-20 sm:py-28 [scroll-margin-top:4rem] bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 animate-slide-up">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -301,8 +301,7 @@ export default async function Home() {
                     <span className="absolute top-5 right-5 text-xs font-bold text-zinc-200 tabular-nums">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                      style={{ background: 'linear-gradient(135deg, #ede9fe, #e0e7ff)' }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 bg-[#EEF7F1]">
                       <Icon size={20} className="text-[#235037]" />
                     </div>
                     <h3 className="font-bold text-[#1a2e22] mb-2 group-hover:text-[#235037] transition-colors">{feat.title}</h3>
@@ -350,7 +349,7 @@ export default async function Home() {
       </section>
 
       {/* ── Comment ça marche ── */}
-      <section id="comment" className="py-20 sm:py-28 [scroll-margin-top:4rem]">
+      <section id="comment" className="py-20 sm:py-28 [scroll-margin-top:4rem] bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 animate-slide-up">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -384,7 +383,7 @@ export default async function Home() {
       </section>
 
       {/* ── Tarifs ── */}
-      <section id="tarifs" className="py-20 sm:py-28 bg-[#EEF7F1]/50 border-y border-[#E8E8E8] [scroll-margin-top:4rem]">
+      <section id="tarifs" className="py-20 sm:py-28 bg-[#F5E9AF]/30 border-y border-[#235037]/10 [scroll-margin-top:4rem]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14 animate-slide-up">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">
@@ -406,7 +405,7 @@ export default async function Home() {
                     : 'border border-zinc-100 bg-white'
                 }`}
                 style={plan.highlighted ? {
-                  background: 'linear-gradient(160deg, #faf5ff 0%, #eff6ff 50%, #faf5ff 100%)',
+                  background: 'linear-gradient(160deg, #EEF7F1 0%, #F5E9AF 50%, #EEF7F1 100%)',
                 } : {}}
               >
                 {plan.highlighted && (
@@ -482,7 +481,7 @@ export default async function Home() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-[#E8E8E8] py-10">
+      <footer className="border-t border-[#E8E8E8] py-10 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
